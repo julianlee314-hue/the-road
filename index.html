@@ -122,13 +122,25 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .expr .grp.going{opacity:.15}
 .expr .n.fresh{animation:pop .3s ease-out;color:var(--good)}
 @keyframes pop{0%{transform:scale(.6);opacity:.3}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-.op{border:0;background:var(--chip);color:var(--card-ink);box-shadow:inset 0 0 0 2px var(--chip-line),0 2px 0 var(--chip-line);border-radius:.18em;
-  font-family:var(--display);font-weight:800;font-size:1em;line-height:1;min-width:1.2em;padding:.08em .14em .12em;margin:0 .12em;vertical-align:.02em}
-.op.pow{font-size:.58em;vertical-align:1.05em;margin:0 .05em 0 .02em;min-width:1.25em;padding:.1em .18em}
+.op{border:0;background:var(--chip);color:var(--card-ink);box-shadow:inset 0 0 0 2px var(--chip-line),0 2px 0 var(--chip-line);border-radius:.22em;
+  font-family:var(--display);font-weight:800;font-size:1em;line-height:1;min-width:1.55em;min-height:1.55em;padding:.22em .28em .26em;margin:0 .16em;vertical-align:.02em;touch-action:manipulation}
+.op.pow{font-size:.62em;vertical-align:1.05em;margin:0 .08em 0 .04em;min-width:1.45em;min-height:1.45em;padding:.16em .22em}
 .op:active{transform:translateY(1px)}
 .op.right{background:var(--good);color:#fff;box-shadow:none}
 .op.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s}
 .op.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+/* streak speedometer: gauge fill tracks consecutive correct-order taps */
+.speedo{display:flex;align-items:center;gap:10px;background:var(--desk-2);border-radius:999px;padding:6px 12px 6px 8px;box-shadow:inset 0 0 0 1px var(--desk-line);min-width:0}
+.speedo .gauge{position:relative;width:52px;height:28px;border-radius:28px 28px 0 0;border:2px solid var(--desk-line);border-bottom:0;overflow:hidden;flex:0 0 auto;background:rgba(0,0,0,.12)}
+.speedo .gauge i{position:absolute;left:0;bottom:0;height:100%;width:0%;background:linear-gradient(90deg,#5b8cff,#3ecf8e 55%,#f5c542);transition:width .25s ease}
+.speedo .gauge.hot i{background:linear-gradient(90deg,#3ecf8e,#f5c542,#ff6b4a)}
+.speedo .read{display:flex;flex-direction:column;line-height:1;min-width:0}
+.speedo .read b{font-family:var(--display);font-weight:900;font-size:22px;font-variant-numeric:tabular-nums;color:var(--chalk)}
+.speedo .read span{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--chalk-dim);text-transform:uppercase}
+.speedo .flame{font-family:var(--display);font-weight:800;font-size:14px;color:#f5c542;white-space:nowrap;margin-left:auto}
+.speedo .flame.cold{color:var(--chalk-dim)}
+.expr .solved-mark{color:var(--good);display:inline-flex;align-items:center;gap:.25em}
+.expr .solved-mark::before{content:"✓";font-weight:900}
 @keyframes glow{50%{transform:scale(1.12)}}
 @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 .card.shake{animation:shake .3s}
@@ -270,9 +282,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
     </div>
     <p class="tip" id="tip">Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.</p>
     <div class="modes" id="modes">
-      <button class="big practice" id="goPractice"><b>Practice</b><span>No clock. Misses explain.</span></button>
-      <button class="big rally" id="goRally"><b>Rally</b><span id="rallyLine">Tap steps, drive far</span></button>
-      <button class="big forks" id="goForks"><b>Forks</b><span id="forksLine">Pick the lane, fast</span></button>
+      <button class="big practice" id="goPractice"><b>Practice</b><span>Tap the next operation. No clock.</span></button>
+      <button class="big rally" id="goRally"><b>Rally</b><span id="rallyLine">Tap ops, drive far</span></button>
+      <button class="big forks" id="goForks"><b>Sprint</b><span id="forksLine">Same taps, harder clock</span></button>
     </div>
     <div class="foot"><button class="ghost" id="goGarage">Garage</button><button class="ghost" id="goSettings">Settings</button></div>
   </section>
@@ -281,8 +293,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
   <section class="view" id="vPlay" hidden>
     <div class="hud">
       <button class="ghost" id="quit">← Stop</button>
-      <div class="mid"><span class="pen" id="clockWrap">⏱ <b id="clock">0:40</b><i id="penalty">−10</i></span><span id="sA"></span><span id="sB"></span></div>
+      <div class="mid"><span class="pen" id="clockWrap">⏱ <b id="clock">0:40</b><i id="penalty">−10</i></span><span id="sA"></span><span id="sB" hidden></span></div>
     </div>
+    <div class="speedo" id="speedo" aria-live="polite" aria-label="Speedometer"><div class="gauge" id="gauge"><i id="gaugeFill"></i></div><div class="read"><b id="spdNum">0</b><span>km/h</span></div><span class="flame cold" id="flame">streak 0</span></div>
     <div class="roadwrap" id="roadWrap" hidden><canvas id="road" aria-hidden="true"></canvas></div>
     <div class="cps" id="cps"></div>
     <div class="stage"><div class="card" id="card"><div class="meta"><span id="metaL"></span><span id="metaR"></span></div><div class="exprbox" id="box"><div class="expr" id="expr"></div></div></div></div>
@@ -6191,45 +6204,64 @@ function fit() {
 }
 window.addEventListener('resize', () => { if (!$('vPlay').hidden) fit(); });
 
-/* ---------- a run ----------
-   Practice: the card alone, no clock. Rally: tap the next step on the card while the car drives. Forks: the road splits
-   into 2, then 4, then 8 lanes and you pick the sign with the next step. Runs score distance: streaks speed the car up,
-   higher levels drive faster, a miss costs time. Everything is timed by the clock, never by frames. */
+/* ---------- a run (Precedence / Permit) ----------
+   Pedagogy: tap the next operation ON the expression itself — never multiple-choice cards.
+   Practice: no clock; road + speedometer still react to streak. Rally: clock + distance.
+   Sprint (mode key still "forks"): same expression taps under a harder clock — no highway-sign MCQ.
+   Correct tap collapses that sub-expression; streak speeds the car; a miss sputters and resets streak.
+   Algebra licenses 2+ still use sign cards (aStart / aPick). */
 let G = null, raf = 0;
 const racing = () => G && G.mode !== 'practice';
 function start(mode) {
   if (S.lic !== 1) return aStart(mode);
   ac();
   setOff(1);
-  G = { mode, level: S.level, tier: mode === 'forks' ? 1 : 0, clean: 0, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], ruleHits: {}, missRules: {},
-    clock: RALLY.start * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
+  // Sprint ("forks") starts one size tier up and with a tighter clock — still expression taps, never signs
+  const sprint = mode === 'forks';
+  G = { mode, level: S.level, tier: sprint ? 1 : 0, clean: 0, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], ruleHits: {}, missRules: {},
+    clock: (sprint ? Math.max(28, RALLY.start - 8) : RALLY.start) * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
   const run = mode !== 'practice';
-  $('signs').classList.remove('alg'); $('expr').className = 'expr';
-  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = !run; $('signs').hidden = mode !== 'forks';
-  $('vPlay').classList.toggle('racing', run);
+  $('signs').classList.remove('alg'); $('signs').innerHTML = ''; $('expr').className = 'expr';
+  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('signs').hidden = true; // Precedence: no MCQ signs
+  $('roadWrap').hidden = false; // road + speedometer always on for Permit
+  $('speedo').hidden = false;
+  $('vPlay').classList.toggle('racing', true);
   show('vPlay');
-  if (run) { RD.reset(); RD.setWorld(G.level <= 2 ? 'lamps' : 'circuit'); RD.setSpeed(0); RD.start(); } else RD.stop();
-  nextExpr(); if (run) loop();
+  RD.reset(); RD.setWorld(G.level <= 2 ? 'lamps' : 'circuit'); RD.setSpeed(0); RD.start();
+  nextExpr(); loop();
 }
 function nextExpr() {
   G.tree = E.generate(G.level, G.tier); G.exprMiss = 0; G.stepT = performance.now();
   $('card').classList.remove('done');
   $('metaL').textContent = `Level ${G.level} · ${E.LEVELS[G.level - 1].name}`;
   $('metaR').textContent = racing() ? `checkpoint ${G.cp + 1}` : `size ${E.countOps(G.tree)}`;
-  $('hint').innerHTML = G.solved ? '' : G.mode === 'forks' ? 'Pick the lane with the step that comes next.' : 'Tap the operation that comes next.';
+  $('hint').innerHTML = G.solved ? '' : 'Tap the <b>operation</b> that comes next on the expression.';
   render(); hud();
 }
 function render() {
-  $('expr').innerHTML = draw(G.tree, null, null); $('expr').classList.toggle('static', G.mode === 'forks'); fit();
-  if (G.mode === 'forks' && G.tree.t === 'o') fork();
+  // Precedence: expression always interactive; never static / never fork signs
+  $('expr').innerHTML = draw(G.tree, null, null); $('expr').classList.remove('static'); fit();
+  $('signs').hidden = true; $('signs').innerHTML = '';
 }
 function hud() {
   if (racing()) {
     const s = Math.max(0, Math.ceil(G.clock / 1000)); $('clock').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); $('clock').classList.toggle('low', s <= 10);
-    $('sA').innerHTML = `<b>${G.dist.toFixed(2)}</b> km`; $('sB').innerHTML = `<b>${Math.round(G.speed)}</b> km/h`;
+    $('sA').innerHTML = `<b>${G.dist.toFixed(2)}</b> km`;
     const per = G.alg ? G.alg.perCp : G.mode === 'forks' ? FORKS.perCp : RALLY.perCp;
     $('cps').innerHTML = Array.from({ length: per }, (_, i) => `<i class="${i < G.cpCount ? 'on' : ''}"></i>`).join('');
-  } else { $('sA').innerHTML = `<b>${G.solved}</b> solved`; $('sB').innerHTML = `<b>${G.streak}</b> streak`; }
+  } else { $('sA').innerHTML = `<b>${G.solved}</b> solved`; }
+  // speedometer always mirrors streak-driven road speed (Permit pedagogy)
+  if (!G.alg && !G.bench) {
+    const kmh = Math.round(G.speed || 0), maxK = Math.round((SPEED.base + SPEED.perStreak * SPEED.cap) * (SPEED.level[G.level - 1] || 1));
+    const pct = Math.max(0, Math.min(100, maxK ? 100 * kmh / maxK : 0));
+    $('spdNum').textContent = kmh;
+    const fill = $('gaugeFill'), gauge = $('gauge'), flame = $('flame');
+    fill.style.width = pct + '%';
+    gauge.classList.toggle('hot', G.streak >= 5);
+    flame.textContent = G.streak ? ('🔥 ' + G.streak) : 'streak 0';
+    flame.classList.toggle('cold', !G.streak);
+    $('speedo').hidden = false;
+  }
 }
 const targetSpeed = () => G.stalling ? 0 : (SPEED.base + SPEED.perStreak * Math.min(G.streak, SPEED.cap)) * (G.alg ? G.alg.k : SPEED.level[G.level - 1]);
 function loop() {
@@ -6237,11 +6269,14 @@ function loop() {
   const step = now => {
     if (!G || G.over) return;
     const dt = now - G.last; G.last = now;
-    if (!G.stalling) G.clock -= dt;
+    if (!G.stalling && racing()) G.clock -= dt; // Practice keeps the engine alive with no clock
     G.speed += (targetSpeed() - G.speed) * Math.min(1, dt / (G.stalling ? 450 : 600));
-    G.dist += G.speed * dt / 3.6e6; RD.setSpeed(G.speed);
-    const low = G.clock <= 10000; if (low !== G.lowSent) { G.lowSent = low; RD.on('time.low', low); }
-    if (G.clock <= 0 && !G.stalling) { G.clock = 0; G.stalling = true; G.stallAt = now; RD.on('run.failed'); SND.stall(); $('hint').innerHTML = '<b>Out of time.</b> The engine coughs…'; }
+    if (racing()) G.dist += G.speed * dt / 3.6e6;
+    RD.setSpeed(G.speed);
+    if (racing()) {
+      const low = G.clock <= 10000; if (low !== G.lowSent) { G.lowSent = low; RD.on('time.low', low); }
+      if (G.clock <= 0 && !G.stalling) { G.clock = 0; G.stalling = true; G.stallAt = now; RD.on('run.failed'); SND.stall(); $('hint').innerHTML = '<b>Out of time.</b> The engine coughs…'; }
+    }
     hud();
     if (G.stalling && now - G.stallAt > 1600) return finish();
     raf = requestAnimationFrame(step);
@@ -6254,18 +6289,21 @@ function good(ms, inPlay, id) {
   G.right++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms);
   inPlay.forEach(k => { const r = RS(G.level, k); r.right++; r.t.push(Math.round(ms)); if (r.t.length > 12) r.t.shift(); hit(k, true); });
   SND.right(G.streak);
-  if (racing()) { RD.on('decision.correct'); const d = id ? depthOf(G.tree, id) : 0; if (d) RD.on('tunnel', d); }
+  RD.on('decision.correct');
+  const d = id ? depthOf(G.tree, id) : 0; if (d) RD.on('tunnel', d);
 }
 function bad(id) {
   G.misses++; G.exprMiss++; G.streak = 0; SND.miss();
   const why = id ? E.reason(G.tree, id) : null;
   if (why) { const r = RS(G.level, why); r.wrong++; hit(why, false); G.missRules[why] = (G.missRules[why] || 0) + 1; }
-  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; G.clock -= RALLY.penalty * 1000; const p = $('penalty'); p.textContent = '−' + RALLY.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+  // sputter the engine on every wrong order tap (Practice included)
+  RD.on('decision.incorrect'); G.speed *= 0.45;
+  if (racing()) { G.clock -= RALLY.penalty * 1000; const p = $('penalty'); p.textContent = '−' + RALLY.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
   const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
   return RULES.find(r => r.k === why);
 }
 function tap(id) {
-  if (!G || G.over || G.busy || G.stalling || G.mode === 'forks') return;
+  if (!G || G.over || G.busy || G.stalling || G.alg || G.bench) return; // Precedence only; algebra/bench keep sign cards
   let eq = null; const legal = E.legal(G.tree), ms = performance.now() - G.stepT, inPlay = E.rulesInPlay(G.tree);
   G.taps++;
   const btn = document.querySelector(`.op[data-id="${id}"]`);
@@ -6360,15 +6398,14 @@ function logTap(id, kind) { const ops = E.opsInOrder(G.tree); S.log.push({ d: ne
 function hit(k, ok) { const h = G.ruleHits[k] || (G.ruleHits[k] = { right: 0, wrong: 0 }); ok ? h.right++ : h.wrong++; }
 function solvedExpr() {
   G.solved++; SND.solved(); if (!G.exprMiss) addOdo();
-  $('expr').innerHTML = `<span class="n fresh">${G.tree.v}</span>`; fit(); $('card').classList.add('done');
-  if (G.mode === 'forks') $('signs').innerHTML = '';
-  $('hint').innerHTML = G.exprMiss ? 'Solved.' : '<b>Clean.</b>';
+  $('expr').innerHTML = `<span class="n fresh solved-mark">${G.tree.v}</span>`; fit(); $('card').classList.add('done');
+  $('signs').innerHTML = '';
+  $('hint').innerHTML = G.exprMiss ? '<b style="color:var(--good)">✓ Solved.</b>' : '<b style="color:var(--good)">✓ Clean.</b>';
   const per = G.mode === 'forks' ? FORKS.perCp : RALLY.perCp;
   // size grows with clean solves in Practice, and with each checkpoint in a run
   if (G.mode === 'practice') { if (!G.exprMiss) { if (++G.clean >= 2) { G.tier = Math.min(4, G.tier + 1); G.clean = 0; } } else { G.clean = 0; if (G.exprMiss >= 2) G.tier = Math.max(0, G.tier - 1); } }
   else if (++G.cpCount >= per) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, RALLY.cpBonus - 2 * (G.cp - 1)); G.clock += bonus * 1000; G.tier = Math.min(4, G.tier + 1); SND.checkpoint(); RD.on('checkpoint');
-    const lanes = G.mode === 'forks' ? FORKS.lanes[Math.min(G.cp, FORKS.lanes.length - 1)] : 0;
-    $('hint').innerHTML = `<b>Checkpoint ${G.cp}!</b> +${bonus} seconds.` + (lanes > FORKS.lanes[Math.min(G.cp - 1, 2)] ? ` The road widens to ${lanes} lanes.` : ''); }
+    $('hint').innerHTML = `<b style="color:var(--good)">✓ Checkpoint ${G.cp}!</b> +${bonus} seconds.`; }
   else if (G.cpCount === per - 1) RD.on('checkpoint.near');
   hud(); G.busy = true; setTimeout(() => { G.busy = false; if (!G.over && !G.stalling) nextExpr(); }, 650);
 }
@@ -6379,7 +6416,7 @@ function finish() {
   const run = racing(), lv = G.level, acc = G.taps ? Math.round(100 * G.right / G.taps) : 0, m = med(G.times), mean = G.times.length ? G.times.reduce((a, b) => a + b, 0) / G.times.length : null;
   let record = false; const bests = S.bestKm[G.mode];
   if (run && G.dist > (bests[lv - 1] || 0)) { bests[lv - 1] = +G.dist.toFixed(2); record = true; }
-  save(); SND.end(); if (run) setTimeout(() => RD.stop(), 400);
+  save(); SND.end(); setTimeout(() => RD.stop(), 400);
   $('vDone').classList.toggle('arcade', run);
   $('rTitle').innerHTML = run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done';
   const lost = Object.keys(G.missRules).sort((a, b) => G.missRules[b] - G.missRules[a])[0], lostR = RULES.find(r => r.k === lost);
@@ -6459,6 +6496,7 @@ function aStart(mode, tune, test) {
     clock: RALLY.start * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
   const run = mode !== 'practice';
   $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = !run; $('signs').hidden = false; $('signs').classList.add('alg');
+  $('speedo').hidden = true; // speedometer is Permit/Precedence pedagogy
   $('vPlay').classList.toggle('racing', run);
   show('vPlay');
   if (run) { RD.reset(); RD.setWorld(LICS[lic].world); RD.setSpeed(0); RD.start(); } else RD.stop();
@@ -6656,6 +6694,7 @@ function bStart() {
   ac(); G = { bench: { recent: [], requeue: [], first: 0, slow: {}, before: bOpen(), lv0: Object.fromEntries(BENCH.flatMap(([n, d]) => ['d', 'p'].map(k => [n + '/' + d + k, bLevel(n + '/' + d + k)]))) },
     mode: 'practice', n: 0, solved: 0, taps: 0, right: 0, times: [], streak: 0, bestStreak: 0, over: false, busy: false, misses: 0 };
   $('clockWrap').hidden = true; $('cps').hidden = true; $('roadWrap').hidden = true; $('signs').hidden = false; $('signs').classList.add('alg');
+  $('speedo').hidden = true;
   $('vPlay').classList.remove('racing'); RD.stop(); show('vPlay'); bNext();
 }
 function bNext() {
@@ -6723,7 +6762,7 @@ function renderHome() {
   $('licCard').hidden = true; $('levels').hidden = !prec; $('board').hidden = !prec; $('alv').hidden = prec || uc; $('ucBox').hidden = !uc; $('modes').hidden = uc; $('goRally').hidden = !prec; $('tip').hidden = uc;
   $('modes').style.gridTemplateColumns = prec ? '' : 'repeat(2,minmax(0,1fr))';
   $('licHead').innerHTML = prec || uc ? '' : `<b>Levels</b><span>World: ${WORLD_NAME[L.world]}</span>`;
-  $('goForks').querySelector('b').textContent = prec ? 'Forks' : 'Race';
+  $('goForks').querySelector('b').textContent = prec ? 'Sprint' : 'Race';
   if (uc) { $('licCard').hidden = true; $('ucBox').innerHTML = `<b>Mathera 2.0</b><span class="tip">${L.tease}. This plate keeps its place on the ladder and opens in Mathera 2.0, once the licenses below it are road-tested.</span>`; return; }
   if (!prec) {
     const cur = S.alv[lic] || 1;
@@ -6748,8 +6787,8 @@ function renderHome() {
   RULES.forEach(r => { h += `<div class="rn">${r.name}</div>` + [1, 2, 3, 4].map(l => { const L = ruleLevel(l, r.k), na = l === 1 && r.k !== 'brackets'; return `<div class="c${L ? ' l' + L : ''}" title="${r.name}, level ${l}"${na ? ' style="opacity:.35"' : ''}></div>`; }).join(''); });
   $('rb').innerHTML = h;
   const bk = m => S.bestKm[m][S.level - 1];
-  $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : 'Tap steps, drive far';
-  $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : '2, 4, then 8 lanes';
+  $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : 'Tap ops, drive far';
+  $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : 'Harder clock, same taps';
 }
 function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage'].forEach(x => $(x).hidden = x !== v); if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); }
 function renderGarage() {
