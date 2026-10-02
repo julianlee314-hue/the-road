@@ -129,6 +129,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .op.right{background:var(--good);color:#fff;box-shadow:none}
 .op.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s}
 .op.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+.op.sel{background:#fffefb;box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.45)}
 .op.dead{pointer-events:none;opacity:.55;box-shadow:none;background:transparent;min-width:0;min-height:0;padding:0;margin:0 .12em}
 /* algebra transform chips: same tan tile language as .op, never full next-line MCQ */
 .xchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0 2px}
@@ -1981,6 +1982,23 @@ function L2_5n() { // a negative fractional exponent: reciprocal, root, power
 }
 const mix = (...fs) => () => pick(fs)();
 
+
+function L2_intro() {
+  const b = 'x';
+  const cards = [
+    { kind: 'expr', rule: 'Same base, multiply: tap the two exponents. They add.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
+      wrongs: [W(P(V(b), 6), 'That multiplied the exponents. Multiplying powers adds them.'), W(P(V(b), 1), 'Multiplying powers adds the exponents: 3 + 2 = 5.'), W(M([N(2), P(V(b), 5)]), 'Nothing doubles: there is no 2 in front.')] }] },
+    { kind: 'expr', rule: 'Tap the two numbers in front (they multiply) and the two exponents (they add). Either pair first.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
+      wrongs: [W(cx(7, 7, b), 'The numbers multiply: 4 × 3, not 4 + 3.'), W(cx(12, 10, b), 'The exponents add when you multiply powers.'), W(cx(4, 7, b), 'Both numbers multiply in.')] }] },
+    { kind: 'expr', rule: 'Same base, divide: tap the two exponents. They subtract.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
+      wrongs: [W(P(V(b), 10), 'Dividing powers subtracts the exponents.'), W(P(V(b), -4), 'Top minus bottom: 7 − 3.'), W(P(V(b), 2), 'The exponents subtract; they don\'t divide.')] }] },
+    { kind: 'expr', rule: 'Power of a power: tap the two exponents. They multiply.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
+      wrongs: [W(P(V(b), 5), 'That adds them; a power of a power multiplies.'), W(P(V(b), 8), 'Multiply the exponents; don\'t raise one to the other.'), W(M([N(3), P(V(b), 2)]), 'The outer power repeats the bracket; it isn\'t a multiplier.')] }] }
+  ];
+  const i = (((G.L2IntroIx || 0) % 4) + 4) % 4;
+  return cards[i];
+}
+
 /* ---------- the ladder ---------- */
 const mk = (fn, kindHint) => () => { for (let i = 0; i < 50; i++) { const r = fn(); if (r) return finish(r); } throw new Error('generator failed'); };
 function finish(r) {
@@ -2002,7 +2020,7 @@ const LIC = [
     lv('f.mul', 'Multiply, cancel first'), lv('f.div', 'Divide'), lv('f.of', 'A fraction of an amount'), lv('f.fdp', 'Fractions, decimals, percents'), lv('f.order', 'Order of operations'),
     lv('f.letter', 'The same moves with a letter'), lv('f.cancel', 'Cancel factors, never terms'), lv('f.mix', 'Mixed review', null, { mix: 0 })] },
   null,
-  { name: 'Powers', levels: [lv('2.mul', 'Same base, multiply', L2_1, { old: 1 }), lv('2.div', 'Same base, divide', L2_2, { old: 2 }), lv('2.pow', 'Power of a power', mix(L2_3, L2_3, L2_3b, L2_3c), { old: 3 }), lv('2.neg', 'Zero and negative exponents', mix(L2_4, L2_4, L2_4, L2_4b), { old: 4 }), lv('2.frac', 'Fractional exponents', mix(L2_5, L2_5, L2_5n), { old: 5 }),
+  { name: 'Powers', levels: [lv('2.intro', 'What combines', L2_intro, { stamp: 4, tutorial: true }), lv('2.mul', 'Same base, multiply', L2_1, { old: 1 }), lv('2.div', 'Same base, divide', L2_2, { old: 2 }), lv('2.pow', 'Power of a power', mix(L2_3, L2_3, L2_3b, L2_3c), { old: 3 }), lv('2.neg', 'Zero and negative exponents', mix(L2_4, L2_4, L2_4, L2_4b), { old: 4 }), lv('2.frac', 'Fractional exponents', mix(L2_5, L2_5, L2_5n), { old: 5 }),
     lv('2.laws', 'All the laws at once'), lv('2.negbase', 'Negatives and fractions as bases'), lv('2.negfrac', 'Negative exponents in fractions'), lv('2.sci', 'Scientific notation'), lv('2.mix', 'Mixed review', null, { mix: 2 }),
     lv('2.rad', 'Radicals and fractional exponents', undefined, { after: 11 }), lv('2.calc', 'Rewrite for the power rule', undefined, { after: 17 })] },
   { name: 'Simplify', levels: [lv('3.like', 'Like terms', L3_1, { old: 1 }), lv('3.dist', 'Distribute', L3_2, { old: 2 }), lv('3.minus', 'Minus before a bracket', L3_3, { old: 3 }), lv('3.nest', 'Nested brackets', L3_4, { old: 4 }), lv('3.pow', 'Like terms with powers', L3_5, { old: 5 }),
@@ -2044,12 +2062,12 @@ function genOf(L) {
   if (cache[L.id] !== undefined) return cache[L.id];
   let g = null;
   if (L.review) g = () => rand() < 0.5 ? pick(built(9).filter(o => !o.mix && !o.review)).g() : pick(allBuilt()).g();
-  else if (L.mix != null) g = () => pick(built(L.mix).filter(o => o.mix == null && !o.L.after)).g();
+  else if (L.mix != null) g = () => pick(built(L.mix).filter(o => o.mix == null && !o.L.after && !o.L.tutorial)).g();
   else if (typeof L.gen === 'function') g = mk(L.gen);
   else if (typeof L.gen === 'string' && EXT[L.gen]) g = mk(EXT[L.gen]);
   return (cache[L.id] = g);
 }
-const built = lic => LIC[lic].levels.filter(L => !L.after && L.mix == null && !L.review && typeof L.gen !== 'object').map(L => ({ L, g: genOf(L), mix: L.mix, review: L.review })).filter(o => o.g);
+const built = lic => LIC[lic].levels.filter(L => !L.after && L.mix == null && !L.review && !L.tutorial && typeof L.gen !== 'object').map(L => ({ L, g: genOf(L), mix: L.mix, review: L.review })).filter(o => o.g);
 const allBuilt = () => LIC.map((l, i) => l && i ? built(i) : []).flat(); // the Fractions app (0) stays out of algebra reviews
 const ready = (lic, i) => { const L = LIC[lic].levels[i - 1]; if (!L) return false; if (L.mix != null) return built(L.mix).filter(o => o.mix == null && !o.L.after).length >= 2; return !!genOf(L); };
 function make(lic, i) { const L = LIC[lic].levels[i - 1], g = L && genOf(L); if (!g) throw new Error('level not built: ' + (L && L.id)); return g(); }
@@ -6409,6 +6427,289 @@ G.Levels.def({
 })(typeof window !== 'undefined' ? window : globalThis);
 
 
+
+/* Powers plate: tap the two pieces that combine (coefficients, exponents).
+   Other plates never call this. Legal pairs come from the tree, not from move text. */
+(function (G) {
+'use strict';
+const A = G.Alg;
+const Q = A.Q, qa = A.qa, qs = A.qs, qm = A.qm;
+
+function qshow(q) {
+  if (!q) return '?';
+  if (q.d === 1) return (q.n < 0 ? '−' + (-q.n) : String(q.n));
+  return (q.n < 0 ? '−' : '') + Math.abs(q.n) + '/' + q.d;
+}
+function clone(t) { return JSON.parse(JSON.stringify(t)); }
+function replaceAt(root, path, val) {
+  const c = clone(root);
+  if (!path.length) return val;
+  const set = (t, i) => {
+    if (i >= path.length) return val;
+    const p = path[i], n = Object.assign({}, t);
+    if (p.k === 'ai') { n.a = t.a.slice(); n.a[p.i] = set(t.a[p.i], i + 1); }
+    else n[p.k] = set(t[p.k], i + 1);
+    return n;
+  };
+  return set(c, 0);
+}
+function bkeyOf(node) {
+  let n = node;
+  if (n && n.t === '()') n = n.a;
+  if (!n) return null;
+  if (n.t === 'v') return 'v:' + n.s;
+  if (n.t === 'n' && n.v) return 'n:' + n.v.n + '/' + n.v.d;
+  return null;
+}
+function baseNode(key) {
+  if (key[0] === 'v') return A.V(key.slice(2));
+  const [n, d] = key.slice(2).split('/').map(Number);
+  return A.N(Q(n, d));
+}
+function buildMono(cQ, eQ, base, opt) {
+  opt = opt || {};
+  const dec = !!opt.dec, sym = opt.sym || '';
+  let pow = null;
+  if (eQ.n !== 0) {
+    const b = baseNode(base);
+    // coef ±1 keeps x^1 (generators write P(v, 1)); any other coef collapses it, like term()
+    const unit = (cQ.n === 1 || cQ.n === -1) && cQ.d === 1;
+    pow = (eQ.n === 1 && eQ.d === 1 && !unit) ? b : A.P(b, eQ.d === 1 ? eQ.n : eQ);
+  }
+  if (!pow) return A.N(cQ, dec);
+  if (cQ.n === 1 && cQ.d === 1) return pow;
+  if (cQ.n === -1 && cQ.d === 1 && sym === '') return A.Neg(pow);
+  return A.M([A.N(cQ, dec), pow], sym);
+}
+function exactDiv(a, b) {
+  if (!a || !b || !A.qint(a) || !A.qint(b) || b.n === 0) return null;
+  if (a.n % b.n !== 0) return null;
+  return Q(a.n / b.n);
+}
+function parseCore(n, path) {
+  if (!n || !n.t) return null;
+  if (n.t === 'neg') {
+    const inner = parseCore(n.a, path.concat([{ k: 'a' }]));
+    if (!inner || inner.cNode || !inner.base) return null;
+    return Object.assign({}, inner, { cQ: A.qneg(inner.cQ), cNode: null, dec: false });
+  }
+  if (n.t === 'v') return { cQ: Q(1), cNode: null, base: 'v:' + n.s, eQ: Q(1), eNode: null, dec: false, innerSym: '', bare: false };
+  if (n.t === '^' && n.e && n.e.t === 'n' && bkeyOf(n.a)) return { cQ: Q(1), cNode: null, base: bkeyOf(n.a), eQ: n.e.v, eNode: n.e, dec: false, innerSym: '', bare: false };
+  if (n.t === '*' && n.a && n.a.length === 2 && n.a[0].t === 'n' && (n.a[1].t === 'v' || (n.a[1].t === '^' && n.a[1].e && n.a[1].e.t === 'n' && bkeyOf(n.a[1].a)))) {
+    const pow = n.a[1];
+    const eNode = pow.t === '^' ? pow.e : null;
+    const eQ = pow.t === 'v' ? Q(1) : pow.e.v;
+    const base = pow.t === 'v' ? 'v:' + pow.s : bkeyOf(pow.a);
+    return { cQ: n.a[0].v, cNode: n.a[0], base, eQ, eNode, dec: !!n.a[0].dec, innerSym: n.sym || '', bare: false };
+  }
+  if (n.t === 'n') return { cQ: n.v, cNode: n, base: null, eQ: Q(0), eNode: null, dec: !!n.dec, innerSym: '', bare: true };
+  return null;
+}
+function parseFactor(node, path) {
+  if (node && node.t === '()') return parseCore(node.a, path.concat([{ k: 'a' }]));
+  return parseCore(node, path);
+}
+function addPair(pairs, seen, p) {
+  if (!p.aNode || !p.bNode || p.aNode === p.bNode) return;
+  const k = p.kind + ':' + (p.key || '');
+  if (seen.has(k)) return;
+  seen.add(k);
+  pairs.push(p);
+}
+function walk(node, path, pairs, seen) {
+  if (!node || !node.t) return;
+  if (node.t === '*' && node.a && node.a.length >= 2) analyzeProduct(node, path, pairs, seen);
+  if (node.t === '/') analyzeFrac(node, path, pairs, seen);
+  if (node.t === '^') analyzePow(node, path, pairs, seen);
+  if (Array.isArray(node.a)) node.a.forEach((c, i) => walk(c, path.concat([{ k: 'ai', i }]), pairs, seen));
+  else if (node.a && node.a.t) walk(node.a, path.concat([{ k: 'a' }]), pairs, seen);
+  if (node.b && node.b.t) walk(node.b, path.concat([{ k: 'b' }]), pairs, seen);
+  if (node.e && node.e.t) walk(node.e, path.concat([{ k: 'e' }]), pairs, seen);
+}
+function analyzeProduct(node, path, pairs, seen) {
+  const facts = node.a.map((f, i) => parseFactor(f, path.concat([{ k: 'ai', i }])));
+  const mult = [];
+  facts.forEach((f, i) => { if (f && f.cNode) mult.push(i); });
+  for (let a = 0; a < mult.length; a++) for (let b = a + 1; b < mult.length; b++) {
+    const i = mult[a], j = mult[b], f1 = facts[i], f2 = facts[j];
+    const prod = qm(f1.cQ, f2.cQ), dec = !!(f1.dec || f2.dec);
+    addPair(pairs, seen, {
+      kind: 'coef-mul', key: 'c' + i + ',' + j + '@' + path.map(p => p.k + (p.i != null ? p.i : '')).join('/'),
+      aNode: f1.cNode, bNode: f2.cNode, aRole: 'num', bRole: 'num',
+      move: qshow(f1.cQ) + ' × ' + qshow(f2.cQ) + ' = ' + qshow(prod),
+      rewrite(root) {
+        const next = node.a.map((raw, k) => {
+          if (k === i) return f1.bare ? A.N(prod, dec) : buildMono(prod, f1.eQ, f1.base, { dec, sym: f1.innerSym });
+          if (k === j) return f2.bare ? null : buildMono(Q(1), f2.eQ, f2.base, { sym: f2.innerSym });
+          return clone(raw);
+        }).filter(Boolean);
+        return putFactors(root, path, node, next);
+      }
+    });
+  }
+  const groups = {};
+  facts.forEach((f, i) => { if (f && f.base && f.eNode) (groups[f.base] = groups[f.base] || []).push(i); });
+  Object.keys(groups).forEach(base => {
+    const ix = groups[base];
+    for (let a = 0; a < ix.length; a++) for (let b = a + 1; b < ix.length; b++) {
+      const i = ix[a], j = ix[b], f1 = facts[i], f2 = facts[j];
+      const sum = qa(f1.eQ, f2.eQ);
+      addPair(pairs, seen, {
+        kind: 'exp-add', key: 'e' + i + ',' + j + base + '@' + path.map(p => p.k + (p.i != null ? p.i : '')).join('/'),
+        aNode: f1.eNode, bNode: f2.eNode, aRole: 'exp', bRole: 'exp',
+        move: qshow(f1.eQ) + ' + ' + qshow(f2.eQ) + ' = ' + qshow(sum),
+        rewrite(root) {
+          const merged = buildMono(f1.cQ, sum, base, { dec: f1.dec, sym: f1.innerSym || (base[0] === 'n' ? '×' : '') });
+          const rest = (f2.cQ.n === 1 && f2.cQ.d === 1) ? null : A.N(f2.cQ, f2.dec);
+          const next = [];
+          node.a.forEach((raw, k) => {
+            if (k === i) { next.push(merged); if (rest) next.push(rest); }
+            else if (k !== j) next.push(clone(raw));
+          });
+          return putFactors(root, path, node, next);
+        }
+      });
+    }
+  });
+}
+function purePow(t) {
+  if (!t) return false;
+  if (t.t === 'v' || t.t === '^') return true;
+  if (t.t === '()') return purePow(t.a);
+  return false;
+}
+function putFactors(root, path, node, next) {
+  if (next.length === 1) return replaceAt(root, path, next[0]);
+  let sym = node.sym || '';
+  // x^6 · y^2 is written x^6y^2 on the next line; a bare number still needs a dot (4x^7 · 3)
+  if (next.every(purePow)) sym = '';
+  else if (sym === '' && next.some(x => x.t === 'n') && next.some(x => x.t !== 'n')) sym = '·';
+  return replaceAt(root, path, { t: '*', a: next, sym });
+}
+function analyzeFrac(node, path, pairs, seen) {
+  const top = parseFactor(node.a, path.concat([{ k: 'a' }]));
+  const bot = parseFactor(node.b, path.concat([{ k: 'b' }]));
+  if (!top || !bot || !top.base || top.base !== bot.base) return;
+  const pk = path.map(p => p.k + (p.i != null ? p.i : '')).join('/');
+  if (top.eNode && bot.eNode) {
+    const diff = qs(top.eQ, bot.eQ);
+    addPair(pairs, seen, {
+      kind: 'exp-sub', key: 'es' + pk, aNode: top.eNode, bNode: bot.eNode, aRole: 'exp', bRole: 'exp',
+      move: qshow(top.eQ) + ' − ' + qshow(bot.eQ) + ' = ' + qshow(diff),
+      rewrite(root) {
+        const topNode = buildMono(top.cQ, diff, top.base, { dec: top.dec, sym: top.innerSym });
+        const botNode = (bot.cQ.n === 1 && bot.cQ.d === 1) ? null : A.N(bot.cQ, bot.dec);
+        const res = botNode ? (node.bar ? A.F(topNode, botNode) : A.Dv(topNode, botNode)) : topNode;
+        return replaceAt(root, path, res);
+      }
+    });
+  }
+  const q = top.cNode && bot.cNode ? exactDiv(top.cQ, bot.cQ) : null;
+  if (q) {
+    addPair(pairs, seen, {
+      kind: 'coef-div', key: 'cd' + pk, aNode: top.cNode, bNode: bot.cNode, aRole: 'num', bRole: 'num',
+      move: qshow(top.cQ) + ' ÷ ' + qshow(bot.cQ) + ' = ' + qshow(q),
+      rewrite(root) {
+        const topNode = top.bare ? A.N(q, top.dec || bot.dec) : buildMono(q, top.eQ, top.base, { dec: top.dec || bot.dec, sym: top.innerSym });
+        const botNode = bot.bare || !bot.base ? null : buildMono(Q(1), bot.eQ, bot.base, { sym: bot.innerSym });
+        const res = botNode ? (node.bar ? A.F(topNode, botNode) : A.Dv(topNode, botNode)) : topNode;
+        return replaceAt(root, path, res);
+      }
+    });
+  }
+}
+function pureInt(node) {
+  let n = node;
+  if (n && n.t === '()') n = n.a;
+  if (n && n.t === 'neg' && n.a && n.a.t === 'n' && A.qint(n.a.v)) return { q: A.qneg(n.a.v), node: n.a };
+  if (n && n.t === 'n' && A.qint(n.v)) return { q: n.v, node: n };
+  return null;
+}
+function analyzePow(node, path, pairs, seen) {
+  if (!node.e || node.e.t !== 'n') return;
+  let inner = node.a, ip = path.concat([{ k: 'a' }]);
+  while (inner && inner.t === '()') { inner = inner.a; ip = ip.concat([{ k: 'a' }]); }
+  const pk = path.map(p => p.k + (p.i != null ? p.i : '')).join('/');
+  if (inner && inner.t === '^' && inner.e && inner.e.t === 'n' && bkeyOf(inner.a)) {
+    const e1 = inner.e, e2 = node.e, prod = qm(e1.v, e2.v), key = bkeyOf(inner.a);
+    addPair(pairs, seen, {
+      kind: 'exp-mul', key: 'em' + pk, aNode: e1, bNode: e2, aRole: 'exp', bRole: 'exp',
+      move: qshow(e1.v) + ' × ' + qshow(e2.v) + ' = ' + qshow(prod),
+      rewrite(root) { return replaceAt(root, path, A.P(baseNode(key), prod.d === 1 ? prod.n : prod)); }
+    });
+  }
+  const mono = inner && parseCore(inner, ip);
+  if (mono && mono.cNode && mono.base && A.qint(node.e.v) && node.e.v.n !== 0 && node.e.v.n !== 1 && Math.abs(node.e.v.n) <= 8) {
+    const exp = node.e.v.n, c = mono.cQ;
+    addPair(pairs, seen, {
+      kind: 'coef-pow', key: 'cp' + pk, aNode: mono.cNode, bNode: node.e, aRole: 'num', bRole: 'exp',
+      move: 'The power reaches the ' + qshow(c),
+      rewrite(root) {
+        const coefPow = c.n < 0 ? A.P(A.B(A.N(c)), exp) : A.P(A.N(c, !!mono.dec), exp);
+        const b = baseNode(mono.base);
+        const varPow = (mono.eQ.n === 1 && mono.eQ.d === 1) ? A.P(b, exp) : A.P(A.B(A.P(b, mono.eQ.d === 1 ? mono.eQ.n : mono.eQ)), exp);
+        return replaceAt(root, path, A.M([coefPow, varPow]));
+      }
+    });
+  }
+  const bn = pureInt(inner);
+  if (bn && A.qint(node.e.v) && Math.abs(bn.q.n) !== 10) {
+    const e = node.e.v.n;
+    if (e !== 1 && Math.abs(e) <= 8 && Math.abs(bn.q.n) <= 30) {
+      const val = Math.pow(bn.q.n, e);
+      if (Number.isFinite(val) && Math.abs(val) <= 1e6 && Math.round(val) === val) {
+        addPair(pairs, seen, {
+          kind: 'eval', key: 'ev' + pk, aNode: bn.node, bNode: node.e, aRole: 'num', bRole: 'exp',
+          move: qshow(bn.q) + (e < 0 ? '^(−' + (-e) + ')' : '^' + e) + ' = ' + (val < 0 ? '−' + (-val) : String(val)),
+          rewrite(root) { return replaceAt(root, path, A.N(val)); }
+        });
+      }
+    }
+  }
+}
+function powerPairs(tree) {
+  const pairs = [], seen = new Set();
+  try { walk(tree, [], pairs, seen); } catch (e) { return []; }
+  return pairs;
+}
+function pairReaches(tree, target, depth, seen, budget) {
+  if (!tree || !target) return false;
+  let key, goal;
+  try { key = A.text(tree); goal = A.text(target); } catch (e) { return false; }
+  if (key === goal) return true;
+  if (!budget) budget = { n: 0 };
+  if ((depth || 0) > 4 || budget.n > 80) return false;
+  seen = seen || new Set();
+  if (seen.has(key)) return false;
+  seen.add(key);
+  const ps = powerPairs(tree);
+  for (let i = 0; i < ps.length; i++) {
+    budget.n++;
+    let n;
+    try { n = ps[i].rewrite(tree); } catch (e) { continue; }
+    if (pairReaches(n, target, (depth || 0) + 1, seen, budget)) return true;
+  }
+  seen.delete(key);
+  return false;
+}
+function safePairs(tree, targets) {
+  const all = powerPairs(tree);
+  if (!targets || !targets.length) return all;
+  return all.filter(p => {
+    let n;
+    try { n = p.rewrite(tree); } catch (e) { return false; }
+    if (!n) return false;
+    let now;
+    try { now = A.text(n); if (now === A.text(tree)) return false; } catch (e) { return false; }
+    return targets.some(t => { try { return pairReaches(n, t); } catch (e) { return false; } });
+  });
+}
+G.powerPairs = powerPairs;
+G.pairReaches = pairReaches;
+G.safePairs = safePairs;
+G.powersPlate = lic => lic === 2;
+})(typeof window !== 'undefined' ? window : globalThis);
+
 </script>
 <script>
 (function () {
@@ -6800,10 +7101,11 @@ function stampOf(id) {
 const isOpen = L => !L.after || S.openAll || !!S.earned[L.after];
 const playable = (lic, i) => { const L = lvAt(lic, i); return !!L && LV.ready(lic, i) && isOpen(L); };
 const coreIdx = lic => LV.LIC[lic].levels.map((L, i) => i + 1).filter(i => !lvAt(lic, i).after && LV.ready(lic, i));
-function licProgress(lic) { const c = coreIdx(lic); let n = 0, fad = 0; c.forEach(i => { const st = stampOf(lvAt(lic, i).id); if (st.n >= ALG.stamp) n++; if (st.fading && st.ever) fad++; }); return { n, of: c.length, fad }; }
+function needStamp(id) { for (let lic = 0; lic <= LV.LAST; lic++) { const row = LV.LIC[lic]; const L = row && row.levels.find(x => x.id === id); if (L) return L.stamp || ALG.stamp; } return ALG.stamp; }
+function licProgress(lic) { const c = coreIdx(lic); let n = 0, fad = 0; c.forEach(i => { const id = lvAt(lic, i).id, st = stampOf(id); if (st.n >= needStamp(id)) n++; if (st.fading && st.ever) fad++; }); return { n, of: c.length, fad }; }
 const afterName = L => L.parked ? 'Waits for ' + L.parked : LICS[L.after].uc ? `Comes back with ${LICS[L.after].math} in Mathera 2.0` : `Comes back after ${L.after} · ${LICS[L.after].math}`;
 // license classes: L (learner, half the levels stamped), ✓ (licensed: passed the road test), ★ (pro: passed the timed test)
-const fadedCore = lic => coreIdx(lic).filter(i => { const st = stampOf(lvAt(lic, i).id); return st.ever && st.n < ALG.stamp; });
+const fadedCore = lic => coreIdx(lic).filter(i => { const id = lvAt(lic, i).id, st = stampOf(id); return st.ever && st.n < needStamp(id); });
 const renewDue = lic => !!S.earned[lic] && fadedCore(lic).length >= 3;
 const licClass = lic => { const p = licProgress(lic); return S.pro[lic] ? '★' : S.earned[lic] ? '✓' : p.of && p.n * 2 >= p.of ? 'L' : ''; };
 const TESTS = { road: { total: 12, allow: 1, tier: 2, mode: 'practice' }, renew: { total: 6, allow: 1, tier: 1, mode: 'practice' }, pro: { total: 12, allow: 99, mode: 'race' } };
@@ -6888,12 +7190,15 @@ function aNext() {
     const [key, g] = G.tune[G.solved % G.tune.length], at = levelById(g.id);
     if (at) { G.alg.lic = at[0]; G.alg.lv = at[1]; G.alg.id = g.id; }
     for (let i = 0; i < 30; i++) { G.prob = LV.make(G.alg.lic, G.alg.lv); if (trapOnPath(G.prob, key)) break; }
-  } else for (let i = 0; i < 10; i++) { G.prob = LV.make(G.alg.lic, G.alg.lv); const k = A.text(G.prob.kind === 'sys' ? A.Sys(G.prob.start.lines) : G.prob.start.tree); if (!G.seen.has(k)) { G.seen.add(k); break; } }
-  G.step = G.prob.start; G.past = []; G.exprMiss = 0; G.stepT = performance.now();
+  } else if (G.alg.id === '2.intro') { window.L2IntroIx = G.introN || 0; G.prob = LV.make(G.alg.lic, G.alg.lv); }
+  else for (let i = 0; i < 10; i++) { G.prob = LV.make(G.alg.lic, G.alg.lv); const k = A.text(G.prob.kind === 'sys' ? A.Sys(G.prob.start.lines) : G.prob.start.tree); if (!G.seen.has(k)) { G.seen.add(k); break; } }
+  G.step = G.prob.start; G.past = []; G.exprMiss = 0; G.pairSel = null; G.stepT = performance.now();
   $('card').classList.remove('done');
   $('metaL').textContent = `${G.tune ? 'Tune-up · ' : G.test ? TEST_NAME[G.test.type] + ' ' + (G.test.done + 1) + '/' + G.test.total + ' · ' : ''}${lvCode(G.alg.lic, G.alg.lv)} · ${lvAt(G.alg.lic, G.alg.lv).name}`;
   $('metaR').textContent = racing() ? `checkpoint ${G.cp + 1}` : 'practice';
-  $('hint').innerHTML = G.solved ? '' : (stepIsPictorial(G.step) ? 'Pick the picture that matches.' : 'Tap the <b>next move</b>. The line simplifies in place.');
+  if (G.alg.id === '2.intro' && G.prob.rule) $('hint').innerHTML = G.prob.rule;
+  else if (window.powersPlate(G.alg.lic)) $('hint').innerHTML = '';
+  else $('hint').innerHTML = G.solved ? '' : (stepIsPictorial(G.step) ? 'Pick the picture that matches.' : 'Tap the <b>next move</b>. The line simplifies in place.');
   aRender(); hud();
 }
 // a system of lines reads one per line; an answer like x = 2, y = 3 stays on one
@@ -6904,13 +7209,25 @@ const lineHtml = t => t.t === 'sys' && !t.a.every(r => r.a && r.a[0].t === 'v' &
 function algTapHtml(t, bag, ctx) {
   bag = bag || { n: 0, nodes: [] };
   const btn = (sym, kind, node, aria) => {
+    if (bag.plainOps) {
+      if (kind === 'add' || kind === 'sub' || kind === 'mul' || kind === 'div') return ` ${sym} `;
+      return sym;
+    }
     const id = bag.n++;
     bag.nodes.push({ id, kind, node, sym });
     return `<button type="button" class="op" data-id="${id}" data-kind="${kind}" aria-label="${aria || sym}">${sym}</button>`;
   };
+  const atomBtn = (node, role, lab) => {
+    const id = bag.n++;
+    bag.nodes.push({ id, kind: 'atom', atom: true, node, role });
+    const aria = (role === 'exp' ? 'exponent ' : 'number ') + String(lab).replace(/<[^>]+>/g, '');
+    const cls = role === 'exp' ? 'op pow' : 'op';
+    return `<button type="button" class="${cls}" data-id="${id}" data-atom="1" aria-label="${aria}">${lab}</button>`;
+  };
+  const expPlain = e => e && e.t === 'n' && !A.qint(e.v) ? ((e.v.n < 0 ? A.MINUS : '') + Math.abs(e.v.n) + '/' + e.v.d) : A.html(e);
   if (!t) return '?';
   switch (t.t) {
-    case 'n': return A.html(t);
+    case 'n': return (bag.atomMap && bag.atomMap.has(t)) ? atomBtn(t, bag.atomMap.get(t) || 'num', A.html(t)) : A.html(t);
     case 'v': return `<i>${t.s}</i>`;
     case 'txt': return `<span class="tx">${A.html(t).replace(/<\/?span[^>]*>/g, '') || t.s}</span>`;
     case 'ec': return '<i>e</i>';
@@ -6937,6 +7254,7 @@ function algTapHtml(t, bag, ctx) {
     case '^': {
       const base = (t.a.t === 'v' || t.a.t === 'ec' || t.a.t === '()' || (t.a.t === 'n' && t.a.v && t.a.v.n >= 0))
         ? algTapHtml(t.a, bag) : '(' + algTapHtml(t.a, bag) + ')';
+      if (bag.atomMap && t.e && bag.atomMap.has(t.e)) return base + `<sup>${atomBtn(t.e, 'exp', expPlain(t.e))}</sup>`;
       const ex = algTapHtml(t.e, bag);
       return base + `<sup>${btn(ex.replace(/<[^>]+>/g, '') || '^', 'pow', t, 'power')}</sup>`;
     }
@@ -7020,10 +7338,10 @@ function bindTapTargets(bag, opts) {
   return map;
 }
 
-function aLine(interactive) {
+function aLine(interactive, extras) {
   const st = G.step, ex = $('expr');
   ex.className = 'expr math';
-  const bag = { n: 0, nodes: [] };
+  const bag = { n: 0, nodes: [], atomMap: extras && extras.atomMap, plainOps: !!(extras && extras.plainOps) };
   const drawCur = t => interactive ? algTapHtml(t, bag) : lineHtml(t);
   if (G.prob.kind === 'sys') {
     const L = st.lines || [], n0 = (G.prob.start.lines || []).length;
@@ -7072,32 +7390,46 @@ function aRender() {
   // algebraic step workout: expression ops + tan transform chips (never full next-line MCQ)
   const keep = shuffle(rights.slice()).slice(0, Math.max(1, Math.min(rights.length, n - 1)));
   const opts = shuffle(keep.concat(wrongs.slice(0, Math.max(1, n - keep.length))));
-  const bag = aLine(true);
-  const tapMap = bindTapTargets(bag, opts);
+  // Powers only: pair taps on coefficients and exponents. Other plates never get atom buttons.
+  G.pairSel = null;
+  let pairs = [];
+  if (window.powersPlate(G.alg.lic) && G.step.tree) { try { pairs = window.safePairs(G.step.tree, rights.map(o => o.tree)); } catch (e) { pairs = []; } }
+  const atomMap = pairs.length ? new WeakMap() : null;
+  if (atomMap) pairs.forEach(p => { atomMap.set(p.aNode, p.aRole || 'num'); atomMap.set(p.bNode, p.bRole || 'num'); });
+  const bag = aLine(true, { atomMap, plainOps: G.alg.id === '2.intro' && pairs.length > 0 });
+  const pairRight = new Set();
+  if (pairs.length) opts.forEach((o, i) => { if (o.ok) { try { if (window.pairReaches(G.step.tree, o.tree)) pairRight.add(i); } catch (e) {} } });
+  const bindOpts = opts.map((o, i) => pairRight.has(i) ? { ok: false, move: '', why: '' } : o);
+  const tapMap = bindTapTargets(bag, bindOpts);
   const covered = new Set(Object.values(tapMap).map(Number));
+  pairRight.forEach(i => covered.add(i));
   const rightsCovered = opts.some((o, i) => o.ok && covered.has(i));
+  const purePair = pairs.length > 0 && opts.some(o => o.ok) && opts.every((o, i) => !o.ok || pairRight.has(i));
   // Chips only for opts NOT already on the expression — never show the next line as an answer card.
-  // If every right is on-expression, chips hide entirely (pure tap-on-expression).
+  // If every right is on-expression (or a Powers pair), chips hide entirely.
   const chipIdx = opts.map((o, i) => i).filter(i => !covered.has(i));
   // Safety: if no right is on-expression, force chips for all opts so the step stays playable
-  const showIdx = rightsCovered ? chipIdx : opts.map((_, i) => i);
-  G.fork = { opts, mode: 'tap', tapMap, bag };
+  const showIdx = purePair ? [] : (rightsCovered ? chipIdx : opts.map((_, i) => i));
+  G.fork = { opts, mode: 'tap', tapMap, bag, pairs };
   const s = $('signs');
   s.classList.add('alg', 'xmode');
   if (!showIdx.length) {
     s.hidden = true; s.innerHTML = '';
-    if (!$('hint').innerHTML) $('hint').innerHTML = 'Tap the <b>operation</b> that comes next on the line.';
+    if (!$('hint').innerHTML) $('hint').innerHTML = pairs.length ? 'Tap the two pieces that combine.' : 'Tap the <b>operation</b> that comes next on the line.';
   } else {
     s.hidden = false;
     s.style.gridTemplateColumns = '1fr'; s.dataset.n = showIdx.length;
     s.innerHTML = `<div class="xchips">${showIdx.map(i => `<button type="button" class="xchip" data-i="${i}">${chipLabel(opts[i])}</button>`).join('')}</div>`;
-    if (!$('hint').innerHTML) $('hint').innerHTML = rightsCovered
+    if (!$('hint').innerHTML) $('hint').innerHTML = pairs.length ? 'Tap the two pieces that combine.' : rightsCovered
       ? 'Tap the <b>operation</b> on the line. Extra moves sit below if needed.'
       : 'Tap the <b>next move</b>. The line simplifies in place.';
   }
-  if (racing()) RD.on('fork', { lanes: Math.max(showIdx.length, Object.keys(tapMap).length) || opts.length });
-  // glow best right op on first problem of a run
-  if (!G.solved && rightsCovered) {
+  if (racing()) RD.on('fork', { lanes: Math.max(showIdx.length, Object.keys(tapMap).length, pairs.length) || opts.length });
+  // glow one legal pair (Powers) or the right op, on the first problem of a run
+  if (!G.solved && pairs.length) {
+    const p0 = pairs[0];
+    bag.nodes.forEach(nd => { if (nd.atom && (nd.node === p0.aNode || nd.node === p0.bNode)) { const b = document.querySelector(`.op[data-id="${nd.id}"]`); if (b) b.classList.add('hint'); } });
+  } else if (!G.solved && rightsCovered) {
     Object.entries(tapMap).forEach(([id, oi]) => { if (opts[+oi] && opts[+oi].ok) { const b = document.querySelector(`.op[data-id="${id}"]`); if (b) b.classList.add('hint'); } });
   }
   G.stepT = performance.now();
@@ -7138,14 +7470,55 @@ function aApply(i) {
   save(); hud();
 }
 function aPick(i) { aApply(i); }
+function glowPair(pair) {
+  if (!pair || !G.fork || !G.fork.bag) return;
+  G.fork.bag.nodes.forEach(nd => { if (nd.atom && (nd.node === pair.aNode || nd.node === pair.bNode)) { const b = document.querySelector(`.op[data-id="${nd.id}"]`); if (b) { b.classList.remove('hint'); void b.offsetWidth; b.classList.add('hint'); } } });
+}
+function aPairMiss(why) {
+  G.pairSel = null;
+  document.querySelectorAll('.op.sel').forEach(b => b.classList.remove('sel'));
+  G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
+  G.whys[why] = (G.whys[why] || 0) + 1; garageMiss(why);
+  S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: 'pair', r: 'miss' }); if (S.log.length > 300) S.log.shift();
+  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+  const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+  glowPair((G.fork.pairs || [])[0]);
+  $('hint').innerHTML = `<span class="why">${why}</span> The glowing pieces combine.`;
+  G.stepT = performance.now(); save(); hud();
+}
+function aAtom(entry) {
+  const sel = G.pairSel;
+  const btn = document.querySelector(`.op[data-id="${entry.id}"]`);
+  if (!sel) { G.pairSel = entry; if (btn) btn.classList.add('sel'); return; }
+  if (sel.node === entry.node) { G.pairSel = null; if (btn) btn.classList.remove('sel'); return; }
+  const pair = (G.fork.pairs || []).find(p => (p.aNode === sel.node && p.bNode === entry.node) || (p.bNode === sel.node && p.aNode === entry.node));
+  G.pairSel = null;
+  document.querySelectorAll('.op.sel').forEach(b => b.classList.remove('sel'));
+  if (!pair) return aPairMiss('Those pieces don\'t combine.');
+  let next;
+  try { next = pair.rewrite(G.step.tree); } catch (e) { return aPairMiss('Those pieces don\'t combine.'); }
+  if (!next || A.text(next) === A.text(G.step.tree)) return aPairMiss('Those pieces don\'t combine.');
+  const oi = G.fork.opts.findIndex(o => o.ok && !o.used && A.text(o.tree) === A.text(next));
+  G.fork.bag.nodes.forEach(nd => { if (nd.atom && (nd.node === pair.aNode || nd.node === pair.bNode)) { const b = document.querySelector(`.op[data-id="${nd.id}"]`); if (b) b.classList.add('right'); } });
+  if (oi >= 0) return aApply(oi);
+  const ms = performance.now() - G.stepT; G.taps++; G.right++; G.cpSteps++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms); SND.right(G.streak);
+  if (racing()) RD.on('decision.correct');
+  G.step.tree = next;
+  $('hint').innerHTML = `<span class="mv">✓ ${pair.move}</span>`;
+  G.busy = true; save(); hud();
+  setTimeout(() => { G.busy = false; if (G.over || G.stalling) return; aRender(); }, 280);
+}
 function aTap(id) {
   if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork || G.fork.mode !== 'tap') return;
+  const entry = (G.fork.bag && G.fork.bag.nodes || []).find(n => n.id === id);
+  if (entry && entry.atom) return aAtom(entry);
+  if (G.pairSel) { G.pairSel = null; document.querySelectorAll('.op.sel').forEach(b => b.classList.remove('sel')); }
   const oi = G.fork.tapMap && G.fork.tapMap[id];
   const btn = document.querySelector(`.op[data-id="${id}"]`);
   if (oi === undefined) {
     // tapping an op that isn't this step's move: soft nudge, not a miss (doesn't change the answer path)
     if (btn) { btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong'); setTimeout(() => btn.classList.remove('wrong'), 280); }
-    $('hint').innerHTML = '<span class="why">Not the move for this step.</span> Try the glowing operation — or a tan move below.';
+    $('hint').innerHTML = (G.fork.pairs && G.fork.pairs.length) ? '<span class="why">That operator isn\'t the combine.</span> Tap the two pieces that combine.' : '<span class="why">Not the move for this step.</span> Try the glowing operation — or a tan move below.';
     const rights = (G.fork.opts || []).map((o, i) => o.ok ? i : -1).filter(i => i >= 0);
     rights.forEach(k => {
       const rb = document.querySelector(`.xchip[data-i="${k}"]`); if (rb) { rb.classList.remove('hint'); void rb.offsetWidth; rb.classList.add('hint'); }
@@ -7163,10 +7536,12 @@ function aSolved() {
   if (racing()) { const fin = G.step.tree; if (fin.t === 'nl') RD.on('numline', fin); RD.on('satnav.progress', (G.cpCount + 1) / G.alg.perCp); }
   const id = G.alg.id;
   if (!G.exprMiss) { // a clean problem counts toward the level stamp and stops it fading
-    const had = stampOf(id), n = Math.min(ALG.stamp, had.n + 1);
-    S.stamps[id] = { n, t: Date.now(), ever: had.ever || n >= ALG.stamp };
-    if (had.n < ALG.stamp && n === ALG.stamp) { SND.checkpoint(); const lic = G.alg.lic, p = licProgress(lic), first = p.n === p.of && !S.earned[lic] && !G.test;
-      $('hint').innerHTML = first ? `<b>Road test open!</b> Every ${LICS[lic].math} level is stamped.` : had.ever ? `<b>Stamp restored.</b> ${lvCode(G.alg.lic, G.alg.lv)} is fresh again.` : `<b>Level ${lvCode(G.alg.lic, G.alg.lv)} stamped.</b> Ten clean problems.`; G.stamped = first ? 'roadopen' : 'level'; }
+    if (id === '2.intro') G.introN = (G.introN || 0) + 1;
+    const goal = needStamp(id), had = stampOf(id), n = Math.min(goal, had.n + 1);
+    S.stamps[id] = { n, t: Date.now(), ever: had.ever || n >= goal };
+    if (had.n < goal && n === goal) { SND.checkpoint(); const lic = G.alg.lic, p = licProgress(lic), first = p.n === p.of && !S.earned[lic] && !G.test;
+      const how = goal === 1 ? 'One clean problem.' : goal + ' clean problems.';
+      $('hint').innerHTML = first ? `<b>Road test open!</b> Every ${LICS[lic].math} level is stamped.` : had.ever ? `<b>Stamp restored.</b> ${lvCode(G.alg.lic, G.alg.lv)} is fresh again.` : `<b>Level ${lvCode(G.alg.lic, G.alg.lv)} stamped.</b> ${how}`; G.stamped = first ? 'roadopen' : 'level'; }
   }
   if (G.mode === 'practice') { if (!G.exprMiss) { if (++G.clean >= 3) { G.tier = Math.min(2, G.tier + 1); G.clean = 0; } } else { G.clean = 0; if (G.exprMiss >= 2) G.tier = Math.max(0, G.tier - 1); } }
   if (racing()) {
@@ -7183,7 +7558,7 @@ function testSolved() { // count the problem toward the test, and settle it once
   else if (t.done >= t.total) { t.pass = true;
     if (t.type === 'road') S.earned[t.lic] = today;
     if (t.type === 'pro') S.pro[t.lic] = today;
-    if (t.type === 'renew') t.ids.forEach(i => { const id = lvAt(t.lic, i).id; S.stamps[id] = { n: ALG.stamp, t: Date.now(), ever: true }; }); }
+    if (t.type === 'renew') t.ids.forEach(i => { const id = lvAt(t.lic, i).id; S.stamps[id] = { n: needStamp(id), t: Date.now(), ever: true }; }); }
   const left = t.allow - t.missed;
   if (t.pass === null && G.exprMiss && t.type !== 'pro') $('hint').innerHTML += left ? ' One slip used.' : ' No slips left.';
   save();
@@ -7205,7 +7580,7 @@ function aFinish() {
   $('rSolved').textContent = G.solved; $('rAcc').textContent = acc + '%'; $('rMed').textContent = fmt(m);
   const lv = G.alg.lv, lic = G.alg.lic, nextLv = G.tune || G.test ? null : nextPlayable(lic, lv), code = lvCode(lic, lv);
   const easy = nextLv && G.taps >= 10 && acc >= 90, st = stampOf(key).n;
-  const stampMsg = G.test ? testMsg(G.test) : G.tune ? `Tune-up done. ${hotParts().length} parts still in the garage.` : G.stamped === 'roadopen' ? `<b>Level ${code} stamped. The ${LICS[lic].plate} road test is open.</b>` : G.stamped === 'level' ? `<b>Level ${code} stamped.</b>` : st < ALG.stamp ? `Stamp for ${code}: ${st}/${ALG.stamp} clean problems.` : '';
+  const stampGoal = needStamp(key), stampMsg = G.test ? testMsg(G.test) : G.tune ? `Tune-up done. ${hotParts().length} parts still in the garage.` : G.stamped === 'roadopen' ? `<b>Level ${code} stamped. The ${LICS[lic].plate} road test is open.</b>` : G.stamped === 'level' ? `<b>Level ${code} stamped.</b>` : st < stampGoal ? `Stamp for ${code}: ${st}/${stampGoal} clean problems.` : '';
   $('rLine').innerHTML = $('rLine').textContent + (stampMsg ? `<br><span class="stmsg">${stampMsg}</span>` : '');
   $('rNudge').innerHTML = easy ? `<div class="nudge"><span>That went well. Ready for ${nextLv[0]}.${nextLv[1]}?</span><button id="upBtn">Try ${nextLv[0]}.${nextLv[1]}</button></div>` : '';
   if (easy) $('upBtn').addEventListener('click', () => { S.lic = nextLv[0]; S.alv[S.lic] = nextLv[1]; save(); start(G.mode); });
@@ -7338,12 +7713,12 @@ function renderHome() {
   if (uc) { $('licCard').hidden = true; $('ucBox').innerHTML = `<b>Mathera 2.0</b><span class="tip">${L.tease}. This plate keeps its place on the ladder and opens in Mathera 2.0, once the licenses below it are road-tested.</span>`; return; }
   if (!prec) {
     const cur = S.alv[lic] || 1;
-    const nextUp = coreIdx(lic).find(v => stampOf(lvAt(lic, v).id).n < ALG.stamp);
+    const nextUp = coreIdx(lic).find(v => { const id = lvAt(lic, v).id; return stampOf(id).n < needStamp(id); });
     $('alv').innerHTML = LV.LIC[lic].levels.map((L, i) => { const v = i + 1, code = lvCode(lic, v);
       if (!isOpen(L)) return `<button class="lvl locked" data-v="${v}" disabled><span class="ln">${code}</span><span class="tx"><span class="nm">${L.name}</span><span class="lk">🔒 ${afterName(L)}</span></span><span class="bs"></span></button>`;
       if (!LV.ready(lic, v)) return `<button class="lvl locked" data-v="${v}" disabled><span class="ln">${code}</span><span class="tx"><span class="nm">${L.name}</span><span class="lk">Coming soon</span></span><span class="bs"></span></button>`;
-      const b = S.abest[L.id], st = stampOf(L.id);
-      const stamp = st.n >= ALG.stamp && !st.fading ? '<span class="stp done">✓ stamped</span>' : st.fading && st.ever ? `<span class="stp fade">fading · ${st.n}/${ALG.stamp}</span>` : `<span class="stp${nextUp === v ? ' next' : ''}">${nextUp === v ? 'next · ' : ''}${st.n}/${ALG.stamp} clean</span>`;
+      const b = S.abest[L.id], st = stampOf(L.id), goal = needStamp(L.id);
+      const stamp = st.n >= goal && !st.fading ? '<span class="stp done">✓ stamped</span>' : st.fading && st.ever ? `<span class="stp fade">fading · ${st.n}/${goal}</span>` : `<span class="stp${nextUp === v ? ' next' : ''}">${nextUp === v ? 'next · ' : ''}${st.n}/${goal} clean</span>`;
       return `<button class="lvl${L.after ? ' back' : ''}" data-v="${v}" aria-pressed="${cur === v}"><span class="ln">${code}</span><span class="tx"><span class="nm">${L.name}${L.after ? ' <i class="cb">comeback</i>' : ''}</span><span class="ex math">${sample(lic, v)}</span></span><span class="bs">${stamp}${b && b.km ? '<br>best ' + b.km.toFixed(2) + ' km' : ''}</span></button>`; }).join('');
     const t = licTest(lic), cl = licClass(lic), lc = $('licCard'); lc.hidden = !t && !cl;
     lc.className = 'lcard' + (t ? t.type === 'renew' ? ' due' : ' on' : '');
