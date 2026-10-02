@@ -734,7 +734,26 @@ function create(canvas, opts) {
       P(cx - 5, y - 20, 10, 10, TYRE); P(cx - 3, y - 18, 6, 6, '#5a5a5a');
       wheel(cx - 21, y - 7, 7, spin); wheel(cx + 21, y - 7, 7, spin); return;
     }
-    // 9: the robotaxi: white, rounded, a sensor spinning on the roof
+    if (v === 9) { // the robotaxi: white, rounded, a sensor spinning on the roof
+      P(cx - 26, y - 6, 8, 6, TYRE); P(cx + 18, y - 6, 8, 6, TYRE);
+      P(cx - 24, y - 22, 48, 16, '#eef1f4'); P(cx - 26, y - 18, 52, 10, '#eef1f4'); P(cx - 18, y - 32, 36, 11, '#eef1f4');
+      P(cx - 14, y - 30, 28, 8, '#1a2230'); P(cx - 24, y - 14, 48, 2, '#ff3b4a'); P(cx - 8, y - 10, 16, 3, '#c9d0d8');
+      P(cx - 4, y - 36, 8, 4, '#2a2f38'); P(cx - 3 + (Math.floor(t / 90) % 6), y - 35, 2, 2, '#4fe0ff');
+      return;
+    }
+    if (v === 10) { // Hyperloop: sleek capsule in a neon tube (Boring / cyberpunk hops)
+      // tunnel ring glow
+      P(cx - 40, y - 48, 80, 4, '#1a0a2e'); P(cx - 38, y - 46, 76, 2, '#ff2bd6');
+      P(cx - 36, y - 8, 72, 3, '#0d1520'); P(cx - 34, y - 6, 68, 2, '#4fe0ff');
+      // capsule body
+      P(cx - 22, y - 28 - bob, 44, 18, '#12181f'); P(cx - 24, y - 24 - bob, 48, 12, '#1a2430');
+      P(cx - 18, y - 36 - bob, 36, 12, '#0a1018'); P(cx - 14, y - 34 - bob, 28, 8, '#4fe0ff');
+      P(cx - 20, y - 14 - bob, 40, 3, '#ff2bd6'); P(cx - 6, y - 30 - bob, 12, 4, '#eef1f4');
+      // no wheels — magnetic float
+      if (st.speed > 8 && !st.stalled && Math.random() < 0.15) st.smoke.push({ x: cx - 20 + Math.random() * 40, y: y - 40, vx: 0, r: 2, life: 400 });
+      return;
+    }
+    // 8 / fallback: open-wheel race car (also drawn when vehicle===8 via main car path)
     P(cx - 26, y - 6, 8, 6, TYRE); P(cx + 18, y - 6, 8, 6, TYRE);
     P(cx - 24, y - 22, 48, 16, '#eef1f4'); P(cx - 26, y - 18, 52, 10, '#eef1f4'); P(cx - 18, y - 32, 36, 11, '#eef1f4');
     P(cx - 14, y - 30, 28, 8, '#1a2230'); P(cx - 24, y - 14, 48, 2, '#ff3b4a'); P(cx - 8, y - 10, 16, 3, '#c9d0d8');
@@ -789,7 +808,11 @@ function create(canvas, opts) {
       if (name === 'decision.incorrect') { st.shake = 320; if (!st.reduce) { const side = Math.random() < 0.5 ? -1 : 1; st.hubcaps.push({ shoe: st.vehicle != null && st.vehicle <= 3, x: W / 2 + st.carX - st.camX + side * 24, y: H - 12, vx: side * (0.06 + Math.random() * 0.05), vy: -0.16, life: 1600 }); } }
       if (name === 'tunnel') { const n = Math.max(1, Math.min(4, d || 1)); for (let i = 0; i < n; i++) st.tunnels.push({ p: 0.12 + i * 0.07 }); st.dark = 0; }
       if (name === 'checkpoint.near') { if (!st.gate) st.gate = { p: 0.02, hold: 0.22, go: false }; }
-      if (name === 'checkpoint') { if (!st.gate) st.gate = { p: 0.3, hold: 0.3, go: true }; else st.gate.go = true; }
+      if (name === 'checkpoint') { if (!st.gate) st.gate = { p: 0.3, hold: 0.3, go: true }; else st.gate.go = true;
+        if (st.vehicle === 10) { // Hyperloop: drop into the tube, beam, pop out in the next city
+          st.tunnels.push({ p: 0.02 }); st.dark = Math.max(st.dark || 0, 520);
+          st.speed = Math.min((st.speed || 10) * 1.4 + 4, 48);
+        } }
       if (name === 'time.low') st.low = !!d;
       if (name === 'run.failed') { st.stalled = true; st.low = false; }
       if (name === 'fork') { // d = { lanes }: a new sign bridge rolls in; the road widens to that many lanes
@@ -6060,7 +6083,7 @@ const LICS = [FR ? { plate: 'Baker', math: 'Fractions', world: 'bakery' } : null
   { math: 'Limits', uc: 1, tease: 'What a function heads toward' }, { math: 'Differentiate', uc: 1, tease: 'Slopes of curves, one rule at a time' }, { math: 'Integrate', uc: 1, tease: 'Areas, and undoing slopes' },
   { math: 'Trigonometry', uc: 1, tease: 'Angles, identities and waves' }, { math: 'Vectors & matrices', uc: 1, tease: 'Linear algebra: row reduction and transformations' },
   { math: 'Sequences & series', uc: 1, tease: 'Patterns that go on forever, and their sums' }, { math: 'Complex numbers', uc: 1, tease: 'The roots that "No real solution" was hiding' }];
-const WORLD_NAME = { bakery: 'Bakery Lane', outrun: 'Sunset Strip', future: 'Neon City', wire: 'Wireframe', gp: 'Grand Prix', poly: 'Mountain Pass', night: 'Night Drive', industrial: 'Foundry Road', cruisn: 'Coast Highway', canyon: 'Canyon Run', aurora: 'Northern Lights' };
+const WORLD_NAME = { bakery: 'Bakery Lane', outrun: 'Sunset Strip', future: 'Neon City', wire: 'Wireframe', gp: 'Grand Prix', poly: 'Mountain Pass', night: 'Night Drive', industrial: 'Foundry Road', cruisn: 'Coast Highway', canyon: 'Canyon Run', aurora: 'Tube City' };
 const ALG = { stepsPerCp: 6, lanes: [2, 4, 4], stamp: 10, perStep: 5.5, decay: 0.3, floor: 2, penalty: 5 }; // about 6 steps between checkpoints; cards per step at checkpoints 0, 1, 2+; clean problems to stamp a level; each checkpoint pays seconds per step driven (5.5, shrinking 0.3 a checkpoint, never under 2); a wrong sign costs 5 s
 const A = window.Alg, LV = window.Levels;
 // the ride (THE ROAD): each license comes with a better way to travel, foot to Hyperloop; Rationals keeps the robotaxi, Radicals & logs take the tube. The upgrade isn't explained, only announced the first time you set off in it. The Fractions app has one
