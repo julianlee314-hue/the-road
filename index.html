@@ -766,7 +766,7 @@ function create(canvas, opts) {
       P(cx - 4, y - 36, 8, 4, '#2a2f38'); P(cx - 3 + (Math.floor(t / 90) % 6), y - 35, 2, 2, '#4fe0ff');
       return;
     }
-    if (v === 10) { // Hyperloop: sleek capsule in a neon tube (Boring / cyberpunk hops)
+    if (v >= 10) { // Hyperloop capsule (plates 11–15). Later Sky rides reuse it until they have art.
       // tunnel ring glow
       P(cx - 40, y - 48, 80, 4, '#1a0a2e'); P(cx - 38, y - 46, 76, 2, '#ff2bd6');
       P(cx - 36, y - 8, 72, 3, '#0d1520'); P(cx - 34, y - 6, 68, 2, '#4fe0ff');
@@ -824,7 +824,7 @@ function create(canvas, opts) {
     start() { if (!running) { running = true; last = 0; raf = requestAnimationFrame(frame); } },
     stop() { running = false; cancelAnimationFrame(raf); },
     setWorld(w) { if (WORLDS[w]) st.world = w; },
-    setVehicle(v) { st.vehicle = v == null ? null : Math.max(0, Math.min(10, v)); },
+    setVehicle(v) { st.vehicle = v == null ? null : Math.max(0, Math.min(21, v)); },
     setSpeed(v) { st.speed = Math.max(0, v); },
     setReduce(r) { st.reduce = !!r; },
     reset() { Object.assign(st, { lanes: 2, lane: 0.5, carX: 0, camX: 0, hubcaps: [], smoke: [], tunnels: [], gate: null, gantry: null, stalled: false, low: false, dark: 0, nl: null, nav: null }); },
@@ -834,7 +834,7 @@ function create(canvas, opts) {
       if (name === 'tunnel') { const n = Math.max(1, Math.min(4, d || 1)); for (let i = 0; i < n; i++) st.tunnels.push({ p: 0.12 + i * 0.07 }); st.dark = 0; }
       if (name === 'checkpoint.near') { if (!st.gate) st.gate = { p: 0.02, hold: 0.22, go: false }; }
       if (name === 'checkpoint') { if (!st.gate) st.gate = { p: 0.3, hold: 0.3, go: true }; else st.gate.go = true;
-        if (st.vehicle === 10) { // Hyperloop: drop into the tube, beam, pop out in the next city
+        if (st.vehicle >= 10) { // Hyperloop family: drop into the tube, beam, pop out in the next city
           st.tunnels.push({ p: 0.02 }); st.dark = Math.max(st.dark || 0, 520);
           st.speed = Math.min((st.speed || 10) * 1.4 + 4, 48);
         } }
@@ -2004,33 +2004,38 @@ const LIC = [
   null,
   { name: 'Powers', levels: [lv('2.mul', 'Same base, multiply', L2_1, { old: 1 }), lv('2.div', 'Same base, divide', L2_2, { old: 2 }), lv('2.pow', 'Power of a power', mix(L2_3, L2_3, L2_3b, L2_3c), { old: 3 }), lv('2.neg', 'Zero and negative exponents', mix(L2_4, L2_4, L2_4, L2_4b), { old: 4 }), lv('2.frac', 'Fractional exponents', mix(L2_5, L2_5, L2_5n), { old: 5 }),
     lv('2.laws', 'All the laws at once'), lv('2.negbase', 'Negatives and fractions as bases'), lv('2.negfrac', 'Negative exponents in fractions'), lv('2.sci', 'Scientific notation'), lv('2.mix', 'Mixed review', null, { mix: 2 }),
-    lv('2.rad', 'Radicals and fractional exponents', undefined, { after: 11 }), lv('2.calc', 'Rewrite for the power rule', undefined, { after: 13 })] },
+    lv('2.rad', 'Radicals and fractional exponents', undefined, { after: 11 }), lv('2.calc', 'Rewrite for the power rule', undefined, { after: 17 })] },
   { name: 'Simplify', levels: [lv('3.like', 'Like terms', L3_1, { old: 1 }), lv('3.dist', 'Distribute', L3_2, { old: 2 }), lv('3.minus', 'Minus before a bracket', L3_3, { old: 3 }), lv('3.nest', 'Nested brackets', L3_4, { old: 4 }), lv('3.pow', 'Like terms with powers', L3_5, { old: 5 }),
     lv('3.fraccoef', 'Fractions as coefficients'), lv('3.twolet', 'Two letters'), lv('3.dec', 'Decimals'), lv('3.mix', 'Mixed review', null, { mix: 3 }),
-    lv('3.rat', 'Cancel factors in fractions', undefined, { after: 10 }), lv('3.radlog', 'Radicals and log laws', undefined, { after: 11 }), lv('3.calc', 'Tidy a derivative', undefined, { after: 13 })] },
+    lv('3.rat', 'Cancel factors in fractions', undefined, { after: 10 }), lv('3.radlog', 'Radicals and log laws', undefined, { after: 11 }), lv('3.calc', 'Tidy a derivative', undefined, { after: 17 })] },
   { name: 'Expand', levels: [lv('4.mono', 'Monomial times polynomial', L4_1, { old: 1 }), lv('4.foil', 'Two binomials', L4_2, { old: 2 }), lv('4.spec', 'Special products', L4_3, { old: 3 }), lv('4.tri', 'Binomial times trinomial', L4_4, { old: 4 }), lv('4.three', 'Three factors', L4_5, { old: 5 }),
     lv('4.twolet', 'Two letters'), lv('4.expsimp', 'Expand and simplify'), lv('4.cube', 'Cube a binomial'), lv('4.mix', 'Mixed review', null, { mix: 4 }),
-    lv('4.conj', 'Conjugates', undefined, { after: 11 }), lv('4.dq', 'Difference quotients', undefined, { after: 12 })] },
+    lv('4.conj', 'Conjugates', undefined, { after: 11 }), lv('4.dq', 'Difference quotients', undefined, { after: 16 })] },
   { name: 'Factor', levels: [lv('5.gcf', 'Common factor', L5_1, { old: 1 }), lv('5.gcfpow', 'Common factor with powers'), lv('5.group', 'Grouping', L5_2, { old: 2 }), lv('5.tri1', 'x² + bx + c', L5_3, { old: 3 }), lv('5.tria', 'ax² + bx + c', L5_4, { old: 4 }), lv('5.spec', 'Special patterns', L5_5, { old: 5 }),
     lv('5.gcfthen', 'Common factor first, then factor'), lv('5.twolet', 'Two letters'), lv('5.cubes', 'Cubes'), lv('5.qtype', 'Quadratic type'), lv('5.twice', 'Factor twice'), lv('5.mix', 'Factor completely', null, { mix: 5 }),
-    lv('5.divthm', 'Long division and the factor theorem', undefined, { after: 10 }), lv('5.fracexp', 'Negative and fractional exponents', undefined, { after: 11 }), lv('5.calc', 'Tidy a derivative', undefined, { after: 13 })] },
+    lv('5.divthm', 'Long division and the factor theorem', undefined, { after: 10 }), lv('5.fracexp', 'Negative and fractional exponents', undefined, { after: 11 }), lv('5.calc', 'Tidy a derivative', undefined, { after: 17 })] },
   { name: 'Isolate', levels: [lv('6.one', 'One step', L6_1, { old: 1 }), lv('6.two', 'Two steps', L6_2, { old: 2 }), lv('6.brack', 'Brackets first'), lv('6.both', 'x on both sides', L6_3, { old: 3 }), lv('6.frac', 'Fractions and decimals', L6_4, { old: 4 }),
     lv('6.prop', 'Proportions'), lv('6.none', 'No solution or every number'), lv('6.abs', 'Absolute value'), lv('6.form', 'Formulas', L6_5, { old: 5 }), lv('6.twice', 'The letter shows up twice'), lv('6.bottom', 'x on the bottom'), lv('6.mix', 'Mixed review', null, { mix: 6 }),
-    lv('6.ratq', 'Rational equations that turn quadratic', undefined, { after: 10 }), lv('6.rad', 'Radical equations and false roots', undefined, { after: 11 }), lv('6.explog', 'Exponential and log equations', undefined, { after: 11 }), lv('6.calc', 'Where the slope is zero', undefined, { after: 13 })] },
+    lv('6.ratq', 'Rational equations that turn quadratic', undefined, { after: 10 }), lv('6.rad', 'Radical equations and false roots', undefined, { after: 11 }), lv('6.explog', 'Exponential and log equations', undefined, { after: 11 }), lv('6.calc', 'Where the slope is zero', undefined, { after: 17 })] },
   { name: 'Inequalities', levels: [lv('7.one', 'One step', L7_1, { old: 1 }), lv('7.flip', 'Negative flips', L7_2, { old: 2 }), lv('7.two', 'Two steps', L7_3, { old: 3 }), lv('7.comp', 'Compound', L7_4, { old: 4 }), lv('7.abs', 'Absolute value', L7_5, { old: 5 }),
     lv('7.nl', 'Number line'), lv('7.int', 'Interval notation'), lv('7.xy', 'Two variables'), lv('7.both', 'Where both are true'), lv('7.frac', 'Fractions in inequalities'), lv('7.mix', 'Mixed review', null, { mix: 7 }),
-    lv('7.rat', 'Rational inequalities', undefined, { after: 10 }), lv('7.calc', 'Where a function rises', undefined, { after: 13 })] },
+    lv('7.rat', 'Rational inequalities', undefined, { after: 10 }), lv('7.calc', 'Where a function rises', undefined, { after: 17 })] },
   { name: 'Systems', levels: [lv('8.sub', 'Substitution', L8_1, { old: 1 }), lv('8.add', 'Add to eliminate', L8_2, { old: 2 }), lv('8.scale', 'Scale, then eliminate', L8_3, { old: 3 }), lv('8.none', 'None or infinitely many', L8_4, { old: 4 }), lv('8.three', 'Three unknowns', L8_5, { old: 5 }),
     lv('8.line', 'Pick the line'), lv('8.graph', 'Graph to solve'), lv('8.slopes', 'Slopes tell the story'), lv('8.frac', 'Fractions and decimals'), lv('8.mix', 'Mixed review', null, { mix: 8 }),
-    lv('8.parab', 'Line meets parabola', '9.linepar', { after: 9 }), lv('8.matrix', 'Matrices and row reduction', undefined, { after: 16 })] },
+    lv('8.parab', 'Line meets parabola', '9.linepar', { after: 9 }), lv('8.matrix', 'Matrices and row reduction', undefined, { after: 20 })] },
   { name: 'Quadratics', levels: [lv('9.sqrt', 'Square roots', () => rand() < 0.35 ? L9_1b() : L9_1(), { old: 1 }), lv('9.fact', 'Factoring', L9_2, { old: 2 }), lv('9.rearr', 'Move everything to one side first'), lv('9.cts', 'Complete the square', L9_3, { old: 3 }), lv('9.formula', 'The formula', L9_4, { old: 4 }),
     lv('9.disc', 'How many solutions?'), lv('9.method', 'Pick your method'), lv('9.vertex', 'Vertex form'), lv('9.qtype', 'Quadratic type'), lv('9.build', 'Build it from its roots'), lv('9.read', 'Read the parabola'), lv('9.ineq', 'Quadratic inequalities'), lv('9.linepar', 'Line meets parabola'),
     lv('9.mix', 'Mixed review', null, { old: 5, review: true }),
-    lv('9.disguise', 'Quadratics in disguise', undefined, { after: 11 }), lv('9.calc', 'Highest and lowest points', undefined, { after: 13 })] },
+    lv('9.disguise', 'Quadratics in disguise', undefined, { after: 11 }), lv('9.calc', 'Highest and lowest points', undefined, { after: 17 })] },
   { name: 'Rationals', levels: [lv('10.cancel', 'Cancel common factors'), lv('10.muldiv', 'Multiply and divide'), lv('10.same', 'Same bottom'), lv('10.lcd', 'Different bottoms'), lv('10.complex', 'Fraction over fraction'),
     lv('10.eq', 'Rational equations'), lv('10.longdiv', 'Long division'), lv('10.remthm', 'The remainder theorem'), lv('10.graph', 'Read the graph'), lv('10.partial', 'Split into partial fractions'), lv('10.mix', 'Mixed review', null, { mix: 10 })] },
   { name: 'Radicals & logs', levels: [lv('11.simp', 'Simplify a root'), lv('11.muldiv', 'Multiply and divide roots'), lv('11.add', 'Add like roots'), lv('11.ration', 'Rationalize the bottom'), lv('11.fracexp', 'Roots and fractional exponents'),
     lv('11.tolog', 'Power to log and back'), lv('11.eval', 'Work out a log'), lv('11.expand', 'Expand with the log laws'), lv('11.condense', 'Condense into one log'), lv('11.base', 'Change of base'), lv('11.graph', 'Read the graph'), lv('11.mix', 'Mixed review', null, { mix: 11 })] },
+  // precalc, before Limits: 12 Functions, 13 Transforms, 14 Polynomials, 15 Exponentials. Generators registered below with Levels.def.
+  { name: 'Functions', levels: [lv('12.eval', 'Evaluate f at a number'), lv('12.quad', 'Evaluate a square'), lv('12.sum', 'f(a) + f(b)'), lv('12.diff', 'f(a) − f(b)'), lv('12.comp', 'Composition, one step'), lv('12.dom', 'Where the bottom is zero'), lv('12.mix', 'Mixed review', null, { mix: 12 })] },
+  { name: 'Transforms', levels: [lv('13.up', 'Shift up'), lv('13.down', 'Shift down'), lv('13.right', 'Shift right'), lv('13.left', 'Shift left'), lv('13.flip', 'Reflect in the x-axis'), lv('13.even', 'Even: f(−x) = f(x)'), lv('13.odd', 'Odd: the minus comes out'), lv('13.graph', 'Which graph moved'), lv('13.mix', 'Mixed review', null, { mix: 13 })] },
+  { name: 'Polynomials', levels: [lv('14.deg', 'Degree and leading term'), lv('14.add', 'Add polynomials'), lv('14.sub', 'Subtract polynomials'), lv('14.mono', 'Monomial times a polynomial'), lv('14.factor', 'Factor a simple one'), lv('14.rem', 'Remainder, lightly'), lv('14.mix', 'Mixed review', null, { mix: 14 })] },
+  { name: 'Exponentials', levels: [lv('15.mul', 'Same base, multiply'), lv('15.div', 'Same base, divide'), lv('15.pow', 'Power of a power'), lv('15.shift', 'Split an exponent'), lv('15.model', 'A growth model'), lv('15.login', 'Log undoes a power'), lv('15.mix', 'Mixed review', null, { mix: 15 })] },
 ];
 const LAST = LIC.length - 1; // licenses 2 to LAST have levels here
 const cache = {};
@@ -6079,6 +6084,331 @@ G.Levels.def({ '2.laws': laws, '2.negbase': negbase, '2.negfrac': negfrac, '2.sc
   '4.twolet': twolet4, '4.expsimp': expsimp, '4.cube': cube, '7.frac': frac7, '8.frac': frac8 });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Precalc plates 12–15, before Limits. Step chains: tap a real rewrite when the next line
+   means the same thing; shift/graph choices stay planning (tan chips or picture cards). */
+(function (G) {
+'use strict';
+const A = G.Alg, K = G.LvKit;
+const { N, V, S, Neg, M, F, Dv, P, B, Eq, Log, term, poly, ptree, padd } = A;
+const { ri, nz, pick, W } = K;
+const PT = o => ptree(poly(o), 'x');
+const Sum = ts => { const t = ts.filter(Boolean); return !t.length ? N(0) : t.length === 1 ? t[0] : S(t); };
+const termsOf = o => Object.keys(poly(o)).map(Number).sort((a, b) => b - a).map(k => term(poly(o)[k], k, 'x'));
+
+function gEval() {
+  const m = ri(2, 9), b = nz(-8, 8), a = ri(0, 8);
+  const prod = m * a, ans = prod + b;
+  const start = S(M([N(m), N(a)]), N(b));
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: S(N(prod), N(b)), move: `Multiply first: ${m} × ${a} = ${prod}`,
+      wrongs: [W(S(N(m + a), N(b)), `${m} × ${a} is ${prod}, not ${m} + ${a}.`), W(S(N(prod + (b > 0 ? 1 : -1)), N(b)), 'Check that product.'), W(N(prod), `The ${b < 0 ? 'minus' : 'plus'} ${Math.abs(b)} is still there.`)] },
+    { tree: N(ans), move: `${prod} ${b < 0 ? '−' : '+'} ${Math.abs(b)} = ${ans}`,
+      wrongs: [W(N(prod - b), 'Keep the sign in front of ' + Math.abs(b) + '.'), W(N(prod * (b || 1)), 'Add the number. Don\'t multiply again.')] }
+  ] };
+}
+function gQuad() {
+  const n = ri(2, 6), a = pick([1, 1, 2, 3]), b = nz(-5, 5), c = nz(-7, 7);
+  const sq = n * n, mid = b * n, ans = a * sq + mid + c;
+  const start = S(M([N(a), P(N(n), 2)]), M([N(b), N(n)]), N(c));
+  const pow = S(M([N(a), N(sq)]), M([N(b), N(n)]), N(c));
+  const mul = S(N(a * sq), N(mid), N(c));
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: pow, move: `Power first: ${n}² = ${sq}`,
+      wrongs: [W(S(M([N(a), N(n * 2)]), M([N(b), N(n)]), N(c)), `${n}² means ${n} × ${n}, not ${n} × 2.`), W(S(M([N(a), N(sq + 1)]), M([N(b), N(n)]), N(c)), 'Check the square.')] },
+    { tree: mul, move: `Multiply: ${a} × ${sq} = ${a * sq}, ${b} × ${n} = ${mid}`,
+      wrongs: [W(S(N(a + sq), N(b + n), N(c)), 'The number in front multiplies the square; it doesn\'t add.'), W(S(N(a * sq), N(-mid), N(c)), 'Keep the sign of ' + b + '.')] },
+    { tree: N(ans), move: `Add: ${a * sq} ${mid < 0 ? '−' : '+'} ${Math.abs(mid)} ${c < 0 ? '−' : '+'} ${Math.abs(c)} = ${ans}`,
+      wrongs: [W(N(a * sq + mid - c), 'Keep the sign of the last number.'), W(N(a * sq * mid || ans + n), 'Add the three numbers.')] }
+  ] };
+}
+function gBoth(op) {
+  return function () {
+    const m = ri(2, 6), c = nz(-6, 6), a = ri(0, 6), b = ri(0, 6);
+    if (op < 0 && a === b) return null;
+    const fa = m * a + c, fb = m * b + c, ans = fa + op * fb;
+    const inner = n => S(M([N(m), N(n)]), N(c));
+    const start = op > 0 ? S(inner(a), inner(b)) : S(inner(a), Neg(B(inner(b))));
+    const mid = op > 0 ? S(N(fa), inner(b)) : S(N(fa), Neg(B(inner(b))));
+    const both = op > 0 ? S(N(fa), N(fb)) : S(N(fa), Neg(N(fb)));
+    const slip = (badA) => op > 0 ? S(N(badA), inner(b)) : S(N(badA), Neg(B(inner(b))));
+    return { kind: 'expr', lines: [
+      { tree: start },
+      { tree: mid, move: `f(${a}) first: ${m} × ${a} ${c < 0 ? '−' : '+'} ${Math.abs(c)} = ${fa}`,
+        wrongs: [W(slip(m * a), `Don't drop the ${c < 0 ? '−' : '+'} ${Math.abs(c)}.`), W(slip(m + a + c), `${m} × ${a} is ${m * a}, not ${m} + ${a}.`)] },
+      { tree: both, move: `f(${b}) = ${m} × ${b} ${c < 0 ? '−' : '+'} ${Math.abs(c)} = ${fb}`,
+        wrongs: [W(op > 0 ? S(N(fa), N(m * b)) : S(N(fa), Neg(N(m * b))), 'The constant on f is still there.'), W(op > 0 ? S(N(fa), N(fb + 2)) : S(N(fa), Neg(N(fb + 2))), 'Check f(' + b + ') again.')] },
+      { tree: N(ans), move: op > 0 ? `${fa} + ${fb} = ${ans}` : `${fa} − ${fb < 0 ? '(' + fb + ')' : fb} = ${ans}`,
+        wrongs: [W(N(fa - op * fb), op > 0 ? 'This one adds the two values.' : 'This one subtracts f(b) from f(a).'), W(N(fa + op * fb + 3), 'Check the arithmetic.')] }
+    ] };
+  };
+}
+function gComp() {
+  const m = ri(2, 5), k = nz(-6, 6), add = nz(-5, 6);
+  // f(t) = mt + add, g(x) = x + k, so f(g(x)) = m(x + k) + add
+  const start = S(M([N(m), B(S(V('x'), N(k)))]), N(add));
+  const dist = S(S(M([N(m), V('x')]), N(m * k)), N(add));
+  const fin = S(M([N(m), V('x')]), N(m * k + add));
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: dist, move: `Inside first, then distribute: ${m} × (x ${k < 0 ? '−' : '+'} ${Math.abs(k)})`,
+      wrongs: [W(S(S(M([N(m), V('x')]), N(k)), N(add)), `${m} multiplies the ${k < 0 ? '−' : ''}${Math.abs(k)} too.`), W(S(M([N(m), B(S(V('x'), N(k)))]), N(m * add)), 'The outside number is not inside the bracket.')] },
+    { tree: fin, move: `Add the numbers: ${m * k} ${add < 0 ? '−' : '+'} ${Math.abs(add)} = ${m * k + add}`,
+      wrongs: [W(S(M([N(m), V('x')]), N(m * k - add)), 'Keep the sign of the outside number.'), W(S(M([N(m), V('x')]), N(k + add)), 'Only the inside was multiplied by ' + m + '.')] }
+  ] };
+}
+function gDom() {
+  const k = ri(1, 9), top = nz(-5, 5);
+  const bot = S(V('x'), N(-k));
+  return { kind: 'eq', x: 'x', lines: [
+    { tree: F(S(V('x'), N(top)), bot) },
+    { tree: Eq(bot, N(0)), move: `The bottom x − ${k} is what must not be 0`,
+      wrongs: [W(Eq(S(V('x'), N(top)), N(0)), 'The top may be 0. The fraction breaks when the bottom is 0.'), W(Eq(bot, N(1)), 'Undefined means the bottom equals 0, not 1.')] },
+    { tree: Eq(V('x'), N(k)), move: `Add ${k} to both sides`,
+      wrongs: [W(Eq(V('x'), N(-k)), `x − ${k} = 0 means x = ${k}, not −${k}.`), W(Eq(V('x'), N(0)), 'Undo the − ' + k + ' by adding ' + k + '.'), W(Eq(bot, N(k)), 'Move ' + k + ' across; don\'t leave it on the bottom.')] }
+  ] };
+}
+
+function shiftUp(k, down) {
+  const y = P(V('x'), 2);
+  const start = Eq(V('y'), y);
+  const right = Eq(V('y'), S(y, N(down ? -k : k)));
+  const vert = Eq(V('y'), S(y, N(down ? k : -k)));
+  const horiz = Eq(V('y'), P(B(S(V('x'), N(down ? k : -k))), 2));
+  const flip = Eq(V('y'), Neg(y));
+  return { kind: 'expr', lines: [{ tree: start }, { tree: right,
+    move: down ? `Subtract ${k} outside: shift down ${k}` : `Add ${k} outside: shift up ${k}`,
+    wrongs: [W(vert, down ? 'Down is y = x² − ' + k + ', not plus.' : 'Up is y = x² + ' + k + ', not minus.'),
+      W(horiz, 'That replaces x (a left/right shift). Up and down add outside.'),
+      W(flip, 'A minus on the whole square reflects it; it doesn\'t slide it.')] }] };
+}
+function gUp() { return shiftUp(ri(1, 5), false); }
+function gDown() { return shiftUp(ri(1, 5), true); }
+function shiftSide(h, left) {
+  const y = P(V('x'), 2);
+  const inside = left ? h : -h;
+  const right = Eq(V('y'), P(B(S(V('x'), N(inside))), 2));
+  const other = Eq(V('y'), P(B(S(V('x'), N(-inside))), 2));
+  const vert = Eq(V('y'), S(y, N(left ? h : -h)));
+  return { kind: 'expr', lines: [{ tree: Eq(V('y'), y) }, { tree: right,
+    move: left ? `Inside the power: x becomes (x + ${h}), a shift left` : `Inside the power: x becomes (x − ${h}), a shift right`,
+    wrongs: [W(other, left ? 'Left is (x + ' + h + ')². (x − ' + h + ')² goes right.' : 'Right is (x − ' + h + ')². (x + ' + h + ')² goes left.'),
+      W(vert, 'Adding outside moves the graph up or down, not sideways.'),
+      W(Eq(V('y'), P(B(S(V('x'), N(inside))), 3)), 'The square stays a square; only the inside changes.')] }] };
+}
+function gRight() { return shiftSide(ri(1, 4), false); }
+function gLeft() { return shiftSide(ri(1, 4), true); }
+function gFlip() {
+  const y = P(V('x'), 2);
+  return { kind: 'expr', lines: [{ tree: Eq(V('y'), y) },
+    { tree: Eq(V('y'), Neg(y)), move: 'Minus on the whole function: reflect in the x-axis',
+      wrongs: [W(Eq(V('y'), S(y, N(-1))), 'Subtracting 1 shifts down. Reflecting puts a minus on the whole square.'),
+        W(Eq(V('y'), P(B(S(V('x'), N(-1))), 2)), 'That slides right. A reflection is a minus on the whole function.'),
+        W(Eq(V('y'), Neg(P(V('x'), 3))), 'The square stays a square. Only a minus goes on it.')] }] };
+}
+function gEven() {
+  return { kind: 'expr', lines: [
+    { tree: P(B(Neg(V('x'))), 2) },
+    { tree: P(V('x'), 2), move: 'Even power: (−x)² = x²',
+      wrongs: [W(Neg(P(V('x'), 2)), 'The minus is inside an even power, so it disappears. −x² would be odd.'), W(P(Neg(V('x')), 3), 'The power is 2, not 3.'), W(Neg(V('x')), 'Squaring comes before you drop the power.')] }
+  ] };
+}
+function gOdd() {
+  return { kind: 'expr', lines: [
+    { tree: P(B(Neg(V('x'))), 3) },
+    { tree: Neg(P(V('x'), 3)), move: 'Odd power: the minus comes out, (−x)³ = −x³',
+      wrongs: [W(P(V('x'), 3), 'An odd power keeps the minus: (−x)³ is negative.'), W(P(Neg(V('x')), 2), 'The power is 3, not 2.'), W(Neg(P(V('x'), 2)), 'Cubing is not squaring, and the minus covers x³.')] }
+  ] };
+}
+function paraPlot(a, b, c) {
+  const parts = [];
+  if (a) parts.push(term(a, 2));
+  if (b) parts.push(term(b, 1));
+  if (c || !parts.length) parts.push(term(c || 0, 0));
+  const expr = parts.length === 1 ? parts[0] : S(parts);
+  return { t: 'plot', a: Eq(V('y'), expr), curves: [{ q: [a, b, c] }], win: 5, label: `y ${a},${b},${c}` };
+}
+function gGraph() {
+  const k = ri(1, 3), kind = ri(0, 2);
+  const base = Eq(V('y'), P(V('x'), 2));
+  let right, move, wrongs;
+  if (kind === 0) {
+    right = paraPlot(1, 0, k); move = `Shift up ${k}: the picture sits ${k} above y = x²`;
+    wrongs = [W(paraPlot(1, 0, -k), 'Up adds ' + k + '. That one dropped.'), W(paraPlot(1, -2 * k, k * k), 'That is a sideways shift, (x − ' + k + ')².'), W(paraPlot(-1, 0, 0), 'That one flipped upside down.')];
+  } else if (kind === 1) {
+    right = paraPlot(1, -2 * k, k * k); move = `Shift right ${k}: (x − ${k})²`;
+    wrongs = [W(paraPlot(1, 2 * k, k * k), 'Right is (x − ' + k + ')², which leans left of the y-axis before it turns. The other way is a left shift.'), W(paraPlot(1, 0, k), 'That only moved up.'), W(paraPlot(1, 0, -k), 'That moved down.')];
+  } else {
+    right = paraPlot(-1, 0, 0); move = 'Reflect in the x-axis: y = −x² opens down';
+    wrongs = [W(paraPlot(1, 0, 0), 'Same as the start: it still opens up.'), W(paraPlot(1, 0, -k), 'Down by ' + k + ' still opens up.'), W(paraPlot(1, -2, 1), 'That is (x − 1)², a sideways move.')];
+  }
+  return { kind: 'expr', lines: [{ tree: base }, { tree: right, move, wrongs }] };
+}
+
+function gDeg() {
+  const A3 = ri(1, 5), B3 = ri(1, 5), a1 = nz(-7, 7), c0 = nz(-8, 8);
+  const lead = A3 + B3;
+  const start = S(term(A3, 3), term(a1, 1), term(B3, 3), term(c0, 0));
+  const done = Sum([term(lead, 3), term(a1, 1), term(c0, 0)]);
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: done, move: `Collect the x³ terms: leading term ${lead}x³, degree 3`,
+      wrongs: [W(Sum([term(A3 * B3, 3), term(a1, 1), term(c0, 0)]), 'Adding like terms adds the numbers in front. It doesn\'t multiply them.'),
+        W(Sum([term(A3 - B3 || lead + 1, 6), term(a1, 1), term(c0, 0)]), 'The power stays 3 when you add x³ terms. It doesn\'t become x⁶.'),
+        W(Sum([term(lead, 3), term(a1 + c0, 1)]), 'A plain number is not an x-term.')] }
+  ] };
+}
+function gAdd() {
+  const p = poly({ 2: ri(1, 4), 1: nz(-5, 5), 0: nz(-6, 6) });
+  const q = poly({ 2: ri(1, 4), 1: nz(-5, 5), 0: nz(-6, 6) });
+  const sum = padd(p, q);
+  const start = S(B(PT(p)), B(PT(q)));
+  const flat = Sum(termsOf(p).concat(termsOf(q)));
+  const forget = Object.assign({}, p); const ks = Object.keys(q).map(Number); const drop = ks[ks.length - 1];
+  const missed = padd(p, q); delete missed[drop];
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: flat, move: 'Drop the brackets: every term of the second joins the first',
+      wrongs: [W(PT(missed), 'Every term of the second polynomial comes across, including the last one.'), W(S(B(PT(p)), Neg(B(PT(q)))), 'Adding keeps each sign. A minus in front would subtract.')] },
+    { tree: PT(sum), move: 'Collect like terms: same power, add the numbers in front',
+      wrongs: [W(PT(padd(p, poly({ 2: q[2] ? -q[2].n : -1 }))), 'The second polynomial is added, so its x² sign stays as written.'),
+        W(flat, 'Like terms still need collecting: two x² terms become one.')] }
+  ] };
+}
+function gSub() {
+  const p = poly({ 2: ri(1, 4), 1: nz(-4, 5), 0: nz(-6, 6) });
+  const q = poly({ 1: nz(1, 5), 0: nz(-6, 6) });
+  if (q[2]) return null;
+  const negq = {}; for (const k in q) negq[k] = { n: -q[k].n, d: q[k].d, q: 1 };
+  const sum = padd(p, negq);
+  const start = S(B(PT(p)), Neg(B(PT(q))));
+  const flat = Sum(termsOf(p).concat(termsOf(negq)));
+  const noflip = Sum(termsOf(p).concat(termsOf(q)));
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: flat, move: 'The minus flips every sign in the second bracket',
+      wrongs: [W(noflip, 'A minus in front of a bracket flips every term inside, not none of them.'), W(S(B(PT(p)), Neg(term(q[1] ? q[1].n : 1, 1))), 'The minus reaches the number at the end too.')] },
+    { tree: PT(sum), move: 'Collect like terms',
+      wrongs: [W(PT(padd(p, q)), 'Those signs were flipped. Don\'t flip them back when you collect.'), W(flat, 'Like terms still need collecting.')] }
+  ] };
+}
+function gMono() {
+  const m = nz(2, 6), pw = pick([1, 1, 2]);
+  const inner = { 2: ri(1, 3), 1: nz(-4, 4), 0: nz(-5, 5) };
+  const res = {}; for (const k in inner) res[+k + pw] = (typeof inner[k] === 'number' ? inner[k] : inner[k]) * m;
+  const onlyFirst = {}; const keys = Object.keys(inner).map(Number).sort((a, b) => b - a);
+  keys.forEach((k, i) => { onlyFirst[i ? k : k + pw] = i ? inner[k] : m * inner[k]; });
+  const noPow = {}; keys.forEach(k => { noPow[k] = (noPow[k] || 0) + m * inner[k]; });
+  return { kind: 'expr', lines: [
+    { tree: M([term(m, pw), B(PT(inner))]) },
+    { tree: PT(res), move: `Multiply ${m === 1 || m === -1 ? '' : m}${pw === 1 ? 'x' : 'x²'} into every term: numbers multiply, exponents add`,
+      wrongs: [W(PT(onlyFirst), 'The outside term multiplies every term in the bracket.'), W(PT(noPow), 'x times x² raises the power: exponents add.'), W(PT(Object.fromEntries(Object.entries(res).map(([k, v]) => [k, -v]))), 'Check the signs as you multiply.')] }
+  ] };
+}
+function gFactor() {
+  const g = ri(2, 6), k = pick([1, 1, 2]), a = ri(1, 4), b = nz(1, 7);
+  const exp = {}; exp[k + 1] = g * a; exp[k] = (exp[k] || 0) + g * b;
+  const start = PT(exp);
+  const fact = M([term(g, k), B(PT({ 1: a, 0: b }))]);
+  const badB = M([term(g, k), B(PT({ 1: a, 0: -b }))]);
+  const badG = M([term(g + 1, k), B(PT({ 1: a, 0: b }))]);
+  const badK = M([term(g, k + 1), B(PT({ 1: a, 0: b }))]);
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: fact, move: `Common factor ${g}${k === 1 ? 'x' : 'x²'}: numbers divide, exponents subtract`,
+      wrongs: [W(badB, 'Check the sign (or the number) left inside.'), W(badG, 'Take out the biggest number that divides both terms.'), W(badK, 'The power you take out can\'t be higher than every term.')] }
+  ] };
+}
+function gRem() {
+  const a = ri(1, 5), b = nz(-6, 6), c = nz(-8, 8);
+  const sq = a * a, mid = b * a, ans = sq + mid + c;
+  const polyT = S(P(V('x'), 2), term(b, 1), N(c));
+  const sub = S(P(N(a), 2), M([N(b), N(a)]), N(c));
+  const mul = S(N(sq), N(mid), N(c));
+  return { kind: 'expr', lines: [
+    { tree: polyT },
+    { tree: sub, move: `Remainder theorem: divisor (x − ${a}) means plug in x = ${a}`,
+      wrongs: [W(S(P(N(-a), 2), M([N(b), N(-a)]), N(c)), `(x − ${a}) uses +${a}, not −${a}.`), W(S(P(N(a), 2), term(b, 1), N(c)), 'Every x is replaced, the middle term too.'), W(Eq(V('x'), N(a)), 'The remainder is the number p(' + a + '), not the statement x = ' + a + '.')] },
+    { tree: mul, move: `Power and multiply: ${a}² = ${sq}, ${b} × ${a} = ${mid}`,
+      wrongs: [W(S(N(a * 2), N(b + a), N(c)), `${a}² is ${sq}, not ${a} × 2.`), W(S(N(sq), N(-mid), N(c)), 'Keep the sign of ' + b + '.')] },
+    { tree: N(ans), move: `Add: the remainder is ${ans}`,
+      wrongs: [W(N(sq + mid - c), 'Keep the sign of the constant.'), W(N(sq * (mid || 1)), 'Add the three numbers.')] }
+  ] };
+}
+
+function gMul() {
+  const base = pick(['a', 'a', 'x']), m = ri(2, 6), n = ri(2, 6);
+  const v = V(base);
+  return { kind: 'expr', lines: [
+    { tree: M([P(v, m), P(v, n)], '·') },
+    { tree: P(v, m + n), move: `Same base, multiply: add the exponents, ${m} + ${n} = ${m + n}`,
+      wrongs: [W(P(v, m * n), 'Multiplying powers of the same base adds the exponents.'), W(M([N(2), P(v, m + n)]), 'Nothing doubles: there is no 2 in front.'), W(P(v, Math.abs(m - n) || m + n + 1), 'Count the factors: ' + m + ' and ' + n + '.')] }
+  ] };
+}
+function gDiv() {
+  const base = pick(['a', 'x']), n = ri(2, 5), m = n + ri(1, 5);
+  const v = V(base);
+  return { kind: 'expr', lines: [
+    { tree: Dv(P(v, m), P(v, n)) },
+    { tree: P(v, m - n), move: `Same base, divide: subtract the exponents, ${m} − ${n} = ${m - n}`,
+      wrongs: [W(P(v, m + n), 'Dividing powers subtracts the exponents.'), W(P(v, n - m), 'Top minus bottom: ' + m + ' − ' + n + '.'), W(P(v, m * n), 'The exponents subtract; they don\'t multiply.')] }
+  ] };
+}
+function gPowE() {
+  const base = pick([2, 3, 5]), n = ri(2, 4);
+  const start = P(B(P(N(base), V('x'))), n);
+  const right = P(N(base), M([N(n), V('x')]));
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: right, move: `Power of a power: multiply the exponents, ${base}^{${n}·x}`,
+      wrongs: [W(P(N(base), S(V('x'), N(n))), 'A power of a power multiplies the exponents. Adding them is a different law.'), W(M([N(n), P(N(base), V('x'))], '·'), n + ' × ' + base + '^x is not (' + base + '^x)^' + n + '.'), W(P(N(base * n), V('x')), 'The base stays ' + base + '. The ' + n + ' joins the exponent.')] }
+  ] };
+}
+function gShiftE() {
+  const base = pick([2, 3, 5]), k = ri(2, 4);
+  const bk = Math.pow(base, k);
+  const start = P(N(base), S(V('x'), N(k)));
+  const split = M([P(N(base), k), P(N(base), V('x'))], '·');
+  const fin = M([N(bk), P(N(base), V('x'))], '·');
+  return { kind: 'expr', lines: [
+    { tree: start },
+    { tree: split, move: `Split the exponent: ${base}^{x+${k}} = ${base}^${k} · ${base}^x`,
+      wrongs: [W(P(N(base), M([V('x'), N(k)])), 'x + ' + k + ' splits into a product of powers, not an exponent that is a product.'), W(S(P(N(base), V('x')), N(bk)), 'The extra ' + k + ' in the exponent multiplies by ' + base + '^' + k + '. It doesn\'t add ' + bk + '.')] },
+    { tree: fin, move: `${base}^${k} = ${bk}`,
+      wrongs: [W(M([N(base * k), P(N(base), V('x'))], '·'), base + '^' + k + ' is ' + bk + ', not ' + base + ' × ' + k + '.'), W(M([N(bk + base), P(N(base), V('x'))], '·'), 'Check the power.')] }
+  ] };
+}
+function gModel() {
+  const P0 = pick([5, 10, 20, 4]), r = pick([2, 2, 3]), t = ri(2, 4);
+  const grown = Math.pow(r, t), ans = P0 * grown;
+  return { kind: 'expr', lines: [
+    { tree: M([N(P0), P(N(r), t)], '·') },
+    { tree: M([N(P0), N(grown)], '·'), move: `${r}^${t} = ${grown}: the growth factor after ${t} steps`,
+      wrongs: [W(M([N(P0), N(r * t)], '·'), r + '^' + t + ' is not ' + r + ' × ' + t + '.'), W(M([N(P0 * r), N(t)], '·'), 'The exponent is how many times you multiply by ' + r + ', not a separate factor.')] },
+    { tree: N(ans), move: `${P0} × ${grown} = ${ans}`,
+      wrongs: [W(N(P0 + grown), 'The starting amount multiplies the growth factor.'), W(N(ans + P0), 'Check the product.')] }
+  ] };
+}
+function gLogInv() {
+  const pairs = [[2, 3], [2, 4], [2, 5], [3, 2], [3, 3], [3, 4], [5, 2], [4, 2]];
+  const [b, e] = pick(pairs), val = Math.pow(b, e);
+  return { kind: 'expr', lines: [
+    { tree: Log(N(val), b) },
+    { tree: N(e), move: `Log undoes the power: ${b}^${e} = ${val}, so the log is ${e}`,
+      wrongs: [W(N(b), 'The log asks for the exponent, not the base.'), W(N(val), 'That\'s the number inside the log, not the exponent.'), W(N(e + 1), 'Check which power of ' + b + ' gives ' + val + '.')] }
+  ] };
+}
+
+G.Levels.def({
+  '12.eval': gEval, '12.quad': gQuad, '12.sum': gBoth(1), '12.diff': gBoth(-1), '12.comp': gComp, '12.dom': gDom,
+  '13.up': gUp, '13.down': gDown, '13.right': gRight, '13.left': gLeft, '13.flip': gFlip, '13.even': gEven, '13.odd': gOdd, '13.graph': gGraph,
+  '14.deg': gDeg, '14.add': gAdd, '14.sub': gSub, '14.mono': gMono, '14.factor': gFactor, '14.rem': gRem,
+  '15.mul': gMul, '15.div': gDiv, '15.pow': gPowE, '15.shift': gShiftE, '15.model': gModel, '15.login': gLogInv
+});
+})(typeof window !== 'undefined' ? window : globalThis);
+
+
 </script>
 <script>
 (function () {
@@ -6099,12 +6429,14 @@ const RALLY = { start: 40, perCp: 5, cpBonus: 20, cpMin: 8, penalty: 10 }; // se
 const FORKS = { perCp: 6, lanes: [2, 4, 8] }; // picks per checkpoint; lanes at checkpoints 0, 1, 2+ (the Texas superhighway)
 const SPEED = { base: 80, perStreak: 16, cap: 12, level: [1, 1.15, 1.3, 1.45, 1.55, 1.65] }; // km/h; streaks speed you up; higher levels drive faster cars
 const INSTANT = 1200, QUICK = 2200; // ms per step
-// the ladder: 1 to 11 drive; 12 to 18 are Mathera 2.0 plates (locked teasers)
+// the ladder: 1 to 15 drive (12–15 are precalc); 16 to 22 are Mathera 2.0 plates (locked teasers)
 const LICS = [FR ? { plate: 'Baker', math: 'Fractions', world: 'bakery' } : null,
   { plate: 'Permit', math: 'Precedence', world: 'lamps' }, { plate: 'Operator', math: 'Powers', world: 'outrun' }, { plate: 'Road', math: 'Simplify', world: 'future' },
   { plate: 'Sport', math: 'Expand', world: 'wire' }, { plate: 'Competition', math: 'Factor', world: 'gp' }, { plate: 'Algebra', math: 'Isolate', world: 'poly' },
   { plate: 'Advanced', math: 'Inequalities', world: 'night' }, { plate: 'Expert', math: 'Systems', world: 'industrial' }, { plate: 'Unlimited', math: 'Quadratics', world: 'cruisn' },
   { plate: 'Commercial', math: 'Rationals', world: 'canyon' }, { plate: 'Heavy', math: 'Radicals & logs', world: 'aurora' },
+  { plate: 'Function', math: 'Functions', world: 'aurora' }, { plate: 'Sketch', math: 'Transforms', world: 'future' },
+  { plate: 'Degree', math: 'Polynomials', world: 'industrial' }, { plate: 'Growth', math: 'Exponentials', world: 'night' },
   { math: 'Limits', uc: 1, tease: 'What a function heads toward' }, { math: 'Differentiate', uc: 1, tease: 'Slopes of curves, one rule at a time' }, { math: 'Integrate', uc: 1, tease: 'Areas, and undoing slopes' },
   { math: 'Trigonometry', uc: 1, tease: 'Angles, identities and waves' }, { math: 'Vectors & matrices', uc: 1, tease: 'Linear algebra: row reduction and transformations' },
   { math: 'Sequences & series', uc: 1, tease: 'Patterns that go on forever, and their sums' }, { math: 'Complex numbers', uc: 1, tease: 'The roots that "No real solution" was hiding' }];
@@ -6124,7 +6456,11 @@ const RIDES = [
   { name: 'Automobile', line: 'Two equations, four wheels, one solution.', at: 300 },
   { name: 'Race car', line: 'Zero to x² in four seconds.', at: 420 },
   { name: 'Robotaxi', line: 'You know the rules. Let the math drive.', at: 580 },
-  { name: 'Hyperloop', line: 'Hop in. Drop under the city. Next checkpoint is another skyline.', at: 580 }];
+  { name: 'Hyperloop', line: 'Hop in. Drop under the city. Next checkpoint is another skyline.', at: 580 },
+  { name: 'Route reader', line: 'Same capsule. Read f before you drop.', at: 580 },
+  { name: 'Shift gate', line: 'The tube bends: up, down, or a mirror.', at: 580 },
+  { name: 'Freight capsule', line: 'More terms. Same beam.', at: 580 },
+  { name: 'Boost capsule', line: 'Every checkpoint the beam doubles.', at: 580 }];
 const odoRide = () => Math.max(S.ride || 0, RIDES.reduce((k, r, i) => S.odo >= r.at ? i : k, 0));
 const rideFor = lic => lic === 0 ? odoRide() : Math.max(0, Math.min(RIDES.length - 1, lic - 1));
 let rideT = 0;
@@ -6221,7 +6557,7 @@ window.addEventListener('resize', () => { if (!$('vPlay').hidden) fit(); });
    Practice: no clock; road + speedometer still react to streak. Rally: clock + distance.
    Sprint (mode key still "forks"): same expression taps under a harder clock — no highway-sign MCQ.
    Correct tap collapses that sub-expression; streak speeds the car; a miss sputters and resets streak.
-   Algebra licenses 2–11: same step-workout rule — tap next transform (expression ops / tan chips).
+   Algebra licenses 2–15: same step-workout rule — tap next transform (expression ops / tan chips).
    Picture answers (graphs, number lines, regions) keep sign cards. */
 let G = null, raf = 0;
 const racing = () => G && G.mode !== 'practice';
@@ -6501,7 +6837,7 @@ const TEST_NAME = { road: 'Road test', renew: 'Renewal', pro: 'Pro test' };
 const akey = () => S.lic + '.' + (S.alv[S.lic] || 1);
 
 // levels whose answers are pictures (or whose steps regularly show picture cards)
-const PIC_IDS = new Set(['f.name','f.line','7.nl','7.int','7.xy','7.both','8.line','8.graph','8.slopes','8.parab','9.read','9.ineq','9.linepar','10.graph','11.graph']);
+const PIC_IDS = new Set(['f.name','f.line','7.nl','7.int','7.xy','7.both','8.line','8.graph','8.slopes','8.parab','9.read','9.ineq','9.linepar','10.graph','11.graph','13.graph']);
 const isPicTree = t => !!(t && (t.t === 'nl' || t.t === 'plot' || t.t === 'bar' || t.t === 'npt' || t.t === 'iv'));
 function stepIsPictorial(step) {
   if (!step) return false;
@@ -6658,7 +6994,8 @@ function bindTapTargets(bag, opts) {
     });
     if (best >= 0 && bestS >= 3) { map[node.id] = best; claimed.add(best); usedNodes.add(node.id); }
   });
-  // pass 2: every uncovered right claims its best leftover node (even weak score)
+  // pass 2: a right with a real keyword match (score >= 2) claims a leftover node.
+  // Planning moves (shift up, which graph, plug-in) stay as tan chips — never a random operator.
   opts.forEach((o, i) => {
     if (!o.ok || claimed.has(i)) return;
     let best = null, bestS = -1;
@@ -6667,10 +7004,7 @@ function bindTapTargets(bag, opts) {
       const sc = scoreFocus(o, node);
       if (sc > bestS) { bestS = sc; best = node; }
     });
-    // if still tied at -1 / 0, take first unused add/mul/rel/paren node
-    if (!best) best = bag.nodes.find(n => !usedNodes.has(n.id) && /add|sub|mul|div|rel|paren|root|pow|log/.test(n.kind));
-    if (!best) best = bag.nodes.find(n => !usedNodes.has(n.id));
-    if (best) { map[best.id] = i; claimed.add(i); usedNodes.add(best.id); }
+    if (best && bestS >= 2) { map[best.id] = i; claimed.add(i); usedNodes.add(best.id); }
   });
   // pass 3: uncovered wrongs bind to leftover nodes with score >= 2 (so a wrong tap can miss)
   opts.forEach((o, i) => {

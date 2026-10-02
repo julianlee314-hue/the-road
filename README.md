@@ -8,8 +8,8 @@ Curriculum first; the race is the spoonful of sugar. Progress saves in the brows
 
 ## Plates (licenses)
 
-| # | Plate | Math | Ride (v1) |
-|--:|-------|------|-----------|
+| # | Plate | Math | Ride |
+|--:|-------|------|------|
 | 1 | Permit | Precedence | On foot |
 | 2 | Operator | Powers | Runner |
 | 3 | Road | Simplify | Litter |
@@ -20,13 +20,17 @@ Curriculum first; the race is the spoonful of sugar. Progress saves in the brows
 | 8 | Expert | Systems | Automobile |
 | 9 | Unlimited | Quadratics | Race car |
 | 10 | Commercial | Rationals | Robotaxi |
-| 11 | Heavy | Radicals & logs | Hyperloop *(sprite stub)* |
-| 12–18 | — | Limits → Complex | *The Sky — locked teasers* |
+| 11 | Heavy | Radicals & logs | Hyperloop |
+| 12 | Function | Functions | Route reader (Hyperloop art) |
+| 13 | Sketch | Transforms | Shift gate (Hyperloop art) |
+| 14 | Degree | Polynomials | Freight capsule (Hyperloop art) |
+| 15 | Growth | Exponentials | Boost capsule (Hyperloop art) |
+| 16–22 | — | Limits → Complex | *The Sky — locked teasers* |
 
-Public spotlight for this push: **plates 1–6** (verified against Julius’s screenshots). 7–11 are playable in the same app; 12–18 stay Mathera 2.0 teasers.
+Plates 12–15 are the precalc bridge (playable) before Limits. Graph / number-line choices stay picture cards. Everything else is tap-the-next-move on the expression.
 
 Separate from Math Sensei’s [Precedence](https://julianlee314-hue.github.io/precedence/) MVP (different save key, different skin).
 
 ## Source
 
-Built from the Oct 2026 design pack (`the-road.zip`). Rebuild with `games/precedence/build.py` in the design pack.
+Single static `index.html` plus `.nojekyll` for GitHub Pages.

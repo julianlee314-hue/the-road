@@ -1,9 +1,9 @@
-# The Road — 18 rides (proposed)
+# The Road — rides
 
-Technology progression: ground (The Road) → air/space (The Sky). Pixel art stays code-drawn; no real brands.
+Technology progression: ground (The Road) → tube (Hyperloop) → air/space (The Sky). Pixel art stays code-drawn; no real brands.
 
-| Plate | Math | Ride | Arrival line (draft) | Sprite status |
-|--:|------|------|----------------------|---------------|
+| Plate | Math | Ride | Arrival line | Sprite |
+|--:|------|------|----------------|------|
 | 1 | Precedence | On foot | Two legs, zero brackets. Let's walk. | built |
 | 2 | Powers | Runner | Same legs. Squared effort. | built |
 | 3 | Simplify | Litter | Some people carry their own terms. You have people for that. | built |
@@ -14,13 +14,17 @@ Technology progression: ground (The Road) → air/space (The Sky). Pixel art sta
 | 8 | Systems | Automobile | Two equations, four wheels, one solution. | built |
 | 9 | Quadratics | Race car | Zero to x² in four seconds. | built |
 | 10 | Rationals | Robotaxi | You know the rules. Let the math drive. | built |
-| 11 | Radicals & logs | Hyperloop | Hop in. Drop under the city. Next checkpoint is another skyline. | **needs draw** (tube/cyberpunk; stub uses race-car silhouette until art) |
-| 12 | Limits | Glider | Approaches the cliff. Never quite hits it. | Sky — stub |
-| 13 | Differentiate | Prop plane | Climb rate = slope. | Sky — stub |
-| 14 | Integrate | Jet | Area under the wing. | Sky — stub |
-| 15 | Trigonometry | Helicopter | Rotors go round. So do angles. | Sky — stub |
-| 16 | Vectors & matrices | Orbital shuttle | Direction and magnitude, docked. | Sky — stub |
-| 17 | Sequences & series | Station tug | One more term. Then one more. | Sky — stub |
-| 18 | Complex numbers | Starship | Imaginary part optional. Navigation isn't. | Sky — stub |
+| 11 | Radicals & logs | Hyperloop | Hop in. Drop under the city. Next checkpoint is another skyline. | built |
+| 12 | Functions | Route reader | Same capsule. Read f before you drop. | Hyperloop art |
+| 13 | Transforms | Shift gate | The tube bends: up, down, or a mirror. | Hyperloop art |
+| 14 | Polynomials | Freight capsule | More terms. Same beam. | Hyperloop art |
+| 15 | Exponentials | Boost capsule | Every checkpoint the beam doubles. | Hyperloop art |
+| 16 | Limits | Glider | Approaches the cliff. Never quite hits it. | locked teaser |
+| 17 | Differentiate | Prop plane | Climb rate = slope. | locked teaser |
+| 18 | Integrate | Jet | Area under the wing. | locked teaser |
+| 19 | Trigonometry | Helicopter | Rotors go round. So do angles. | locked teaser |
+| 20 | Vectors & matrices | Orbital shuttle | Direction and magnitude, docked. | locked teaser |
+| 21 | Sequences & series | Station tug | One more term. Then one more. | locked teaser |
+| 22 | Complex numbers | Starship | Imaginary part optional. Navigation isn't. | locked teaser |
 
-Plate 11 = Boring-style Hyperloop (city → underground beam → other city on checkpoints). Confirm Sky craft before art pass.
+Plates 12–15 reuse the Hyperloop capsule (checkpoint still drops into the tube). Sky craft stay names-only until those plates unlock.
