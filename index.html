@@ -14,7 +14,7 @@
   --desk:#f1eee6; --desk-2:#e5e1d6; --desk-line:#cfc9ba;
   --card:#fffefb; --card-ink:#1c232b; --rule-red:#d6453d; --card-shadow:0 1px 0 rgba(0,0,0,.08),0 10px 24px rgba(40,30,10,.12);
   --chalk:#1c232b; --chalk-dim:#5d6873; --good:#2f9a5a; --warn:#c48a12; --bad:#d6453d; --hint:#1f7fb8;
-  --chip:#f3f0e8; --chip-line:#c9c2b2;
+  --chip:#e8dcc4; --chip-line:#c4b498;
   --cell:#dcd7ca; --l1:#ecd3a6; --l2:#ddb04f; --l3:#5fb883; --l4:#1d8a4c;
   --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -26,7 +26,7 @@
     --desk:#22303c; --desk-2:#2b3b49; --desk-line:#3a4c5c;
     --card:#fbfaf6; --card-ink:#1c232b; --card-shadow:0 2px 0 rgba(0,0,0,.25),0 14px 30px rgba(0,0,0,.28);
     --chalk:#e9eef2; --chalk-dim:#9fb0be; --good:#5fbf7f; --warn:#e3b23c; --bad:#ef6a5f; --hint:#4fb6ee;
-    --chip:#f1eee6; --chip-line:#c9c2b2;
+    --chip:#e8dcc4; --chip-line:#c4b498;
     --cell:#22303c; --l1:#5a4a2c; --l2:#9a7a2e; --l3:#3f8f5c; --l4:#7fe0a0;
     color-scheme:dark;
   }
@@ -35,7 +35,7 @@
   --desk:#22303c; --desk-2:#2b3b49; --desk-line:#3a4c5c;
   --card:#fbfaf6; --card-ink:#1c232b; --card-shadow:0 2px 0 rgba(0,0,0,.25),0 14px 30px rgba(0,0,0,.28);
   --chalk:#e9eef2; --chalk-dim:#9fb0be; --good:#5fbf7f; --warn:#e3b23c; --bad:#ef6a5f; --hint:#4fb6ee;
-  --chip:#f1eee6; --chip-line:#c9c2b2;
+  --chip:#e8dcc4; --chip-line:#c4b498;
   --cell:#22303c; --l1:#5a4a2c; --l2:#9a7a2e; --l3:#3f8f5c; --l4:#7fe0a0;
   color-scheme:dark;
 }
@@ -122,13 +122,25 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .expr .grp.going{opacity:.15}
 .expr .n.fresh{animation:pop .3s ease-out;color:var(--good)}
 @keyframes pop{0%{transform:scale(.6);opacity:.3}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-.op{border:0;background:var(--chip);color:var(--card-ink);box-shadow:inset 0 0 0 2px var(--chip-line),0 2px 0 var(--chip-line);border-radius:.22em;
-  font-family:var(--display);font-weight:800;font-size:1em;line-height:1;min-width:1.55em;min-height:1.55em;padding:.22em .28em .26em;margin:0 .16em;vertical-align:.02em;touch-action:manipulation}
-.op.pow{font-size:.62em;vertical-align:1.05em;margin:0 .08em 0 .04em;min-width:1.45em;min-height:1.45em;padding:.16em .22em}
-.op:active{transform:translateY(1px)}
+.op{border:0;background:#e8dcc4;color:var(--card-ink);box-shadow:inset 0 0 0 1.5px #c4b498,0 2px 0 #b8a888,0 3px 6px rgba(40,30,10,.12);border-radius:.28em;
+  font-family:var(--display);font-weight:800;font-size:1em;line-height:1;min-width:1.7em;min-height:1.7em;padding:.28em .34em .32em;margin:0 .2em;vertical-align:.04em;touch-action:manipulation;cursor:pointer}
+.op.pow{font-size:.62em;vertical-align:1.05em;margin:0 .08em 0 .04em;min-width:1.5em;min-height:1.5em;padding:.18em .24em}
+.op:active{transform:translateY(2px);box-shadow:inset 0 0 0 1.5px #c4b498,0 1px 0 #b8a888}
 .op.right{background:var(--good);color:#fff;box-shadow:none}
 .op.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s}
 .op.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+.op.dead{pointer-events:none;opacity:.55;box-shadow:none;background:transparent;min-width:0;min-height:0;padding:0;margin:0 .12em}
+/* algebra transform chips: same tan tile language as .op, never full next-line MCQ */
+.xchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0 2px}
+.xchip{border:0;background:#e8dcc4;color:var(--card-ink);box-shadow:inset 0 0 0 1.5px #c4b498,0 2px 0 #b8a888,0 3px 6px rgba(40,30,10,.12);border-radius:10px;
+  font-family:var(--display);font-weight:800;font-size:clamp(15px,4.2vw,20px);line-height:1.15;padding:12px 14px;touch-action:manipulation;cursor:pointer;max-width:100%;text-align:center}
+.xchip:active{transform:translateY(2px)}
+.xchip.right{background:var(--good);color:#fff;box-shadow:none}
+.xchip.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s;opacity:.7}
+.xchip.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+.xchip small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;opacity:.65;font-weight:600;margin-bottom:2px;text-transform:uppercase}
+.signs.alg.xmode{background:transparent;box-shadow:none;padding:0;outline:none}
+.signs.alg.xmode .xchips{width:100%}
 /* streak speedometer: gauge fill tracks consecutive correct-order taps */
 .speedo{display:flex;align-items:center;gap:10px;background:var(--desk-2);border-radius:999px;padding:6px 12px 6px 8px;box-shadow:inset 0 0 0 1px var(--desk-line);min-width:0}
 .speedo .gauge{position:relative;width:52px;height:28px;border-radius:28px 28px 0 0;border:2px solid var(--desk-line);border-bottom:0;overflow:hidden;flex:0 0 auto;background:rgba(0,0,0,.12)}
@@ -1219,7 +1231,7 @@ function sysStatus(lines, vars) {
 }
 
 G.Alg = { Mx, Bar, Npt, Log, Ln, Ec, Q, qa, qs, qm, qd, qneg, qabs, qcmp, qf, qint, qz, toQ, gcd, N, V, S, Neg, M, F, Dv, P, R, Abs, B, PM, Rel, Eq, Or, Sys, T,
-  poly, padd, pmul, pscale, pdeg, term, ptree, html, text, evalf, evalq, holdsq, splitPM, lettersOf,
+  poly, padd, pmul, pscale, pdeg, term, ptree, html, text, evalf, evalq, holdsq, splitPM, lettersOf, signOf, REL, MINUS,
   sameExpr, sameSol, sameSolN, solSetN, sameRegion, sameFormula, sameIneq, rowOf, rank, implied, sysStatus, solSet };
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -6209,7 +6221,8 @@ window.addEventListener('resize', () => { if (!$('vPlay').hidden) fit(); });
    Practice: no clock; road + speedometer still react to streak. Rally: clock + distance.
    Sprint (mode key still "forks"): same expression taps under a harder clock — no highway-sign MCQ.
    Correct tap collapses that sub-expression; streak speeds the car; a miss sputters and resets streak.
-   Algebra licenses 2+ still use sign cards (aStart / aPick). */
+   Algebra licenses 2–11: same step-workout rule — tap next transform (expression ops / tan chips).
+   Picture answers (graphs, number lines, regions) keep sign cards. */
 let G = null, raf = 0;
 const racing = () => G && G.mode !== 'practice';
 function start(mode) {
@@ -6250,9 +6263,12 @@ function hud() {
     const per = G.alg ? G.alg.perCp : G.mode === 'forks' ? FORKS.perCp : RALLY.perCp;
     $('cps').innerHTML = Array.from({ length: per }, (_, i) => `<i class="${i < G.cpCount ? 'on' : ''}"></i>`).join('');
   } else { $('sA').innerHTML = `<b>${G.solved}</b> solved`; }
-  // speedometer always mirrors streak-driven road speed (Permit pedagogy)
-  if (!G.alg && !G.bench) {
-    const kmh = Math.round(G.speed || 0), maxK = Math.round((SPEED.base + SPEED.perStreak * SPEED.cap) * (SPEED.level[G.level - 1] || 1));
+  // speedometer mirrors streak-driven road speed on every step workout (Permit + licenses)
+  if (!G.bench) {
+    const kmh = Math.round(G.speed || 0);
+    const maxK = G.alg
+      ? Math.round((SPEED.base + SPEED.perStreak * SPEED.cap) * (G.alg.k || 1))
+      : Math.round((SPEED.base + SPEED.perStreak * SPEED.cap) * (SPEED.level[G.level - 1] || 1));
     const pct = Math.max(0, Math.min(100, maxK ? 100 * kmh / maxK : 0));
     $('spdNum').textContent = kmh;
     const fill = $('gaugeFill'), gauge = $('gauge'), flame = $('flame');
@@ -6466,7 +6482,7 @@ function startTest(lic) { const t = licTest(lic); if (!t) return; const c = TEST
 function nextPlayable(lic, i) { const n = LV.LIC[lic].levels.length; for (let j = i + 1; j <= n; j++) if (playable(lic, j)) return [lic, j]; return lic && lic < LV.LAST ? [lic + 1, 1] : null; }
 
 /* ---------- the mistake garage ----------
-   Every wrong card you pick files its reason as a part, by license. Heat rises with each miss; meeting the same
+   Every wrong move you pick files its reason as a part, by license. Heat rises with each miss; meeting the same
    trap and picking right three times in a row fixes it. Tune-up drives problems that show your hottest traps. */
 const trapKey = w => String(w || '').replace(/<[^>]+>/g, '').replace(/[−-]?\d+(\.\d+)?/g, '#').replace(/\b[a-z]\b/g, '_').trim();
 function garageMiss(why) { const k = trapKey(why); if (!k) return; const g = S.garage[k] || (S.garage[k] = { why, lic: G.alg.lic, id: G.alg.id, heat: 0, miss: 0, fix: 0, fixed: false });
@@ -6477,11 +6493,36 @@ const hotParts = () => Object.entries(S.garage).filter(([, g]) => !g.fixed).sort
 function trapOnPath(prob, key) { let st = prob.start, k = 0; while (st && !st.done && k++ < 14) { if (st.opts.some(o => !o.ok && trapKey(o.why) === key)) return true; st = st.opts.find(o => o.ok).next(); } return false; }
 function levelById(id) { for (let lic = FR ? 0 : 2; lic <= LV.LAST; lic++) { if (lic === 1) continue; const i = LV.LIC[lic].levels.findIndex(L => L.id === id); if (i >= 0) return [lic, i + 1]; } return null; }
 
-/* ---------- licenses 2 to 9: pick the right next line ----------
-   The card shows the line (and the last lines above it, faded); the signs below are candidate next lines.
-   A sign is right when the checker says it means the same thing, so any equivalent move counts. */
+/* ---------- licenses 2 to 11: step workouts ----------
+   Algebraic steps: tap the next transform (tan chips / ops on the live expression). The line
+   collapses in place. A pick is wrong only when it changes the meaning (equivalence checker).
+   Pictorial steps (graphs, number lines, bars, regions): keep sign cards — the answer is a picture. */
 const TEST_NAME = { road: 'Road test', renew: 'Renewal', pro: 'Pro test' };
 const akey = () => S.lic + '.' + (S.alv[S.lic] || 1);
+
+// levels whose answers are pictures (or whose steps regularly show picture cards)
+const PIC_IDS = new Set(['f.name','f.line','7.nl','7.int','7.xy','7.both','8.line','8.graph','8.slopes','8.parab','9.read','9.ineq','9.linepar','10.graph','11.graph']);
+const isPicTree = t => !!(t && (t.t === 'nl' || t.t === 'plot' || t.t === 'bar' || t.t === 'npt' || t.t === 'iv'));
+function stepIsPictorial(step) {
+  if (!step) return false;
+  if (G && G.alg && PIC_IDS.has(G.alg.id)) return true;
+  if (isPicTree(step.tree)) return true;
+  const opts = step.opts || [];
+  if (opts.some(o => isPicTree(o.tree))) return true;
+  // a step whose options are mostly short txt answers about a picture still counts
+  if (opts.length && opts.every(o => o.tree && (o.tree.t === 'txt' || isPicTree(o.tree))) && /graph|line|shade|region|parabola|number line/i.test(opts.map(o => o.move || o.why || '').join(' '))) return true;
+  return false;
+}
+// short tan-chip label from a move / why — never the full next expression
+function chipLabel(o) {
+  let m = String(o.move || o.why || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  if (!m) m = o.ok ? 'Next step' : 'Not this';
+  // keep first clause, trim length
+  m = m.split(/[.:]/)[0].trim();
+  if (m.length > 42) m = m.slice(0, 40).replace(/\s+\S*$/, '') + '…';
+  return m;
+}
+
 function aStart(mode, tune, test) {
   ac();
   let lic = S.lic, lv = S.alv[lic] || 1;
@@ -6495,12 +6536,13 @@ function aStart(mode, tune, test) {
   G = { mode, tune, test, alg: { lic, lv, id: lvAt(lic, lv).id, perCp, k: 1 + 0.1 * (lic - 2) + 0.03 * (lv - 1) }, tier: 0, clean: 0, seen: new Set(), cpSteps: 0, level: 1, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], whys: {},
     clock: RALLY.start * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
   const run = mode !== 'practice';
-  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = !run; $('signs').hidden = false; $('signs').classList.add('alg');
-  $('speedo').hidden = true; // speedometer is Permit/Precedence pedagogy
-  $('vPlay').classList.toggle('racing', run);
+  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = false;
+  $('signs').hidden = false; $('signs').classList.add('alg');
+  $('speedo').hidden = false; // step workouts share the streak speedometer
+  $('vPlay').classList.toggle('racing', true);
   show('vPlay');
-  if (run) { RD.reset(); RD.setWorld(LICS[lic].world); RD.setSpeed(0); RD.start(); } else RD.stop();
-  aNext(); if (run) loop();
+  RD.reset(); RD.setWorld(LICS[lic].world); RD.setSpeed(0); RD.start();
+  aNext(); loop();
 }
 function aNext() {
   // numbers grow with the run (tier 0 to 2); never the same problem twice in one run
@@ -6515,45 +6557,215 @@ function aNext() {
   $('card').classList.remove('done');
   $('metaL').textContent = `${G.tune ? 'Tune-up · ' : G.test ? TEST_NAME[G.test.type] + ' ' + (G.test.done + 1) + '/' + G.test.total + ' · ' : ''}${lvCode(G.alg.lic, G.alg.lv)} · ${lvAt(G.alg.lic, G.alg.lv).name}`;
   $('metaR').textContent = racing() ? `checkpoint ${G.cp + 1}` : 'practice';
-  $('hint').innerHTML = G.solved ? '' : 'Pick the right next line.';
+  $('hint').innerHTML = G.solved ? '' : (stepIsPictorial(G.step) ? 'Pick the picture that matches.' : 'Tap the <b>next move</b>. The line simplifies in place.');
   aRender(); hud();
 }
 // a system of lines reads one per line; an answer like x = 2, y = 3 stays on one
 const lineHtml = t => t.t === 'sys' && !t.a.every(r => r.a && r.a[0].t === 'v' && r.a[1].t === 'n') ? t.a.map(A.html).join('<br>') : A.html(t);
-function aLine() {
+
+/* Walk an algebra tree and emit HTML with tappable operators / radicals / relations / brackets.
+   Each hotspot gets a sequential data-id; callers map ids → opts. Numbers and letters stay plain. */
+function algTapHtml(t, bag, ctx) {
+  bag = bag || { n: 0, nodes: [] };
+  const btn = (sym, kind, node, aria) => {
+    const id = bag.n++;
+    bag.nodes.push({ id, kind, node, sym });
+    return `<button type="button" class="op" data-id="${id}" data-kind="${kind}" aria-label="${aria || sym}">${sym}</button>`;
+  };
+  if (!t) return '?';
+  switch (t.t) {
+    case 'n': return A.html(t);
+    case 'v': return `<i>${t.s}</i>`;
+    case 'txt': return `<span class="tx">${A.html(t).replace(/<\/?span[^>]*>/g, '') || t.s}</span>`;
+    case 'ec': return '<i>e</i>';
+    case '+': return t.a.map((x, i) => {
+      const [sg, u] = A.signOf(x);
+      const h = algTapHtml(u, bag, '+');
+      if (i === 0) return sg < 0 ? (A.MINUS + h) : h;
+      return (sg < 0 ? btn(A.MINUS, 'sub', t, 'minus') : btn('+', 'add', t, 'plus')) + h;
+    }).join('');
+    case 'neg': {
+      const inner = algTapHtml(t.a, bag, 'neg');
+      return btn(A.MINUS, 'neg', t, 'negate') + (t.a.t === '+' ? '(' + inner + ')' : inner);
+    }
+    case '*': return t.a.map((x, i) => {
+      let h = algTapHtml(x, bag, '*');
+      if (x.t === '+' || (x.t === 'neg' && i > 0) || (x.t === 'n' && x.v && x.v.n < 0 && i > 0)) h = '(' + h + ')';
+      if (i === 0) return h;
+      if (t.sym === '') return btn('·', 'mul', t, 'times') + h;
+      return btn(t.sym === '*' ? '×' : t.sym, 'mul', t, 'times') + h;
+    }).join('');
+    case '/':
+      if (t.bar) return `<span class="fr"><span>${algTapHtml(t.a, bag)}</span><span>${algTapHtml(t.b, bag)}</span></span>`;
+      return algTapHtml(t.a, bag) + btn('÷', 'div', t, 'divide') + algTapHtml(t.b, bag);
+    case '^': {
+      const base = (t.a.t === 'v' || t.a.t === 'ec' || t.a.t === '()' || (t.a.t === 'n' && t.a.v && t.a.v.n >= 0))
+        ? algTapHtml(t.a, bag) : '(' + algTapHtml(t.a, bag) + ')';
+      const ex = algTapHtml(t.e, bag);
+      return base + `<sup>${btn(ex.replace(/<[^>]+>/g, '') || '^', 'pow', t, 'power')}</sup>`;
+    }
+    case 'rt': return (t.k === 2 ? '' : `<sup class="ri">${t.k}</sup>`) + btn('√', 'root', t, 'root') + `<span class="rad">${algTapHtml(t.a, bag)}</span>`;
+    case 'abs': return '|' + algTapHtml(t.a, bag) + '|';
+    case 'log': {
+      const head = t.b === 'e' ? 'ln' : t.b === 10 ? 'log' : `log<sub>${t.b}</sub>`;
+      return btn(head, 'log', t, 'log') + '(' + algTapHtml(t.a, bag) + ')';
+    }
+    case '()': return btn(t.sq ? '[' : '(', 'paren', t, 'bracket') + algTapHtml(t.a, bag) + (t.sq ? ']' : ')');
+    case 'pm': return (t.a ? algTapHtml(t.a, bag) + ' ' : '') + btn('±', 'pm', t, 'plus-minus') + algTapHtml(t.b, bag);
+    case 'rel': return t.a.map((x, i) => (i ? btn((A.REL[t.ops[i - 1]] || t.ops[i - 1]), 'rel', t, 'relation') : '') + algTapHtml(x, bag)).join('');
+    case 'or': return t.a.map((x, i) => (i ? ' <span class="or">or</span> ' : '') + algTapHtml(x, bag)).join('');
+    case 'sys': return t.only !== undefined ? algTapHtml(t.a[t.only], bag) : t.a.map((x, i) => (i ? ', ' : '') + algTapHtml(x, bag)).join('');
+    case 'nl': case 'plot': case 'iv': case 'bar': case 'npt': case 'mx': return A.html(t);
+  }
+  return A.html(t);
+}
+
+// score how well a move/why wants a given hotspot kind (+ optional number match)
+function scoreFocus(opt, node) {
+  const m = String(opt.move || opt.why || '').toLowerCase();
+  let s = 0;
+  const kind = node.kind;
+  if (/distribut|expand|foil|multiply out|bracket/.test(m) && (kind === 'paren' || kind === 'mul')) s += 5;
+  if (/divid|÷|both sides.*\/|undo times/.test(m) && (kind === 'div' || kind === 'mul' || kind === 'rel')) s += 4;
+  if (/(add|subtract|move|both sides|flip the sign)/.test(m) && (kind === 'add' || kind === 'sub' || kind === 'rel' || kind === 'neg')) s += 4;
+  if (/factor|take out|common factor|gcf/.test(m) && (kind === 'mul' || kind === 'paren' || kind === 'add')) s += 4;
+  if (/combin|like term|collect/.test(m) && (kind === 'add' || kind === 'sub')) s += 5;
+  if (/square|root|radical|√|rationaliz/.test(m) && (kind === 'root' || kind === 'pow')) s += 5;
+  if (/log|ln|exponent|change of base|condense|expand with the log/.test(m) && (kind === 'log' || kind === 'pow' || kind === 'mul' || kind === 'div' || kind === 'add')) s += 3;
+  if (/isolat|solve for|put [xyz]/.test(m) && (kind === 'rel' || kind === 'add' || kind === 'sub' || kind === 'mul' || kind === 'div')) s += 3;
+  if (/=/.test(m) && kind === 'rel') s += 1;
+  // number mentioned in the move that appears near this node
+  const nums = m.match(/-?\d+(?:\.\d+)?/g) || [];
+  if (nums.length) {
+    const blob = JSON.stringify(node.node || {}).slice(0, 400);
+    if (nums.some(n => blob.includes(n))) s += 2;
+  }
+  return s;
+}
+
+function bindTapTargets(bag, opts) {
+  // map each hotspot id → best matching opt index (prefer rights). Threshold soft; then
+  // guarantee every right gets its best remaining node so expression taps stay primary.
+  const map = {}, claimed = new Set(), usedNodes = new Set();
+  const order = opts.map((o, i) => i).sort((a, b) => (opts[b].ok - opts[a].ok) || a - b);
+  // pass 1: strong matches
+  bag.nodes.forEach(node => {
+    let best = -1, bestS = 0;
+    order.forEach(i => {
+      if (claimed.has(i)) return;
+      const sc = scoreFocus(opts[i], node);
+      if (sc > bestS) { bestS = sc; best = i; }
+    });
+    if (best >= 0 && bestS >= 3) { map[node.id] = best; claimed.add(best); usedNodes.add(node.id); }
+  });
+  // pass 2: every uncovered right claims its best leftover node (even weak score)
+  opts.forEach((o, i) => {
+    if (!o.ok || claimed.has(i)) return;
+    let best = null, bestS = -1;
+    bag.nodes.forEach(node => {
+      if (usedNodes.has(node.id)) return;
+      const sc = scoreFocus(o, node);
+      if (sc > bestS) { bestS = sc; best = node; }
+    });
+    // if still tied at -1 / 0, take first unused add/mul/rel/paren node
+    if (!best) best = bag.nodes.find(n => !usedNodes.has(n.id) && /add|sub|mul|div|rel|paren|root|pow|log/.test(n.kind));
+    if (!best) best = bag.nodes.find(n => !usedNodes.has(n.id));
+    if (best) { map[best.id] = i; claimed.add(i); usedNodes.add(best.id); }
+  });
+  // pass 3: uncovered wrongs bind to leftover nodes with score >= 2 (so a wrong tap can miss)
+  opts.forEach((o, i) => {
+    if (o.ok || claimed.has(i)) return;
+    let best = null, bestS = 1;
+    bag.nodes.forEach(node => {
+      if (usedNodes.has(node.id)) return;
+      const sc = scoreFocus(o, node);
+      if (sc > bestS) { bestS = sc; best = node; }
+    });
+    if (best) { map[best.id] = i; claimed.add(i); usedNodes.add(best.id); }
+  });
+  return map;
+}
+
+function aLine(interactive) {
   const st = G.step, ex = $('expr');
   ex.className = 'expr math';
-  if (G.prob.kind === 'sys') { // the starting equations, then the latest working lines
+  const bag = { n: 0, nodes: [] };
+  const drawCur = t => interactive ? algTapHtml(t, bag) : lineHtml(t);
+  if (G.prob.kind === 'sys') {
     const L = st.lines || [], n0 = (G.prob.start.lines || []).length;
-    if (st === G.prob.start) ex.innerHTML = L.map(l => `<span class="cur">${A.html(l)}</span>`).join('');
+    if (st === G.prob.start) ex.innerHTML = L.map(l => `<span class="cur">${drawCur(l)}</span>`).join('');
     else {
       const isLast = L.length && L[L.length - 1] === st.tree, work = isLast ? L.slice(n0, -1) : L.slice(n0);
-      ex.innerHTML = L.slice(0, n0).map(l => `<span class="past sys">${A.html(l)}</span>`).join('') + work.slice(-2).map(l => `<span class="past">${A.html(l)}</span>`).join('') + `<span class="cur">${A.html(st.tree)}</span>`;
+      ex.innerHTML = L.slice(0, n0).map(l => `<span class="past sys">${lineHtml(l)}</span>`).join('') + work.slice(-2).map(l => `<span class="past">${lineHtml(l)}</span>`).join('') + `<span class="cur">${drawCur(st.tree)}</span>`;
     }
-  } else ex.innerHTML = G.past.slice(-2).map(t => `<span class="past">${lineHtml(t)}</span>`).join('') + `<span class="cur">${lineHtml(st.tree)}</span>`;
+  } else ex.innerHTML = G.past.slice(-2).map(t => `<span class="past">${lineHtml(t)}</span>`).join('') + `<span class="cur">${drawCur(st.tree)}</span>`;
   fit();
-  if (racing()) { // graphing on the road: the latest graph goes on the sat-nav
+  if (racing()) {
     const pic = [st.tree, ...G.past.slice().reverse()].find(t => t && t.t === 'plot');
     if (pic && pic !== G.navPic) { G.navPic = pic; RD.on('satnav', pic); }
   }
+  return bag;
 }
 function aRender() {
-  aLine();
-  const all = G.step.opts, rights = all.filter(o => o.ok), wrongs = shuffle(all.filter(o => !o.ok));
+  const all = G.step.opts || [], rights = all.filter(o => o.ok), wrongs = shuffle(all.filter(o => !o.ok));
+  const pic = stepIsPictorial(G.step);
   const n = racing() ? ALG.lanes[Math.min(G.cp, ALG.lanes.length - 1)] : 4;
-  if (!wrongs.length) { // nothing to choose: the car takes this step on its own
-    G.fork = null; $('signs').innerHTML = ''; G.busy = true;
+
+  if (!wrongs.length && rights.length) {
+    // nothing to choose: the car takes this step on its own
+    G.fork = null; $('signs').innerHTML = ''; $('signs').classList.remove('xmode'); G.busy = true;
+    aLine(false);
     setTimeout(() => { G.busy = false; if (G.over || G.stalling) return; aAdvance(rights[0]); }, 500); return;
   }
+
+  if (pic) {
+    // pictorial: keep classic sign cards (the answer is a picture)
+    aLine(false);
+    $('signs').classList.add('alg'); $('signs').classList.remove('xmode'); $('signs').hidden = false;
+    const keep = shuffle(rights.slice()).slice(0, Math.max(1, Math.min(rights.length, n - 1)));
+    const opts = shuffle(keep.concat(wrongs.slice(0, Math.max(1, n - keep.length))));
+    G.fork = { opts, mode: 'pic' };
+    const long = opts.some(o => A.text(o.tree).length > (A.html(o.tree).includes('class="fr"') ? 9 : 15)), cols = long ? (opts.length >= 3 ? 2 : 1) : Math.min(opts.length, 4);
+    const s = $('signs'); s.style.gridTemplateColumns = `repeat(${cols},minmax(0,1fr))`; s.dataset.n = opts.length;
+    s.innerHTML = opts.map((o, i) => `<button class="sign" data-i="${i}"><small>${i + 1}</small><span class="math">${A.html(o.tree)}</span></button>`).join('');
+    for (let c = cols; c > 1 && [...s.querySelectorAll('.sign')].some(e => e.scrollWidth > e.clientWidth + 1); ) { c = c > 2 ? 2 : 1; s.style.gridTemplateColumns = `repeat(${c},minmax(0,1fr))`; }
+    if (racing()) RD.on('fork', { lanes: opts.length });
+    if (!$('hint').innerHTML) $('hint').innerHTML = 'Pick the picture that matches.';
+    G.stepT = performance.now();
+    return;
+  }
+
+  // algebraic step workout: expression ops + tan transform chips (never full next-line MCQ)
   const keep = shuffle(rights.slice()).slice(0, Math.max(1, Math.min(rights.length, n - 1)));
   const opts = shuffle(keep.concat(wrongs.slice(0, Math.max(1, n - keep.length))));
-  G.fork = { opts };
-  const long = opts.some(o => A.text(o.tree).length > (A.html(o.tree).includes('class="fr"') ? 9 : 15)), cols = long ? (opts.length >= 3 ? 2 : 1) : Math.min(opts.length, 4);
-  const s = $('signs'); s.style.gridTemplateColumns = `repeat(${cols},minmax(0,1fr))`; s.dataset.n = opts.length;
-  s.innerHTML = opts.map((o, i) => `<button class="sign" data-i="${i}"><small>${i + 1}</small><span class="math">${A.html(o.tree)}</span></button>`).join('');
-  // short-looking cards can still be wide (subscripts, words): fall back to fewer columns when one spills
-  for (let c = cols; c > 1 && [...s.querySelectorAll('.sign')].some(e => e.scrollWidth > e.clientWidth + 1); ) { c = c > 2 ? 2 : 1; s.style.gridTemplateColumns = `repeat(${c},minmax(0,1fr))`; }
-  if (racing()) RD.on('fork', { lanes: opts.length });
+  const bag = aLine(true);
+  const tapMap = bindTapTargets(bag, opts);
+  const covered = new Set(Object.values(tapMap).map(Number));
+  const rightsCovered = opts.some((o, i) => o.ok && covered.has(i));
+  // Chips only for opts NOT already on the expression — never show the next line as an answer card.
+  // If every right is on-expression, chips hide entirely (pure tap-on-expression).
+  const chipIdx = opts.map((o, i) => i).filter(i => !covered.has(i));
+  // Safety: if no right is on-expression, force chips for all opts so the step stays playable
+  const showIdx = rightsCovered ? chipIdx : opts.map((_, i) => i);
+  G.fork = { opts, mode: 'tap', tapMap, bag };
+  const s = $('signs');
+  s.classList.add('alg', 'xmode');
+  if (!showIdx.length) {
+    s.hidden = true; s.innerHTML = '';
+    if (!$('hint').innerHTML) $('hint').innerHTML = 'Tap the <b>operation</b> that comes next on the line.';
+  } else {
+    s.hidden = false;
+    s.style.gridTemplateColumns = '1fr'; s.dataset.n = showIdx.length;
+    s.innerHTML = `<div class="xchips">${showIdx.map(i => `<button type="button" class="xchip" data-i="${i}">${chipLabel(opts[i])}</button>`).join('')}</div>`;
+    if (!$('hint').innerHTML) $('hint').innerHTML = rightsCovered
+      ? 'Tap the <b>operation</b> on the line. Extra moves sit below if needed.'
+      : 'Tap the <b>next move</b>. The line simplifies in place.';
+  }
+  if (racing()) RD.on('fork', { lanes: Math.max(showIdx.length, Object.keys(tapMap).length) || opts.length });
+  // glow best right op on first problem of a run
+  if (!G.solved && rightsCovered) {
+    Object.entries(tapMap).forEach(([id, oi]) => { if (opts[+oi] && opts[+oi].ok) { const b = document.querySelector(`.op[data-id="${id}"]`); if (b) b.classList.add('hint'); } });
+  }
   G.stepT = performance.now();
 }
 function aAdvance(o) {
@@ -6561,15 +6773,19 @@ function aAdvance(o) {
   if (G.step.done) return aSolved();
   aRender();
 }
-function aPick(i) {
+function aApply(i) {
   if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork) return;
-  const o = G.fork.opts[i], btn = document.querySelector(`.sign[data-i="${i}"]`); if (!o || o.used) return;
+  const o = G.fork.opts[i]; if (!o || o.used) return;
   const ms = performance.now() - G.stepT; G.taps++;
+  const btn = document.querySelector(`.xchip[data-i="${i}"], .sign[data-i="${i}"]`);
   if (o.ok) {
     if (!G.fork.opts.some(x => x.used)) garagePass(G.fork.opts);
     G.right++; G.cpSteps++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms); SND.right(G.streak);
     if (racing()) { RD.on('decision.correct'); RD.on('fork.pick', { lane: i, ok: true }); }
-    btn.classList.add('right'); G.busy = true;
+    if (btn) btn.classList.add('right');
+    // flash matching expression op
+    if (G.fork.tapMap) Object.entries(G.fork.tapMap).forEach(([id, oi]) => { if (+oi === i) { const b = document.querySelector(`.op[data-id="${id}"]`); if (b) b.classList.add('right'); } });
+    G.busy = true;
     $('hint').innerHTML = `<span class="mv">✓ ${o.move || 'Right.'}</span>`;
     setTimeout(() => { G.busy = false; if (G.over) return; aAdvance(o); }, 320);
   } else {
@@ -6577,13 +6793,35 @@ function aPick(i) {
     S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: A.text(o.tree), r: 'miss' }); if (S.log.length > 300) S.log.shift();
     if (racing()) { RD.on('decision.incorrect'); RD.on('fork.pick', { lane: i, ok: false }); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
     const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
-    o.used = true; btn.classList.add('wrong'); btn.disabled = true;
-    G.fork.opts.forEach((x, k) => { if (x.ok) { const rb = document.querySelector(`.sign[data-i="${k}"]`); if (rb) { rb.classList.remove('hint'); void rb.offsetWidth; rb.classList.add('hint'); } } });
-    $('hint').innerHTML = `<span class="why">${o.why}</span> The glowing one is right.`;
+    o.used = true; if (btn) { btn.classList.add('wrong'); btn.disabled = true; }
+    G.fork.opts.forEach((x, k) => { if (x.ok) {
+      const rb = document.querySelector(`.xchip[data-i="${k}"], .sign[data-i="${k}"]`); if (rb) { rb.classList.remove('hint'); void rb.offsetWidth; rb.classList.add('hint'); }
+      if (G.fork.tapMap) Object.entries(G.fork.tapMap).forEach(([id, oi]) => { if (+oi === k) { const b = document.querySelector(`.op[data-id="${id}"]`); if (b) { b.classList.remove('hint'); void b.offsetWidth; b.classList.add('hint'); } } });
+    } });
+    $('hint').innerHTML = `<span class="why">${o.why}</span> ${G.fork.mode === 'pic' ? 'The glowing one is right.' : 'The glowing move is next.'}`;
     G.stepT = performance.now();
   }
   save(); hud();
 }
+function aPick(i) { aApply(i); }
+function aTap(id) {
+  if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork || G.fork.mode !== 'tap') return;
+  const oi = G.fork.tapMap && G.fork.tapMap[id];
+  const btn = document.querySelector(`.op[data-id="${id}"]`);
+  if (oi === undefined) {
+    // tapping an op that isn't this step's move: soft nudge, not a miss (doesn't change the answer path)
+    if (btn) { btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong'); setTimeout(() => btn.classList.remove('wrong'), 280); }
+    $('hint').innerHTML = '<span class="why">Not the move for this step.</span> Try the glowing operation — or a tan move below.';
+    const rights = (G.fork.opts || []).map((o, i) => o.ok ? i : -1).filter(i => i >= 0);
+    rights.forEach(k => {
+      const rb = document.querySelector(`.xchip[data-i="${k}"]`); if (rb) { rb.classList.remove('hint'); void rb.offsetWidth; rb.classList.add('hint'); }
+      Object.entries(G.fork.tapMap || {}).forEach(([tid, oi2]) => { if (+oi2 === k) { const b = document.querySelector(`.op[data-id="${tid}"]`); if (b) { b.classList.remove('hint'); void b.offsetWidth; b.classList.add('hint'); } } });
+    });
+    return;
+  }
+  aApply(oi);
+}
+
 function aSolved() {
   G.solved++; SND.solved(); G.fork = null; $('signs').innerHTML = ''; if (!G.exprMiss) addOdo();
   aLine(); $('card').classList.add('done');
@@ -6625,7 +6863,7 @@ function aFinish() {
   const b = S.abest[key] || (S.abest[key] = { km: 0, solved: 0, right: 0, taps: 0 });
   b.solved += G.solved; b.right += G.right; b.taps += G.taps;
   let record = false; if (run && G.dist > b.km) { b.km = +G.dist.toFixed(2); record = true; }
-  save(); SND.end(); if (run) setTimeout(() => RD.stop(), 400);
+  save(); SND.end(); setTimeout(() => RD.stop(), 400);
   $('vDone').classList.toggle('arcade', run);
   $('rTitle').innerHTML = run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done';
   if (G.test && G.test.pass === null && !run) G.test.pass = false;
@@ -6776,12 +7014,14 @@ function renderHome() {
     const t = licTest(lic), cl = licClass(lic), lc = $('licCard'); lc.hidden = !t && !cl;
     lc.className = 'lcard' + (t ? t.type === 'renew' ? ' due' : ' on' : '');
     lc.innerHTML = `<span class="cls" aria-label="class">${cl || '–'}</span><span class="lc">${t ? `<b>${t.title}</b><span>${t.line}</span>` : (cl === 'L' ? (p => `<b>Learner</b><span>${p.n}/${p.of} stamped. Stamp them all to open the road test.</span>`)(licProgress(lic)) : `<b>Pro</b><span>Every class earned. Keep the stamps fresh.</span>`)}</span>${t ? `<button>${t.go}</button>` : ''}`;
-    $('tip').innerHTML = 'Each step, <b>pick the right next line</b>. Any line that means the same thing counts.';
+    $('tip').innerHTML = 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
     const b = S.abest[lvAt(lic, cur).id];
-    $('forksLine').textContent = b && b.km ? `Best ${b.km.toFixed(2)} km` : 'Signs: 2, then 4 lanes';
+    $('goPractice').querySelector('span').textContent = 'Tap the next move. No clock.';
+    $('forksLine').textContent = b && b.km ? `Best ${b.km.toFixed(2)} km` : 'Same taps, race the clock';
     return;
   }
   $('tip').innerHTML = "Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.";
+  $('goPractice').querySelector('span').textContent = 'Tap the next operation. No clock.';
   $('levels').innerHTML = E.LEVELS.map((L, i) => `<button class="lvl" data-l="${L.n}" aria-pressed="${S.level === L.n}"><span class="ops">${OPS_LABEL[i]}</span><span class="nm">Level ${L.n} · ${L.name}</span><span class="bs">${bestLine(i)}</span></button>`).join('');
   let h = '<div></div>' + [1, 2, 3, 4].map(l => `<div class="h">L${l}</div>`).join('');
   RULES.forEach(r => { h += `<div class="rn">${r.name}</div>` + [1, 2, 3, 4].map(l => { const L = ruleLevel(l, r.k), na = l === 1 && r.k !== 'brackets'; return `<div class="c${L ? ' l' + L : ''}" title="${r.name}, level ${l}"${na ? ' style="opacity:.35"' : ''}></div>`; }).join(''); });
@@ -6799,7 +7039,7 @@ function renderGarage() {
     return `<div class="branch"><div class="bh"><b>${LICS[lic].math}</b><span>${FR ? 'Bakery Lane' : lic + ' · ' + LICS[lic].plate}</span></div>` + gs.filter(g => !g.fixed).map(g => { const at = levelById(g.id);
       return `<div class="part h${g.heat}"><span class="pips" aria-label="heat ${g.heat} of 5">${'●'.repeat(g.heat)}${'○'.repeat(5 - g.heat)}</span><span class="pw">${g.why}</span><span class="pl">${at ? lvCode(at[0], at[1]) : ''}${g.fix ? ' · ' + g.fix + '/3' : ''}</span></div>`; }).join('') +
       (fx ? `<div class="part fixed"><span class="pips">✓</span><span class="pw">${fx} fixed</span><span class="pl"></span></div>` : '') + '</div>'; }).join('')
-    : '<p class="tip">Every wrong card you pick gets filed here with its reason. Fix a part by meeting that trap three times and picking right.</p>';
+    : '<p class="tip">Every wrong move you pick gets filed here with its reason. Fix a part by meeting that trap three times and picking right.</p>';
   $('goTune').disabled = !hot.length; $('tuneLine').textContent = hot.length ? `8 problems on your ${Math.min(4, hot.length)} hottest part${hot.length > 1 ? 's' : ''}` : 'Nothing to tune yet';
 }
 function tuneUp() { const hot = hotParts().slice(0, 4); if (hot.length) aStart('practice', hot); }
@@ -6808,14 +7048,14 @@ function renderLog() { const c = k => S.log.filter(e => e.r.startsWith(k)).lengt
 function renderSet() { renderLog(); $('openAll').textContent = S.openAll ? 'Lock comebacks again' : 'Open every level'; $('themeSeg').innerHTML = [[null, 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button data-t="${k || ''}" aria-pressed="${S.theme === k}">${l}</button>`).join(''); }
 
 /* ---------- wiring ---------- */
-$('expr').addEventListener('click', e => { const b = e.target.closest('.op'); if (b) tap(+b.dataset.id); });
+$('expr').addEventListener('click', e => { const b = e.target.closest('.op'); if (!b) return; if (G && G.alg) aTap(+b.dataset.id); else tap(+b.dataset.id); });
 $('plates').addEventListener('click', e => { const b = e.target.closest('.plate'); if (!b) return; S.lic = +b.dataset.lic; save(); renderHome(); });
 $('alv').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; S.alv[S.lic] = +b.dataset.v; save(); renderHome(); });
 $('levels').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; S.level = +b.dataset.l; save(); renderHome(); });
 $('goPractice').addEventListener('click', () => start('practice'));
 $('goRally').addEventListener('click', () => start('rally'));
 $('goForks').addEventListener('click', () => start(S.lic !== 1 ? 'race' : 'forks'));
-$('signs').addEventListener('click', e => { const b = e.target.closest('.sign'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i); });
+$('signs').addEventListener('click', e => { const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i); });
 $('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
@@ -6838,7 +7078,7 @@ $('copyLog').addEventListener('click', () => { const t = JSON.stringify(S.log, n
   if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, () => $('logMsg').textContent = 'Copy blocked here.'); else $('logMsg').textContent = 'Copy blocked here.'; });
 $('sndBtn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSnd(); if (S.sound) SND.solved(); });
 $('thmBtn').addEventListener('click', () => { S.theme = isDark() ? 'light' : 'dark'; save(); applyTheme(); if (!$('vSet').hidden) renderSet(); });
-window.__prec = { RIDES, rideFor, odoRide, S: () => S, G: () => G, tap, pick, aPick, bPick, bStart, bLevel, BENCH, E, RD, A, LV, stampOf, tuneUp, hotParts };
+window.__prec = { RIDES, rideFor, odoRide, S: () => S, G: () => G, tap, pick, aPick, aTap, bPick, bStart, bLevel, BENCH, E, RD, A, LV, stampOf, tuneUp, hotParts, stepIsPictorial, PIC_IDS };
 applyTheme(); renderSnd(); show('vHome');
 })();
 </script>
