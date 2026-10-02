@@ -14,7 +14,7 @@ Technology progression: ground (The Road) → air/space (The Sky). Pixel art sta
 | 8 | Systems | Automobile | Two equations, four wheels, one solution. | built |
 | 9 | Quadratics | Race car | Zero to x² in four seconds. | built |
 | 10 | Rationals | Robotaxi | You know the rules. Let the math drive. | built |
-| 11 | Radicals & logs | Maglev | Faster than sound. Quiet as a log. | **needs draw** (uses robotaxi for now) |
+| 11 | Radicals & logs | Hyperloop | Hop in. Drop under the city. Next checkpoint is another skyline. | **needs draw** (tube/cyberpunk; stub uses race-car silhouette until art) |
 | 12 | Limits | Glider | Approaches the cliff. Never quite hits it. | Sky — stub |
 | 13 | Differentiate | Prop plane | Climb rate = slope. | Sky — stub |
 | 14 | Integrate | Jet | Area under the wing. | Sky — stub |
@@ -23,4 +23,4 @@ Technology progression: ground (The Road) → air/space (The Sky). Pixel art sta
 | 17 | Sequences & series | Station tug | One more term. Then one more. | Sky — stub |
 | 18 | Complex numbers | Starship | Imaginary part optional. Navigation isn't. | Sky — stub |
 
-Confirm Maglev name + Sky craft before art pass.
+Plate 11 = Boring-style Hyperloop (city → underground beam → other city on checkpoints). Confirm Sky craft before art pass.

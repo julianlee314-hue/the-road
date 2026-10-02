@@ -780,7 +780,7 @@ function create(canvas, opts) {
     start() { if (!running) { running = true; last = 0; raf = requestAnimationFrame(frame); } },
     stop() { running = false; cancelAnimationFrame(raf); },
     setWorld(w) { if (WORLDS[w]) st.world = w; },
-    setVehicle(v) { st.vehicle = v == null ? null : Math.max(0, Math.min(9, v)); },
+    setVehicle(v) { st.vehicle = v == null ? null : Math.max(0, Math.min(10, v)); },
     setSpeed(v) { st.speed = Math.max(0, v); },
     setReduce(r) { st.reduce = !!r; },
     reset() { Object.assign(st, { lanes: 2, lane: 0.5, carX: 0, camX: 0, hubcaps: [], smoke: [], tunnels: [], gate: null, gantry: null, stalled: false, low: false, dark: 0, nl: null, nav: null }); },
@@ -6063,8 +6063,7 @@ const LICS = [FR ? { plate: 'Baker', math: 'Fractions', world: 'bakery' } : null
 const WORLD_NAME = { bakery: 'Bakery Lane', outrun: 'Sunset Strip', future: 'Neon City', wire: 'Wireframe', gp: 'Grand Prix', poly: 'Mountain Pass', night: 'Night Drive', industrial: 'Foundry Road', cruisn: 'Coast Highway', canyon: 'Canyon Run', aurora: 'Northern Lights' };
 const ALG = { stepsPerCp: 6, lanes: [2, 4, 4], stamp: 10, perStep: 5.5, decay: 0.3, floor: 2, penalty: 5 }; // about 6 steps between checkpoints; cards per step at checkpoints 0, 1, 2+; clean problems to stamp a level; each checkpoint pays seconds per step driven (5.5, shrinking 0.3 a checkpoint, never under 2); a wrong sign costs 5 s
 const A = window.Alg, LV = window.Levels;
-// the ride (THE ROAD): each license comes with a better way to travel, foot to robotaxi; Rationals and Radicals & logs share
-// the robotaxi. The upgrade isn't explained, only announced the first time you set off in it. The Fractions app has one
+// the ride (THE ROAD): each license comes with a better way to travel, foot to Hyperloop; Rationals keeps the robotaxi, Radicals & logs take the tube. The upgrade isn't explained, only announced the first time you set off in it. The Fractions app has one
 // ladder, so there the ride upgrades with clean problems instead. Lines match the development briefing (§10.4).
 const RIDES = [
   { name: 'On foot', line: 'Two legs, zero brackets. Let’s walk.', at: 0 },
@@ -6076,7 +6075,8 @@ const RIDES = [
   { name: 'Train', line: 'Runs on rails. Never crosses the line.', at: 210 },
   { name: 'Automobile', line: 'Two equations, four wheels, one solution.', at: 300 },
   { name: 'Race car', line: 'Zero to x² in four seconds.', at: 420 },
-  { name: 'Robotaxi', line: 'You know the rules. Let the math drive.', at: 580 }];
+  { name: 'Robotaxi', line: 'You know the rules. Let the math drive.', at: 580 },
+  { name: 'Hyperloop', line: 'Hop in. Drop under the city. Next checkpoint is another skyline.', at: 580 }];
 const odoRide = () => Math.max(S.ride || 0, RIDES.reduce((k, r, i) => S.odo >= r.at ? i : k, 0));
 const rideFor = lic => lic === 0 ? odoRide() : Math.max(0, Math.min(RIDES.length - 1, lic - 1));
 let rideT = 0;

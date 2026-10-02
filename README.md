@@ -20,7 +20,7 @@ Curriculum first; the race is the spoonful of sugar. Progress saves in the brows
 | 8 | Expert | Systems | Automobile |
 | 9 | Unlimited | Quadratics | Race car |
 | 10 | Commercial | Rationals | Robotaxi |
-| 11 | Heavy | Radicals & logs | Maglev *(sprite still robotaxi)* |
+| 11 | Heavy | Radicals & logs | Hyperloop *(sprite stub)* |
 | 12–18 | — | Limits → Complex | *The Sky — locked teasers* |
 
 Public spotlight for this push: **plates 1–6** (verified against Julius’s screenshots). 7–11 are playable in the same app; 12–18 stay Mathera 2.0 teasers.
