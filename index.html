@@ -133,12 +133,24 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .op.dead{pointer-events:none;opacity:.55;box-shadow:none;background:transparent;min-width:0;min-height:0;padding:0;margin:0 .12em}
 /* algebra transform chips: same tan tile language as .op, never full next-line MCQ */
 .xchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0 2px}
-.xchip{border:0;background:#e8dcc4;color:var(--card-ink);box-shadow:inset 0 0 0 1.5px #c4b498,0 2px 0 #b8a888,0 3px 6px rgba(40,30,10,.12);border-radius:10px;
-  font-family:var(--display);font-weight:800;font-size:clamp(15px,4.2vw,20px);line-height:1.15;padding:12px 14px;touch-action:manipulation;cursor:pointer;max-width:100%;text-align:center}
-.xchip:active{transform:translateY(2px)}
-.xchip.right{background:var(--good);color:#fff;box-shadow:none}
-.xchip.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s;opacity:.7}
-.xchip.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+.xchip,.obtn{border:0;background:#e8dcc4;color:var(--card-ink);box-shadow:inset 0 0 0 1.5px #c4b498,0 2px 0 #b8a888,0 3px 6px rgba(40,30,10,.12);border-radius:10px;
+  font-family:var(--display);font-weight:800;font-size:clamp(15px,4.2vw,20px);line-height:1.15;padding:12px 14px;touch-action:manipulation;cursor:pointer;max-width:100%;text-align:center;min-height:48px}
+.xchip:active,.obtn:active{transform:translateY(2px)}
+.xchip.right,.obtn.right{background:var(--good);color:#fff;box-shadow:none}
+.xchip.wrong,.obtn.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s;opacity:.7}
+.xchip.hint,.obtn.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
+.orderbar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:2px 0 4px}
+.orderbar.home{margin-top:8px}
+.orderbar .ob{font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.orderbar .note{flex-basis:100%;text-align:center;font-size:12px;color:var(--chalk-dim);line-height:1.35}
+.calcbtn{border:1px solid var(--desk-line);background:transparent;color:var(--chalk);border-radius:999px;padding:8px 14px;font-family:var(--display);font-weight:800;font-size:14px;min-height:44px;touch-action:manipulation;cursor:pointer}
+.calcbtn[aria-pressed="true"]{background:var(--good);border-color:transparent;color:#fff}
+.calcrow{display:flex;align-items:center;justify-content:center;gap:10px;padding:4px 0}
+.calcrow input{font-family:var(--display);font-weight:800;font-size:28px;width:4.4em;min-height:52px;text-align:center;border:0;border-radius:12px;background:#fffefb;color:var(--card-ink);box-shadow:inset 0 0 0 2px #c4b498;padding:4px}
+.calcrow input:focus{outline:none;box-shadow:inset 0 0 0 3px var(--hint)}
+.calcrow .var{font-family:var(--display);font-weight:800;font-size:34px;line-height:1}
+.calcrow .var sup input{font-size:22px;min-height:44px;width:3.4em;vertical-align:baseline}
+.op.expok{min-width:52px;min-height:52px;font-size:22px}
 .xchip small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;opacity:.65;font-weight:600;margin-bottom:2px;text-transform:uppercase}
 .signs.alg.xmode{background:transparent;box-shadow:none;padding:0;outline:none}
 .signs.alg.xmode .xchips{width:100%}
@@ -299,6 +311,11 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
       <button class="big rally" id="goRally"><b>Rally</b><span id="rallyLine">Tap ops, drive far</span></button>
       <button class="big forks" id="goForks"><b>Sprint</b><span id="forksLine">Same taps, harder clock</span></button>
     </div>
+    <div class="orderbar home" id="homeOrder" hidden>
+      <span class="ob">Order</span>
+      <button type="button" class="calcbtn" id="homeCalc" aria-pressed="false">Calculate</button>
+      <span class="note" id="homeOrderNote">Powers: press the next move. Calculate types the number after.</span>
+    </div>
     <div class="foot"><button class="ghost" id="goGarage">Garage</button><button class="ghost" id="goSettings">Settings</button></div>
   </section>
 
@@ -309,6 +326,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
       <div class="mid"><span class="pen" id="clockWrap">⏱ <b id="clock">0:40</b><i id="penalty">−10</i></span><span id="sA"></span><span id="sB" hidden></span></div>
     </div>
     <div class="speedo" id="speedo" aria-live="polite" aria-label="Speedometer"><div class="gauge" id="gauge"><i id="gaugeFill"></i></div><div class="read"><b id="spdNum">0</b><span>km/h</span></div><span class="flame cold" id="flame">streak 0</span></div>
+    <div class="orderbar" id="orderBar" hidden><span class="ob">Order</span><button type="button" class="calcbtn" id="calcToggle" aria-pressed="false">Calculate</button></div>
     <div class="roadwrap" id="roadWrap" hidden><canvas id="road" aria-hidden="true"></canvas></div>
     <div class="cps" id="cps"></div>
     <div class="stage"><div class="card" id="card"><div class="meta"><span id="metaL"></span><span id="metaR"></span></div><div class="exprbox" id="box"><div class="expr" id="expr"></div></div></div></div>
@@ -2022,13 +2040,13 @@ const mix = (...fs) => () => pick(fs)();
 function L2_intro() {
   const b = 'x';
   const cards = [
-    { kind: 'expr', rule: 'Same base, multiply: tap the two exponents. They add.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
+    { kind: 'expr', rule: 'Order: press <b>Combine exponents</b>. The exponents add. Turn on Calculate if you also want to type the answer.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
       wrongs: [W(P(V(b), 6), 'That multiplied the exponents. Multiplying powers adds them.'), W(P(V(b), 1), 'Multiplying powers adds the exponents: 3 + 2 = 5.'), W(M([N(2), P(V(b), 5)]), 'Nothing doubles: there is no 2 in front.')] }] },
-    { kind: 'expr', rule: 'Tap the two numbers in front (they multiply) and the two exponents (they add). Either pair first.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
+    { kind: 'expr', rule: 'Two legal moves: <b>Combine exponents</b> or <b>Combine coefficients</b>. Either order is fine.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
       wrongs: [W(cx(7, 7, b), 'The numbers multiply: 4 × 3, not 4 + 3.'), W(cx(12, 10, b), 'The exponents add when you multiply powers.'), W(cx(4, 7, b), 'Both numbers multiply in.')] }] },
-    { kind: 'expr', rule: 'Same base, divide: tap the two exponents. They subtract.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
+    { kind: 'expr', rule: 'Same base, divide: press <b>Combine exponents</b>. The exponents subtract.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
       wrongs: [W(P(V(b), 10), 'Dividing powers subtracts the exponents.'), W(P(V(b), -4), 'Top minus bottom: 7 − 3.'), W(P(V(b), 2), 'The exponents subtract; they don\'t divide.')] }] },
-    { kind: 'expr', rule: 'Power of a power: tap the two exponents. They multiply.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
+    { kind: 'expr', rule: 'Power of a power: press <b>Combine exponents</b>. The exponents multiply.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
       wrongs: [W(P(V(b), 5), 'That adds them; a power of a power multiplies.'), W(P(V(b), 8), 'Multiply the exponents; don\'t raise one to the other.'), W(M([N(3), P(V(b), 2)]), 'The outer power repeats the bracket; it isn\'t a multiplier.')] }] }
   ];
   const i = (((G.L2IntroIx || 0) % 4) + 4) % 4;
@@ -6464,7 +6482,8 @@ G.Levels.def({
 
 
 
-/* Powers plate: tap the two pieces that combine (coefficients, exponents).
+/* Powers plate, Order mode: legal combines become buttons (Combine exponents /
+   Combine coefficients). The game fills the number unless Calculate is on.
    Other plates never call this. Legal pairs come from the tree, not from move text. */
 (function (G) {
 'use strict';
@@ -6572,6 +6591,7 @@ function analyzeProduct(node, path, pairs, seen) {
     addPair(pairs, seen, {
       kind: 'coef-mul', key: 'c' + i + ',' + j + '@' + path.map(p => p.k + (p.i != null ? p.i : '')).join('/'),
       aNode: f1.cNode, bNode: f2.cNode, aRole: 'num', bRole: 'num',
+      calcQ: prod, calcKind: 'coef',
       move: qshow(f1.cQ) + ' × ' + qshow(f2.cQ) + ' = ' + qshow(prod),
       rewrite(root) {
         const next = node.a.map((raw, k) => {
@@ -6593,6 +6613,7 @@ function analyzeProduct(node, path, pairs, seen) {
       addPair(pairs, seen, {
         kind: 'exp-add', key: 'e' + i + ',' + j + base + '@' + path.map(p => p.k + (p.i != null ? p.i : '')).join('/'),
         aNode: f1.eNode, bNode: f2.eNode, aRole: 'exp', bRole: 'exp',
+        calcQ: sum, calcKind: 'exp', baseName: base[0] === 'v' ? base.slice(2) : '',
         move: qshow(f1.eQ) + ' + ' + qshow(f2.eQ) + ' = ' + qshow(sum),
         rewrite(root) {
           const merged = buildMono(f1.cQ, sum, base, { dec: f1.dec, sym: f1.innerSym || (base[0] === 'n' ? '×' : '') });
@@ -6631,6 +6652,7 @@ function analyzeFrac(node, path, pairs, seen) {
     const diff = qs(top.eQ, bot.eQ);
     addPair(pairs, seen, {
       kind: 'exp-sub', key: 'es' + pk, aNode: top.eNode, bNode: bot.eNode, aRole: 'exp', bRole: 'exp',
+      calcQ: diff, calcKind: 'exp', baseName: top.base[0] === 'v' ? top.base.slice(2) : '',
       move: qshow(top.eQ) + ' − ' + qshow(bot.eQ) + ' = ' + qshow(diff),
       rewrite(root) {
         const topNode = buildMono(top.cQ, diff, top.base, { dec: top.dec, sym: top.innerSym });
@@ -6644,6 +6666,7 @@ function analyzeFrac(node, path, pairs, seen) {
   if (q) {
     addPair(pairs, seen, {
       kind: 'coef-div', key: 'cd' + pk, aNode: top.cNode, bNode: bot.cNode, aRole: 'num', bRole: 'num',
+      calcQ: q, calcKind: 'coef',
       move: qshow(top.cQ) + ' ÷ ' + qshow(bot.cQ) + ' = ' + qshow(q),
       rewrite(root) {
         const topNode = top.bare ? A.N(q, top.dec || bot.dec) : buildMono(q, top.eQ, top.base, { dec: top.dec || bot.dec, sym: top.innerSym });
@@ -6670,6 +6693,7 @@ function analyzePow(node, path, pairs, seen) {
     const e1 = inner.e, e2 = node.e, prod = qm(e1.v, e2.v), key = bkeyOf(inner.a);
     addPair(pairs, seen, {
       kind: 'exp-mul', key: 'em' + pk, aNode: e1, bNode: e2, aRole: 'exp', bRole: 'exp',
+      calcQ: prod, calcKind: 'exp', baseName: key[0] === 'v' ? key.slice(2) : '',
       move: qshow(e1.v) + ' × ' + qshow(e2.v) + ' = ' + qshow(prod),
       rewrite(root) { return replaceAt(root, path, A.P(baseNode(key), prod.d === 1 ? prod.n : prod)); }
     });
@@ -6696,6 +6720,7 @@ function analyzePow(node, path, pairs, seen) {
       if (Number.isFinite(val) && Math.abs(val) <= 1e6 && Math.round(val) === val) {
         addPair(pairs, seen, {
           kind: 'eval', key: 'ev' + pk, aNode: bn.node, bNode: node.e, aRole: 'num', bRole: 'exp',
+          calcQ: Q(val), calcKind: 'num',
           move: qshow(bn.q) + (e < 0 ? '^(−' + (-e) + ')' : '^' + e) + ' = ' + (val < 0 ? '−' + (-val) : String(val)),
           rewrite(root) { return replaceAt(root, path, A.N(val)); }
         });
@@ -6740,9 +6765,37 @@ function safePairs(tree, targets) {
     return targets.some(t => { try { return pairReaches(n, t); } catch (e) { return false; } });
   });
 }
+function orderMoves(tree, targets) {
+  // one pass: safePairs builds its own pair objects, so filter this list in place
+  let all;
+  try { all = powerPairs(tree); } catch (e) { return []; }
+  const safeList = !targets || !targets.length ? all : all.filter(p => {
+    let n;
+    try { n = p.rewrite(tree); } catch (e) { return false; }
+    if (!n) return false;
+    try { if (A.text(n) === A.text(tree)) return false; } catch (e) { return false; }
+    return targets.some(t => { try { return pairReaches(n, t); } catch (e) { return false; } });
+  });
+  const safe = new Set(safeList);
+  const spec = [
+    { id: 'exp', label: 'Combine exponents', kinds: { 'exp-add': 1, 'exp-sub': 1, 'exp-mul': 1 }, why: 'Not the exponents to combine yet.' },
+    { id: 'coef', label: 'Combine coefficients', kinds: { 'coef-mul': 1, 'coef-div': 1 }, why: 'The numbers in front are not the next move.' },
+    { id: 'cpow', label: 'Power the coefficient', kinds: { 'coef-pow': 1 }, why: 'The power does not reach that number yet.' },
+    { id: 'eval', label: 'Evaluate', kinds: { eval: 1 }, why: 'That is not the next power to work out.' }
+  ];
+  const out = [];
+  spec.forEach(s => {
+    const pairs = all.filter(p => s.kinds[p.kind]);
+    if (!pairs.length) return;
+    const good = pairs.filter(p => safe.has(p));
+    out.push({ id: s.id, label: s.label, ok: good.length > 0, pairs: good, why: s.why });
+  });
+  return out;
+}
 G.powerPairs = powerPairs;
 G.pairReaches = pairReaches;
 G.safePairs = safePairs;
+G.orderMoves = orderMoves;
 G.powersPlate = lic => lic === 2;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -6821,7 +6874,7 @@ function migrate() {
   if (S.odo == null || isNaN(S.odo)) S.odo = Object.values(S.stamps).reduce((a, s) => a + (s.ever ? 10 : s.n || 0), 0);
   for (const lic in S.alv) { const L = LV.LIC[lic]; if (L && S.alv[lic] > L.levels.length) S.alv[lic] = 1; }
 }
-function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false }; }
+function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false }; }
 function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); return Object.assign(b, o); } } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const RS = (lv, k) => { const id = lv + ':' + k; return S.rules[id] || (S.rules[id] = { right: 0, wrong: 0, t: [] }); };
@@ -6910,6 +6963,7 @@ function start(mode) {
   $('signs').classList.remove('alg'); $('signs').innerHTML = ''; $('expr').className = 'expr';
   $('clockWrap').hidden = !run; $('cps').hidden = !run; $('signs').hidden = true; // Precedence: no MCQ signs
   $('roadWrap').hidden = false; // road + speedometer always on for Permit
+  if ($('orderBar')) $('orderBar').hidden = true;
   $('speedo').hidden = false;
   $('vPlay').classList.toggle('racing', true);
   show('vPlay');
@@ -7395,7 +7449,144 @@ function aLine(interactive, extras) {
   }
   return bag;
 }
+
+function useOrder() { return !!(G && G.alg && window.powersPlate && window.powersPlate(G.alg.lic)); }
+function syncCalcBtns() {
+  const on = !!S.calc;
+  ['calcToggle', 'homeCalc'].forEach(id => {
+    const b = $(id); if (!b) return;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.textContent = on ? 'Calculate on' : 'Calculate';
+  });
+}
+function showOrderBar() { const bar = $('orderBar'); if (bar) bar.hidden = !useOrder(); syncCalcBtns(); }
+function parseExp(raw) {
+  const t = String(raw || '').trim().replace(/\u2212/g, '-').replace(/\s+/g, '');
+  if (!t) return null;
+  const fr = t.match(/^([+-]?\d+)\/([+-]?\d+)$/);
+  if (fr) { const d = +fr[2]; if (!d) return null; return A.Q(+fr[1], d); }
+  if (/^[+-]?\d+$/.test(t)) return A.Q(+t, 1);
+  return null;
+}
+function qSame(a, b) { return !!(a && b && A.qcmp(a, b) === 0); }
+function exponentOf(t, base) {
+  if (!t || !base) return null;
+  if (t.t === '()' || t.t === 'neg') return exponentOf(t.a, base);
+  if (t.t === 'v' && t.s === base) return A.Q(1);
+  if (t.t === '^' && t.a && t.a.t === 'v' && t.a.s === base && t.e && t.e.t === 'n') return t.e.v;
+  if (t.t === '*' && t.a) { for (const f of t.a) { const e = exponentOf(f, base); if (e) return e; } }
+  return null;
+}
+function coefOf(t) {
+  if (!t) return null;
+  if (t.t === 'n') return t.v;
+  if (t.t === '()') return coefOf(t.a);
+  if (t.t === '*' && t.a && t.a[0] && t.a[0].t === 'n') return t.a[0].v;
+  return null;
+}
+function whyNumber(q, kind, base) {
+  const opts = (G.fork && G.fork.opts) || [];
+  for (const o of opts) {
+    if (!o || o.ok || !o.tree) continue;
+    const hit = kind === 'exp' ? exponentOf(o.tree, base) : (o.tree.t === 'n' ? o.tree.v : coefOf(o.tree));
+    if (qSame(hit, q)) return o.why;
+  }
+  if (!q) return 'Type the number.';
+  return kind === 'exp' ? 'Check the exponent.' : 'Check that number.';
+}
+function renderOrder(opts, moves) {
+  aLine(false);
+  G.fork = { opts, mode: 'order', moves, pending: null };
+  const sEl = $('signs');
+  sEl.classList.add('alg', 'xmode');
+  sEl.hidden = false;
+  sEl.style.gridTemplateColumns = '1fr';
+  sEl.dataset.n = moves.length;
+  sEl.innerHTML = `<div class="xchips">${moves.map((m, i) => `<button type="button" class="obtn" data-i="${i}">${m.label}</button>`).join('')}</div>`;
+  if (!$('hint').innerHTML) $('hint').innerHTML = 'Press the next move, in order.';
+  if (racing()) RD.on('fork', { lanes: moves.length });
+  if (!G.solved || G.alg.id === '2.intro') moves.forEach((m, i) => { if (m.ok) { const b = document.querySelector(`.obtn[data-i="${i}"]`); if (b) b.classList.add('hint'); } });
+  G.stepT = performance.now();
+}
+function openCalc(pnd) {
+  G.fork.pending = pnd;
+  const bases = pnd.base ? [pnd.base] : [...new Set((pnd.pairs || []).map(p => p.baseName).filter(Boolean))];
+  const base = pnd.kind === 'exp' && bases.length === 1 ? bases[0] : '';
+  pnd.base = base;
+  const field = `<input id="calcIn" inputmode="text" autocomplete="off" enterkeyhint="done" aria-label="${pnd.kind === 'exp' ? 'exponent' : 'number'}">`;
+  const body = base ? `<span class="var"><i>${base}</i><sup>${field}</sup></span>` : field;
+  const sEl = $('signs');
+  sEl.hidden = false; sEl.classList.add('alg', 'xmode');
+  sEl.innerHTML = `<div class="calcrow">${body}<button type="button" class="op expok" id="calcGo" aria-label="check">✓</button></div>`;
+  $('hint').innerHTML = pnd.kind === 'exp' ? 'Type the new exponent.' : 'Type the number.';
+  G.stepT = performance.now();
+  setTimeout(() => { const inp = $('calcIn'); if (inp) inp.focus(); }, 30);
+}
+function aOrderMiss(why) {
+  G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
+  G.whys[why] = (G.whys[why] || 0) + 1; garageMiss(why);
+  try { S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: 'order', r: 'miss' }); if (S.log.length > 300) S.log.shift(); } catch (e) {}
+  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const pen = $('penalty'); pen.textContent = '−' + ALG.penalty; pen.classList.remove('show'); void pen.offsetWidth; pen.classList.add('show'); }
+  const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+  document.querySelectorAll('.obtn').forEach(b => { const m = G.fork.moves && G.fork.moves[+b.dataset.i]; if (m && m.ok) { b.classList.remove('hint'); void b.offsetWidth; b.classList.add('hint'); } });
+  $('hint').innerHTML = `<span class="why">${why}</span> ${G.fork.pending ? 'Try the number again.' : 'The glowing move is next.'}`;
+  const inp = $('calcIn'); if (inp) { inp.style.boxShadow = 'inset 0 0 0 3px var(--bad)'; setTimeout(() => { if (inp.isConnected) inp.style.boxShadow = ''; }, 420); inp.focus(); try { inp.select(); } catch (e) {} }
+  G.stepT = performance.now(); save(); hud();
+}
+function applyPair(pair, fromCalc) {
+  if (!pair) return;
+  let next;
+  try { next = pair.rewrite(G.step.tree); } catch (e) { return aOrderMiss('That combine does not change the line.'); }
+  if (!next) return aOrderMiss('That combine does not change the line.');
+  let same = false;
+  try { same = A.text(next) === A.text(G.step.tree); } catch (e) {}
+  if (same) return aOrderMiss('That combine does not change the line.');
+  const oi = (G.fork.opts || []).findIndex(o => o.ok && !o.used && (() => { try { return A.text(o.tree) === A.text(next); } catch (e) { return false; } })());
+  if (oi >= 0) {
+    const isNum = !!(G.fork.opts[oi].tree && G.fork.opts[oi].tree.t === 'n');
+    return aApply(oi, !!fromCalc || !isNum);
+  }
+  const ms = performance.now() - G.stepT;
+  G.taps++; G.right++; G.cpSteps++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms); SND.right(G.streak);
+  if (racing()) RD.on('decision.correct');
+  G.step.tree = next; G.fork.pending = null;
+  $('hint').innerHTML = `<span class="mv">✓ ${pair.move || 'Right.'}</span>`;
+  G.busy = true; save(); hud();
+  setTimeout(() => { G.busy = false; if (G.over || G.stalling) return; aRender(); }, 280);
+}
+function aOrder(i) {
+  if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork || G.fork.mode !== 'order' || G.fork.pending) return;
+  const m = G.fork.moves[i]; if (!m || m.used) return;
+  const btn = document.querySelector(`.obtn[data-i="${i}"]`);
+  if (!m.ok) { m.used = true; if (btn) { btn.classList.add('wrong'); btn.disabled = true; } return aOrderMiss(m.why); }
+  if (btn) btn.classList.add('right');
+  if (S.calc && m.pairs.some(p => p.calcQ)) return openCalc({ pairs: m.pairs.filter(p => p.calcQ), kind: m.id === 'exp' ? 'exp' : 'num' });
+  applyPair(m.pairs[0], false);
+}
+function aCalcSubmit() {
+  if (!G || !G.fork || !G.fork.pending || G.over || G.busy || G.stalling) return;
+  const pnd = G.fork.pending;
+  const q = parseExp($('calcIn') && $('calcIn').value);
+  if (pnd.opt != null) {
+    if (!qSame(q, pnd.answers[0])) return aOrderMiss(whyNumber(q, 'num', ''));
+    G.fork.pending = null;
+    return aApply(pnd.opt, true);
+  }
+  const pair = (pnd.pairs || []).find(p => qSame(p.calcQ, q));
+  if (!pair) return aOrderMiss(whyNumber(q, pnd.kind, (pnd.pairs[0] && pnd.pairs[0].baseName) || ''));
+  G.fork.pending = null;
+  applyPair(pair, true);
+}
+function setCalc(on) {
+  S.calc = !!on; save(); syncCalcBtns();
+  if (on || !G || !G.fork || !G.fork.pending || G.busy || G.over) return;
+  const pnd = G.fork.pending; G.fork.pending = null;
+  if (pnd.opt != null) aApply(pnd.opt, true);
+  else if (pnd.pairs && pnd.pairs[0]) applyPair(pnd.pairs[0], true);
+}
+
 function aRender() {
+  showOrderBar();
   const all = G.step.opts || [], rights = all.filter(o => o.ok), wrongs = shuffle(all.filter(o => !o.ok));
   const pic = stepIsPictorial(G.step);
   const n = racing() ? ALG.lanes[Math.min(G.cp, ALG.lanes.length - 1)] : 4;
@@ -7427,13 +7618,15 @@ function aRender() {
   // algebraic step workout: expression ops + tan transform chips (never full next-line MCQ)
   const keep = shuffle(rights.slice()).slice(0, Math.max(1, Math.min(rights.length, n - 1)));
   const opts = shuffle(keep.concat(wrongs.slice(0, Math.max(1, n - keep.length))));
-  // Powers only: pair taps on coefficients and exponents. Other plates never get atom buttons.
+  // Powers plays in Order: Combine buttons, not pair-taps. Other plates stay on operator taps.
   G.pairSel = null;
+  if (useOrder() && G.step.tree) {
+    let moves = [];
+    try { moves = window.orderMoves(G.step.tree, rights.map(o => o.tree)); } catch (e) { moves = []; }
+    if (moves.some(m => m.ok)) return renderOrder(opts, moves);
+  }
   let pairs = [];
-  if (window.powersPlate(G.alg.lic) && G.step.tree) { try { pairs = window.safePairs(G.step.tree, rights.map(o => o.tree)); } catch (e) { pairs = []; } }
-  const atomMap = pairs.length ? new WeakMap() : null;
-  if (atomMap) pairs.forEach(p => { atomMap.set(p.aNode, p.aRole || 'num'); atomMap.set(p.bNode, p.bRole || 'num'); });
-  const bag = aLine(true, { atomMap, plainOps: G.alg.id === '2.intro' && pairs.length > 0 });
+  const bag = aLine(true);
   const pairRight = new Set();
   if (pairs.length) opts.forEach((o, i) => { if (o.ok) { try { if (window.pairReaches(G.step.tree, o.tree)) pairRight.add(i); } catch (e) {} } });
   const bindOpts = opts.map((o, i) => pairRight.has(i) ? { ok: false, move: '', why: '' } : o);
@@ -7476,9 +7669,10 @@ function aAdvance(o) {
   if (G.step.done) return aSolved();
   aRender();
 }
-function aApply(i) {
+function aApply(i, fromCalc) {
   if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork) return;
   const o = G.fork.opts[i]; if (!o || o.used) return;
+  if (!fromCalc && useOrder() && S.calc && o.tree && o.tree.t === 'n') return openCalc({ opt: i, answers: [o.tree.v], kind: 'num' });
   const ms = performance.now() - G.stepT; G.taps++;
   const btn = document.querySelector(`.xchip[data-i="${i}"], .sign[data-i="${i}"]`);
   if (o.ok) {
@@ -7745,6 +7939,7 @@ function renderHome() {
   $('plates').hidden = FR; $('bench').hidden = !FR; if (FR) renderBench();
   $('licCard').hidden = true; $('levels').hidden = !prec; $('board').hidden = !prec; $('alv').hidden = prec || uc; $('ucBox').hidden = !uc; $('modes').hidden = uc; $('goRally').hidden = !prec; $('tip').hidden = uc;
   $('modes').style.gridTemplateColumns = prec ? '' : 'repeat(2,minmax(0,1fr))';
+  if ($('homeOrder')) $('homeOrder').hidden = prec || uc || FR;
   $('licHead').innerHTML = prec || uc ? '' : `<b>Levels</b><span>World: ${WORLD_NAME[L.world]}</span>`;
   $('goForks').querySelector('b').textContent = prec ? 'Sprint' : 'Race';
   if (uc) { $('licCard').hidden = true; $('ucBox').innerHTML = `<b>Mathera 2.0</b><span class="tip">${L.tease}. This plate keeps its place on the ladder and opens in Mathera 2.0, once the licenses below it are road-tested.</span>`; return; }
@@ -7760,7 +7955,13 @@ function renderHome() {
     const t = licTest(lic), cl = licClass(lic), lc = $('licCard'); lc.hidden = !t && !cl;
     lc.className = 'lcard' + (t ? t.type === 'renew' ? ' due' : ' on' : '');
     lc.innerHTML = `<span class="cls" aria-label="class">${cl || '–'}</span><span class="lc">${t ? `<b>${t.title}</b><span>${t.line}</span>` : (cl === 'L' ? (p => `<b>Learner</b><span>${p.n}/${p.of} stamped. Stamp them all to open the road test.</span>`)(licProgress(lic)) : `<b>Pro</b><span>Every class earned. Keep the stamps fresh.</span>`)}</span>${t ? `<button>${t.go}</button>` : ''}`;
-    $('tip').innerHTML = 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
+    $('tip').innerHTML = lic === 2
+    ? 'Order: press <b>Combine exponents</b>, <b>Combine coefficients</b>, or the operator. Turn on Calculate to type the number.'
+    : 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
+  const ho = $('homeOrder'); if (ho) { ho.hidden = false; const note = $('homeOrderNote'); if (note) note.textContent = lic === 2
+    ? 'This plate is Order. Calculate, saved on this device, asks you to type the exponent or the coefficient after the right button.'
+    : 'Order is how Powers plays. Calculate is saved on this device.'; }
+  syncCalcBtns();
     const b = S.abest[lvAt(lic, cur).id];
     $('goPractice').querySelector('span').textContent = 'Tap the next move. No clock.';
     $('forksLine').textContent = b && b.km ? `Best ${b.km.toFixed(2)} km` : 'Same taps, race the clock';
@@ -7801,7 +8002,14 @@ $('levels').addEventListener('click', e => { const b = e.target.closest('.lvl');
 $('goPractice').addEventListener('click', () => start('practice'));
 $('goRally').addEventListener('click', () => start('rally'));
 $('goForks').addEventListener('click', () => start(S.lic !== 1 ? 'race' : 'forks'));
-$('signs').addEventListener('click', e => { const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i); });
+$('signs').addEventListener('click', e => {
+  if (e.target.closest('#calcGo')) { if (G && G.alg) aCalcSubmit(); return; }
+  const ob = e.target.closest('.obtn'); if (ob && G && G.alg) return aOrder(+ob.dataset.i);
+  const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i);
+});
+$('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
+$('calcToggle').addEventListener('click', () => setCalc(!S.calc));
+$('homeCalc').addEventListener('click', () => setCalc(!S.calc));
 $('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
