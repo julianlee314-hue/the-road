@@ -878,7 +878,7 @@ const qpowi = (a, k) => { let r = Q(1); const b = k < 0 ? qd(Q(1), a) : a; for (
 const toQ = v => isQ(v) ? v : Q(v);
 
 /* ---------- trees ----------
-   n number (v: Q, dec: show as decimal) · v letter · + sum (a: terms) · neg (a) · * product (a: factors, sym: '' | '·' | '×')
+   n number (v: Q, dec: show as decimal) · v letter · + sum (a: terms) · neg (a) · * product (a: factors, sym: '' implicit | '×' | '÷'; a legacy '·' renders as implicit too)
    / fraction (a, b; bar true = stacked, false = ÷) · ^ power (a, e) · rt root (a, k) · abs · () brackets (sq: square)
    pm (a ± b, a may be null) · rel (a: sides, ops) · or (a: rels) · sys (a: rels) · txt (s) */
 const N = (v, dec) => ({ t: 'n', v: toQ(v), dec: !!dec });
@@ -929,6 +929,35 @@ function ptree(p, x, order) { const ks = order || Object.keys(p).map(Number).sor
 
 /* ---------- rendering (HTML) ---------- */
 const MINUS = '−';
+// '' and a legacy middle dot are implicit multiplication. Factors touch, or the next one
+// takes brackets when touching would glue them: 4x²(3x⁵), x³(x²), 5(8). A real × or ÷ stays.
+function implicitMul(sym) { return sym == null || sym === '' || sym === '·'; }
+function leadNum(t) {
+  if (!t) return false;
+  if (t.t === 'n') return true;
+  if (t.t === 'neg' || t.t === '^' || t.t === '()') return leadNum(t.a);
+  if (t.t === '*' && t.a && t.a.length) return leadNum(t.a[0]);
+  return false;
+}
+function baseKey(t) {
+  if (!t) return null;
+  if (t.t === '()' || t.t === 'neg') return baseKey(t.a);
+  if (t.t === 'v') return 'v:' + t.s;
+  if (t.t === 'ec') return 'e';
+  if (t.t === 'n' && t.v) return 'n:' + t.v.n + '/' + t.v.d;
+  if (t.t === '^') return baseKey(t.a);
+  if (t.t === '*' && t.a && t.a.length) return baseKey(t.a[t.a.length - 1]);
+  return null;
+}
+// bracket the next factor of an implicit product when juxtaposition would glue two factors
+function needsGroup(prev, x) {
+  if (!prev || !x) return false;
+  if (x.t === '()' || x.t === 'abs') return false;
+  if (leadNum(x)) return true;
+  const pb = baseKey(prev), xb = baseKey(x);
+  if (pb && xb && pb === xb && (pb[0] === 'v' || pb[0] === 'e')) return true;
+  return false;
+}
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 function qhtml(q, dec) {
   const neg = q.n < 0, a = Math.abs(q.n);
@@ -952,7 +981,14 @@ function html(t, ctx) {
     case 'txt': return `<span class="tx">${esc(t.s)}</span>`;
     case '+': return t.a.map((x, i) => { const [s, a] = signOf(x); const h = html(a, '+'); return i === 0 ? (s < 0 ? MINUS + h : h) : (s < 0 ? ` ${MINUS} ` : ' + ') + h; }).join('');
     case 'neg': { const inner = html(t.a, 'neg'); return MINUS + (t.a.t === '+' ? '(' + inner + ')' : inner); }
-    case '*': return t.a.map((x, i) => { let h = html(x, '*'); if (x.t === '+' || x.t === 'neg' && i > 0 || (x.t === 'n' && x.v.n < 0 && i > 0)) h = '(' + h + ')'; return (i === 0 ? '' : t.sym === '' ? '' : ` ${t.sym} `) + h; }).join('');
+    case '*': return t.a.map((x, i) => {
+      let h = html(x, '*');
+      const prev = i ? t.a[i - 1] : null;
+      const implicit = implicitMul(t.sym);
+      if (x.t === '+' || x.t === 'neg' && i > 0 || (x.t === 'n' && x.v.n < 0 && i > 0) || (i > 0 && implicit && needsGroup(prev, x))) h = '(' + h + ')';
+      if (i === 0 || implicit) return h;
+      return ` ${t.sym === '*' ? '×' : t.sym} ` + h;
+    }).join('');
     case '/': return t.bar ? `<span class="fr"><span>${html(t.a)}</span><span>${html(t.b)}</span></span>` : `${wrapLow(t.a)} ÷ ${wrapLow(t.b, true)}`;
     case '^': { const base = t.a.t === 'v' || t.a.t === 'ec' || (t.a.t === 'n' && t.a.v.n >= 0 && qint(t.a.v)) || t.a.t === '()' ? html(t.a) : '(' + html(t.a) + ')'; const ex = t.e.t === 'n' && !qint(t.e.v) ? (t.e.v.n < 0 ? MINUS : '') + Math.abs(t.e.v.n) + '/' + t.e.v.d : html(t.e); return base + `<sup>${ex}</sup>`; }
     case 'rt': return (t.k === 2 ? '' : `<sup class="ri">${t.k}</sup>`) + `√<span class="rad">${html(t.a)}</span>`;
@@ -1232,7 +1268,7 @@ function sysStatus(lines, vars) {
 }
 
 G.Alg = { Mx, Bar, Npt, Log, Ln, Ec, Q, qa, qs, qm, qd, qneg, qabs, qcmp, qf, qint, qz, toQ, gcd, N, V, S, Neg, M, F, Dv, P, R, Abs, B, PM, Rel, Eq, Or, Sys, T,
-  poly, padd, pmul, pscale, pdeg, term, ptree, html, text, evalf, evalq, holdsq, splitPM, lettersOf, signOf, REL, MINUS,
+  poly, padd, pmul, pscale, pdeg, term, ptree, html, text, evalf, evalq, holdsq, splitPM, lettersOf, signOf, REL, MINUS, implicitMul, needsGroup,
   sameExpr, sameSol, sameSolN, solSetN, sameRegion, sameFormula, sameIneq, rowOf, rank, implied, sysStatus, solSet };
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -1557,7 +1593,7 @@ function L5_5() {
     return { kind: 'expr', lines: [{ tree: pt({ 2: a * a, 0: -k * k }) }, { tree: M([lin(a, -k), lin(a, k)]), move: `Difference of squares: ${a * a}x² is (${a}x)², ${k * k} is ${k}²`,
       wrongs: [W(M([lin(a * a, -k), lin(1, k)]), a * a + 'x² is (' + a + 'x)²: each bracket gets ' + a + 'x.'), W(P(lin(a, -k), 2), 'A difference of squares gives a minus bracket and a plus bracket.'), W(M([lin(a, -k * k), lin(a, k * k)]), 'Take the square root of ' + k * k + ': it is ' + k + '.')] }] }; }
   if (v === 5) { const a = ri(2, 4), s = pick([1, -1]); if (A.gcd(a, k) !== 1) return null;
-    return { kind: 'expr', lines: [{ tree: pt({ 2: a * a, 1: 2 * a * k * s, 0: k * k }) }, { tree: P(lin(a, s * k), 2), move: `A perfect square: (${a}x)² ${s < 0 ? '−' : '+'} 2·${a}x·${k} + ${k}²`,
+    return { kind: 'expr', lines: [{ tree: pt({ 2: a * a, 1: 2 * a * k * s, 0: k * k }) }, { tree: P(lin(a, s * k), 2), move: `A perfect square: (${a}x)² ${s < 0 ? '−' : '+'} 2(${a}x)(${k}) + ${k}²`,
       wrongs: [W(P(lin(a, -s * k), 2), 'The middle sign tells you the sign in the bracket.'), W(P(lin(a * a, s * k), 2), 'The square root of ' + a * a + 'x² is ' + a + 'x.'), W(M([lin(a, k), lin(a, -k)]), 'That gives a difference of squares, with no middle term.')] }] }; }
   if (v === 0) { const k2 = ri(1, 3);
     return { kind: 'expr', lines: [{ tree: pt({ 4: 1, 0: -Math.pow(k2, 4) }) }, { tree: M([B(pt({ 2: 1, 0: -k2 * k2 })), B(pt({ 2: 1, 0: k2 * k2 }))]), move: 'Difference of squares: x⁴ is (x²)²',
@@ -1565,7 +1601,7 @@ function L5_5() {
       { tree: M([lin(1, -k2), lin(1, k2), B(pt({ 2: 1, 0: k2 * k2 }))]), move: 'Factor completely: the first bracket is a difference of squares again', wrongs: [W(M([P(lin(1, -k2), 2), B(pt({ 2: 1, 0: k2 * k2 }))]), 'x² − ' + k2 * k2 + ' is (x − ' + k2 + ')(x + ' + k2 + '), not a square.'), W(M([lin(1, -k2), lin(1, k2), lin(1, -k2), lin(1, k2)]), 'x² + ' + k2 * k2 + ' (a sum of squares) doesn\'t factor.')] }] };
   }
   if (v === 1) { const s = pick([1, -1]);
-    return { kind: 'expr', lines: [{ tree: pt({ 2: 1, 1: 2 * s * k, 0: k * k }) }, { tree: P(lin(1, s * k), 2), move: 'A perfect square: first² ± 2·first·last + last²',
+    return { kind: 'expr', lines: [{ tree: pt({ 2: 1, 1: 2 * s * k, 0: k * k }) }, { tree: P(lin(1, s * k), 2), move: 'A perfect square: first² ± 2(first)(last) + last²',
       wrongs: [W(P(lin(1, -s * k), 2), 'The middle sign tells you the sign in the bracket.'), W(M([lin(1, k), lin(1, -k)]), 'That gives a difference of squares, with no middle term.')] }] };
   }
   if (v === 2) { const c = ri(2, 5);
@@ -2236,7 +2272,7 @@ function twolet() {
   }
   const k = Math.abs(nz(1, 6)), s = pick([1, -1]), ks = mt(s * k, { [w]: 1 });
   return { kind: 'expr', lines: [{ tree: sum([[1, { [u]: 2 }], [2 * s * k, { [u]: 1, [w]: 1 }], [k * k, { [w]: 2 }]]) },
-    { tree: P(lin2(1, u, s * k, w), 2), move: `A perfect square: ${u}² ${s < 0 ? '−' : '+'} 2·${u}·${mt(k, { [w]: 1 })} + (${mt(k, { [w]: 1 })})²`,
+    { tree: P(lin2(1, u, s * k, w), 2), move: `A perfect square: ${u}² ${s < 0 ? '−' : '+'} 2(${u})(${mt(k, { [w]: 1 })}) + (${mt(k, { [w]: 1 })})²`,
       wrongs: take([], [W(P(lin2(1, u, -s * k, w), 2), 'The middle sign tells you the sign in the bracket.'),
         W(M([lin2(1, u, -k, w), lin2(1, u, k, w)]), 'That multiplies out with no middle term.'),
         W(P(lin2(1, u, 2 * s * k, w), 2), `The bracket holds half of ${2 * k}${w}: that's ${mt(k, { [w]: 1 })}.`),
@@ -4120,7 +4156,7 @@ function L_disguise() {
   const start = Eq(S(P(N(Bv), X()), ...restD), N(0)), sq = Eq(S(P(B(Bx()), 2), ...restD), N(0));
   const [lo, hi] = neg ? [u1, u2] : [Math.min(u1, u2), Math.max(u1, u2)];
   const lines = [{ tree: start }, { tree: sq, move: `${Bv}ˣ = (${b}²)ˣ = (${b}ˣ)²`, wrongs: [
-    W(Eq(S(P(N(b), P(X(), 2)), ...restD), N(0)), `${Bv}ˣ is (${b}ˣ)², not ${b} to the power x².`), W(Eq(S(M([N(2), Bx()], '·'), ...restD), N(0)), `${Bv}ˣ is ${b}ˣ times itself, not 2 · ${b}ˣ.`), W(Eq(S(P(B(P(N(Bv), X())), 2), ...restD), N(0)), `${Bv}ˣ is already the square: it's (${b}ˣ)².`)] },
+    W(Eq(S(P(N(b), P(X(), 2)), ...restD), N(0)), `${Bv}ˣ is (${b}ˣ)², not ${b} to the power x².`), W(Eq(S(M([N(2), Bx()], '·'), ...restD), N(0)), `${Bv}ˣ is ${b}ˣ times itself, not 2(${b}ˣ).`), W(Eq(S(P(B(P(N(Bv), X())), 2), ...restD), N(0)), `${Bv}ˣ is already the square: it's (${b}ˣ)².`)] },
     { tree: Eq(M([fac(lo), fac(hi)]), N(0)), move: `Let u = ${b}ˣ: u² ${uT(B1)} ${sgn(C1)} ${Math.abs(C1)} = 0 factors`, wrongs: [
       W(Eq(M([fac(-lo), fac(-hi)]), N(0)), `The numbers add to ${B1} and multiply to ${C1}: check the signs.`), W(Eq(M([B(S(X(), N(-lo))), B(S(X(), N(-hi)))]), N(0)), `The brackets hold ${b}ˣ, not x.`), C1 !== -1 && C1 !== 1 ? W(Eq(M([fac(C1 > 0 ? 1 : -1), fac(C1 > 0 ? C1 : -C1)]), N(0)), `Those numbers multiply to ${C1} but don't add to ${B1}.`) : null].filter(Boolean) },
     { tree: Or(Eq(Bx(), N(lo)), Eq(Bx(), N(hi))), move: 'Each bracket can be 0', wrongs: [W(Or(Eq(Bx(), N(-lo)), Eq(Bx(), N(-hi))), 'Each bracket is 0 when the sign flips: check them.'), W(Or(xeq(Math.min(lo, hi)), xeq(Math.max(lo, hi))), `It's ${b}ˣ that equals those numbers, not x.`), W(Eq(Bx(), N(neg ? u2 : hi === u1 ? u2 : u1)), 'Each bracket gives an answer: keep both for now.')] }];
@@ -4614,11 +4650,11 @@ function gSimp() {
       W(cr(c * s * s, f), `√${s * s} comes out as ${s}, not ${s * s}.`),
       W(cr(c * s, s * f), `Divide ${n} by ${s * s}, not by ${s}: what stays inside is ${f}.`),
       p ? W(cr(c * p, n / p), `${p} isn't a perfect square, so it can't come out of the root.`) : null,
-      W(c > 1 ? M([N(c), B(S(rt(s * s), rt(f)))]) : S(rt(s * s), rt(f)), `√(${s * s} × ${f}) splits into a product, √${s * s} · √${f}, not a sum.`)];
+      W(c > 1 ? M([N(c), B(S(rt(s * s), rt(f)))]) : S(rt(s * s), rt(f)), `√(${s * s} × ${f}) splits into a product, (√${s * s})(√${f}), not a sum.`)];
     if (rand() < 0.3) return { kind: 'expr', lines: [{ tree: start }, line(end, `${n} = ${s * s} × ${f}, and √${s * s} = ${s} comes out`, w1)] };
     const w2 = [W(cr(c * s * s, f), `√${s * s} is ${s}, not ${s * s}.`), W(ct(c, rt(s * f)), `${s} comes out in front; it doesn't go back under the root.`),
       s > 2 && s % 2 === 0 ? W(cr(c * s * s / 2, f), `A square root isn't half: √${s * s} = ${s} because ${s} × ${s} = ${s * s}.`) : null,
-      c > 1 ? W(cr(c + s, f), `The ${s} multiplies the ${c}: ${c} × ${s} = ${c * s}.`) : W(S(N(s), rt(f)), `√${s * s} · √${f} is ${s} times √${f}, not ${s} plus √${f}.`)];
+      c > 1 ? W(cr(c + s, f), `The ${s} multiplies the ${c}: ${c} × ${s} = ${c * s}.`) : W(S(N(s), rt(f)), `(√${s * s})(√${f}) is ${s} times √${f}, not ${s} plus √${f}.`)];
     return { kind: 'expr', lines: [{ tree: start },
       line(mid, `Split off the biggest square: ${n} = ${s * s} × ${f}`, w1.slice(0, 3).concat([W(M([...pre, rt(s * s), rt(n - s * s)], '·'), `${n} = ${s * s} × ${f}, not ${s * s} + ${n - s * s}: split into a product.`)])),
       line(end, `√${s * s} = ${s}`, w2)] };
@@ -4634,8 +4670,8 @@ function gSimp() {
     const w = [
       W(out(s * s, 2 * h, rest), `√(${s * s}${xs(2 * h, x)}) comes out as ${s}${xs(h, x)}: take the root of both parts.`),
       W(out(s, 2 * h, rest), `Halve the exponent: √(${xs(2 * h, x)}) = ${xs(h, x)}.`),
-      r ? W(out(s, h, N(f === 1 ? 1 : f)), `${xs(e, x)} = ${xs(2 * h, x)} · ${x}: one ${x} stays under the root.`) : W(out(s, h, N(f * s)), `Divide ${n} by ${s * s}, not by ${s}: what stays inside is ${f}.`)];
-    if (f === 1 && r) w[2] = W(M([N(s), xp(h, x)]), `${xs(e, x)} = ${xs(2 * h, x)} · ${x}: one ${x} stays under the root.`);
+      r ? W(out(s, h, N(f === 1 ? 1 : f)), `${xs(e, x)} = ${xs(2 * h, x)}(${x}): one ${x} stays under the root.`) : W(out(s, h, N(f * s)), `Divide ${n} by ${s * s}, not by ${s}: what stays inside is ${f}.`)];
+    if (f === 1 && r) w[2] = W(M([N(s), xp(h, x)]), `${xs(e, x)} = ${xs(2 * h, x)}(${x}): one ${x} stays under the root.`);
     if (rand() < 0.35) return { kind: 'expr', lines: [{ tree: start }, line(end, `Take out the square: ${s * s}${xs(2 * h, x)} comes out as ${s}${xs(h, x)}`, w)] };
     return { kind: 'expr', lines: [{ tree: start },
       line(mid, `Split into a square part and the rest`, [W(S(R(sqIn), R(rest)), 'A root of a product splits into a product, not a sum.'), w[0], w[1], w[2]]),
@@ -4666,14 +4702,14 @@ function gMulDiv() {
   if (v <= 1) { // √6 · √10 → √60 → 2√15
     const a = pick(NONSQ), b = pick(NONSQ), k = a * b; if (a === b || k > 300 || sqPart(k)[0] === 1) return null;
     return { kind: 'expr', lines: [{ tree: M([rt(a), rt(b)], '·') },
-      line(rt(k), `Multiply under one root: ${a} × ${b} = ${k}`, [W(rt(a + b), `Roots multiply under one root: ${a} × ${b}, not ${a} + ${b}.`), W(N(k), `√${a} · √${b} = √${k}: the root stays.`), W(cr(a, b), `${a} is under a root too; it can't come out as ${a}.`)]),
+      line(rt(k), `Multiply under one root: ${a} × ${b} = ${k}`, [W(rt(a + b), `Roots multiply under one root: ${a} × ${b}, not ${a} + ${b}.`), W(N(k), `(√${a})(√${b}) = √${k}: the root stays.`), W(cr(a, b), `${a} is under a root too; it can't come out as ${a}.`)]),
       endSimp(k)] };
   }
   if (v <= 3) { // 2√3 · 5√6 → 10√18 → 30√2
     const p = ri(2, 5), q = ri(2, 6), a = pick(NONSQ.slice(0, 9)), b = pick(NONSQ.slice(0, 9)), k = a * b; if (a === b || k > 200 || sqPart(k)[0] === 1) return null;
     return { kind: 'expr', lines: [{ tree: M([cr(p, a), cr(q, b)], '·') },
       line(cr(p * q, k), `Numbers with numbers (${p} × ${q}), roots with roots (${a} × ${b})`, [p + q !== p * q ? W(cr(p + q, k), `The numbers in front multiply: ${p} × ${q}, not ${p} + ${q}.`) : null, W(cr(p * q, a + b), `Under the root, multiply: ${a} × ${b}, not ${a} + ${b}.`),
-        W(N(p * q * k), `√${a} · √${b} = √${k}: the root stays.`), W(cr(p * q * a, b), `√${a} stays a root: it can't come out as ${a}.`)]),
+        W(N(p * q * k), `(√${a})(√${b}) = √${k}: the root stays.`), W(cr(p * q * a, b), `√${a} stays a root: it can't come out as ${a}.`)]),
       endSimp(k, p * q)] };
   }
   // √96 / √2 → √48 → 4√3
@@ -4699,7 +4735,7 @@ function gAdd() {
   const repl = (fn) => S(...ts.map(t => t === big ? fn(t) : simp(t)), ...tail(false));
   const sumC = ts.reduce((a, t) => a + t.c, 0), sumIn = ts.reduce((a, t) => a + t.s * t.s * f, 0);
   const w1 = [sumC && !g ? W(cr(sumC, sumIn), 'Roots don\'t add their insides: first make the roots match.') : null,
-    W(repl(t => cr(t.c * t.s * t.s, f)), `√${big.s * big.s * f} = √${big.s * big.s} · √${f} = ${big.s}√${f}: the ${big.s * big.s} comes out as ${big.s}.`),
+    W(repl(t => cr(t.c * t.s * t.s, f)), `√${big.s * big.s * f} = (√${big.s * big.s})(√${f}) = ${big.s}√${f}: the ${big.s * big.s} comes out as ${big.s}.`),
     big.s * f !== f * big.s * big.s ? W(repl(t => cr(t.c * t.s, t.s * f)), `${big.s * big.s * f} = ${big.s * big.s} × ${f}: what stays inside is ${f}.`) : null,
     g && gs === 1 ? W(S(...ts.map(simp), cr(gc, g * 4)), `√${g} is already as simple as it gets; leave it alone.`) : null];
   const like = cr(T, f), end = g ? S(like, cr(gT, g)) : like, prodC = ts.reduce((a, t) => a * t.c * t.s, 1), absT = ts.reduce((a, t) => a + Math.abs(t.c * t.s), 0);
@@ -5427,7 +5463,7 @@ function r10remthm() {
   const noConst = qs(r, p[0] || Q(0));
   const negSq = c < 0 ? ks.reduce((s, k) => qa(s, qm(p[k], Q(k === 0 ? 1 : -Math.pow(Math.abs(c), k)))), Q(0)) : null;
   const sup = k => k === 2 ? '²' : '³';
-  if (top >= 2) lines[2].wrongs.push(W(Eq(V('r'), plugged(p, c, { times: true })), `x${sup(top)} becomes ${pn(c)}${sup(top)}, a power, not ${pn(c)} · ${top}.`));
+  if (top >= 2) lines[2].wrongs.push(W(Eq(V('r'), plugged(p, c, { times: true })), `x${sup(top)} becomes ${pn(c)}${sup(top)}, a power, not ${pn(c)}(${top}).`));
   const ev = ks.filter(k => k >= 2 && k % 2 === 0 && p[k]);
   if (c < 0 && ev.length) lines[2].wrongs.push(W(Eq(V('r'), plugged(p, c, { nobr: true })), `Keep the brackets: −${-c}² means −(${-c}²); you need (${num(c)})².`));
   const nk = ks.filter(k => k >= 1 && Math.abs(p[k].n) !== 1).sort((a, b) => b - a)[0];
@@ -6379,7 +6415,7 @@ function gPowE() {
   const right = P(N(base), M([N(n), V('x')]));
   return { kind: 'expr', lines: [
     { tree: start },
-    { tree: right, move: `Power of a power: multiply the exponents, ${base}^{${n}·x}`,
+    { tree: right, move: `Power of a power: multiply the exponents, ${base}^{${n}x}`,
       wrongs: [W(P(N(base), S(V('x'), N(n))), 'A power of a power multiplies the exponents. Adding them is a different law.'), W(M([N(n), P(N(base), V('x'))], '·'), n + ' × ' + base + '^x is not (' + base + '^x)^' + n + '.'), W(P(N(base * n), V('x')), 'The base stays ' + base + '. The ' + n + ' joins the exponent.')] }
   ] };
 }
@@ -6391,7 +6427,7 @@ function gShiftE() {
   const fin = M([N(bk), P(N(base), V('x'))], '·');
   return { kind: 'expr', lines: [
     { tree: start },
-    { tree: split, move: `Split the exponent: ${base}^{x+${k}} = ${base}^${k} · ${base}^x`,
+    { tree: split, move: `Split the exponent: ${base}^{x+${k}} = ${base}^${k}(${base}^x)`,
       wrongs: [W(P(N(base), M([V('x'), N(k)])), 'x + ' + k + ' splits into a product of powers, not an exponent that is a product.'), W(S(P(N(base), V('x')), N(bk)), 'The extra ' + k + ' in the exponent multiplies by ' + base + '^' + k + '. It doesn\'t add ' + bk + '.')] },
     { tree: fin, move: `${base}^${k} = ${bk}`,
       wrongs: [W(M([N(base * k), P(N(base), V('x'))], '·'), base + '^' + k + ' is ' + bk + ', not ' + base + ' × ' + k + '.'), W(M([N(bk + base), P(N(base), V('x'))], '·'), 'Check the power.')] }
@@ -6581,9 +6617,9 @@ function purePow(t) {
 function putFactors(root, path, node, next) {
   if (next.length === 1) return replaceAt(root, path, next[0]);
   let sym = node.sym || '';
-  // x^6 · y^2 is written x^6y^2 on the next line; a bare number still needs a dot (4x^7 · 3)
+  if (sym === '·') sym = '';
+  // letter powers sit together (x^6y^2); a following number or the same base is bracketed by the renderer
   if (next.every(purePow)) sym = '';
-  else if (sym === '' && next.some(x => x.t === 'n') && next.some(x => x.t !== 'n')) sym = '·';
   return replaceAt(root, path, { t: '*', a: next, sym });
 }
 function analyzeFrac(node, path, pairs, seen) {
@@ -7243,9 +7279,10 @@ function algTapHtml(t, bag, ctx) {
     }
     case '*': return t.a.map((x, i) => {
       let h = algTapHtml(x, bag, '*');
-      if (x.t === '+' || (x.t === 'neg' && i > 0) || (x.t === 'n' && x.v && x.v.n < 0 && i > 0)) h = '(' + h + ')';
-      if (i === 0) return h;
-      if (t.sym === '') return btn('·', 'mul', t, 'times') + h;
+      const prev = i ? t.a[i - 1] : null;
+      const implicit = A.implicitMul(t.sym);
+      if (x.t === '+' || (x.t === 'neg' && i > 0) || (x.t === 'n' && x.v && x.v.n < 0 && i > 0) || (i > 0 && implicit && A.needsGroup(prev, x))) h = '(' + h + ')';
+      if (i === 0 || implicit) return h;
       return btn(t.sym === '*' ? '×' : t.sym, 'mul', t, 'times') + h;
     }).join('');
     case '/':
