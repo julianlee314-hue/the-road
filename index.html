@@ -7517,7 +7517,7 @@ function openCalc(pnd) {
   const body = base ? `<span class="var"><i>${base}</i><sup>${field}</sup></span>` : field;
   const sEl = $('signs');
   sEl.hidden = false; sEl.classList.add('alg', 'xmode');
-  sEl.innerHTML = `<div class="calcrow">${body}<button type="button" class="op expok" id="calcGo" aria-label="check">✓</button></div>`;
+  sEl.innerHTML = `<div class="calcrow">${body}</div>`;
   $('hint').innerHTML = pnd.kind === 'exp' ? 'Type the new exponent.' : 'Type the number.';
   G.stepT = performance.now();
   setTimeout(() => { const inp = $('calcIn'); if (inp) inp.focus(); }, 30);
@@ -7563,19 +7563,33 @@ function aOrder(i) {
   if (S.calc && m.pairs.some(p => p.calcQ)) return openCalc({ pairs: m.pairs.filter(p => p.calcQ), kind: m.id === 'exp' ? 'exp' : 'num' });
   applyPair(m.pairs[0], false);
 }
-function aCalcSubmit() {
-  if (!G || !G.fork || !G.fork.pending || G.over || G.busy || G.stalling) return;
+function calcHit() {
+  if (!G || !G.fork || !G.fork.pending) return null;
   const pnd = G.fork.pending;
   const q = parseExp($('calcIn') && $('calcIn').value);
-  if (pnd.opt != null) {
-    if (!qSame(q, pnd.answers[0])) return aOrderMiss(whyNumber(q, 'num', ''));
-    G.fork.pending = null;
-    return aApply(pnd.opt, true);
-  }
+  if (!q) return null;
+  if (pnd.opt != null) return qSame(q, pnd.answers[0]) ? { opt: pnd.opt } : null;
   const pair = (pnd.pairs || []).find(p => qSame(p.calcQ, q));
-  if (!pair) return aOrderMiss(whyNumber(q, pnd.kind, (pnd.pairs[0] && pnd.pairs[0].baseName) || ''));
+  return pair ? { pair } : null;
+}
+// exact numeric match only: "05" is 5, "1" is not 12. No miss while the number is still being typed.
+function aCalcLive() {
+  if (!G || G.over || G.busy || G.stalling || !G.fork || !G.fork.pending) return;
+  const hit = calcHit();
+  if (!hit) return;
+  const pnd = G.fork.pending;
   G.fork.pending = null;
-  applyPair(pair, true);
+  if (hit.opt != null) return aApply(hit.opt, true);
+  applyPair(hit.pair, true);
+}
+function aCalcSubmit() {
+  if (!G || !G.fork || !G.fork.pending || G.over || G.busy || G.stalling) return;
+  const hit = calcHit();
+  if (hit) return aCalcLive();
+  const pnd = G.fork.pending;
+  const q = parseExp($('calcIn') && $('calcIn').value);
+  if (pnd.opt != null) return aOrderMiss(whyNumber(q, 'num', ''));
+  return aOrderMiss(whyNumber(q, pnd.kind, (pnd.pairs[0] && pnd.pairs[0].baseName) || ''));
 }
 function setCalc(on) {
   S.calc = !!on; save(); syncCalcBtns();
@@ -8003,10 +8017,10 @@ $('goPractice').addEventListener('click', () => start('practice'));
 $('goRally').addEventListener('click', () => start('rally'));
 $('goForks').addEventListener('click', () => start(S.lic !== 1 ? 'race' : 'forks'));
 $('signs').addEventListener('click', e => {
-  if (e.target.closest('#calcGo')) { if (G && G.alg) aCalcSubmit(); return; }
   const ob = e.target.closest('.obtn'); if (ob && G && G.alg) return aOrder(+ob.dataset.i);
   const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i);
 });
+$('signs').addEventListener('input', e => { if (e.target && e.target.id === 'calcIn' && G && G.alg) aCalcLive(); });
 $('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
 $('calcToggle').addEventListener('click', () => setCalc(!S.calc));
 $('homeCalc').addEventListener('click', () => setCalc(!S.calc));
