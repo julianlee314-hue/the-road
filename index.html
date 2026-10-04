@@ -130,6 +130,10 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .op.wrong{background:var(--bad);color:#fff;box-shadow:none;animation:shake .3s}
 .op.hint{box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.35);animation:glow .9s ease-in-out 2}
 .op.sel{background:#fffefb;box-shadow:inset 0 0 0 3px var(--hint),0 0 0 4px rgba(79,182,238,.45)}
+.op.term{margin:.1em .06em;padding:.32em .4em .36em;border-radius:.4em;min-height:2.15em}
+.op.term.yel{background:#f6c945;color:#3a2a04;box-shadow:inset 0 0 0 2px #d4a40a}
+.op.term.grn{background:#3ecf8e;color:#06351f;box-shadow:none}
+.op.term.red{background:var(--bad);color:#fff;box-shadow:none}
 .op.dead{pointer-events:none;opacity:.55;box-shadow:none;background:transparent;min-width:0;min-height:0;padding:0;margin:0 .12em}
 /* algebra transform chips: same tan tile language as .op, never full next-line MCQ */
 .xchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0 2px}
@@ -7319,7 +7323,7 @@ function aNext() {
     for (let i = 0; i < 30; i++) { G.prob = LV.make(G.alg.lic, G.alg.lv); if (trapOnPath(G.prob, key)) break; }
   } else if (G.alg.id === '2.intro') { window.L2IntroIx = G.introN || 0; G.prob = LV.make(G.alg.lic, G.alg.lv); }
   else for (let i = 0; i < 10; i++) { G.prob = LV.make(G.alg.lic, G.alg.lv); const k = A.text(G.prob.kind === 'sys' ? A.Sys(G.prob.start.lines) : G.prob.start.tree); if (!G.seen.has(k)) { G.seen.add(k); break; } }
-  G.step = G.prob.start; G.past = []; G.exprMiss = 0; G.pairSel = null; G.stepT = performance.now();
+  G.step = G.prob.start; G.past = []; G.exprMiss = 0; G.pairSel = null; G.likeRun = false; G.likeSel = null; G.stepT = performance.now();
   $('card').classList.remove('done');
   $('metaL').textContent = `${G.tune ? 'Tune-up · ' : G.test ? TEST_NAME[G.test.type] + ' ' + (G.test.done + 1) + '/' + G.test.total + ' · ' : ''}${lvCode(G.alg.lic, G.alg.lv)} · ${lvAt(G.alg.lic, G.alg.lv).name}`;
   $('metaR').textContent = racing() ? `checkpoint ${G.cp + 1}` : 'practice';
@@ -7637,8 +7641,8 @@ function openCalc(pnd) {
   const body = base ? `<span class="var"><i>${base}</i><sup>${field}</sup></span>` : field;
   const sEl = $('signs');
   sEl.hidden = false; sEl.classList.add('alg', 'xmode');
-  sEl.innerHTML = `<div class="calcrow">${body}</div>`;
-  $('hint').innerHTML = pnd.kind === 'exp' ? 'Type the new exponent. It advances when the number is right.' : 'Type the number. It advances when it is right.';
+  sEl.innerHTML = `<div class="calcrow">${body}</div>` + (pnd.like ? `<div class="xchips"><button type="button" class="xchip" id="likeDone">Done</button></div>` : '');
+  $('hint').innerHTML = pnd.like ? 'Type the combined coefficient. It advances when the number is right.' : (pnd.kind === 'exp' ? 'Type the new exponent. It advances when the number is right.' : 'Type the number. It advances when it is right.');
   G.stepT = performance.now();
   const inp = $('calcIn');
   if (inp) { inp.addEventListener('input', aCalcLive); inp.oninput = aCalcLive; }
@@ -7689,8 +7693,9 @@ function aOrder(i) {
 function calcHit() {
   if (!G || !G.fork || !G.fork.pending) return null;
   const pnd = G.fork.pending;
-  const q = parseExp($('calcIn') && $('calcIn').value);
+  const q = (pnd.like ? parseCoef : parseExp)($('calcIn') && $('calcIn').value);
   if (!q) return null;
+  if (pnd.like) return qSame(q, pnd.answers[0]) ? { like: pnd.like } : null;
   if (pnd.opt != null) return qSame(q, pnd.answers[0]) ? { opt: pnd.opt } : null;
   const pair = (pnd.pairs || []).find(p => qSame(p.calcQ, q));
   return pair ? { pair } : null;
@@ -7703,7 +7708,7 @@ function aCalcLive() {
   const morph = !!G.fork.pending.morph;
   const grp = G.expGrp;
   G.fork.pending = null;
-  const go = () => { if (hit.opt != null) return aApply(hit.opt, true); applyPair(hit.pair, true); };
+  const go = () => { if (hit.like) return finishLike(hit.like); if (hit.opt != null) return aApply(hit.opt, true); applyPair(hit.pair, true); };
   if (morph) { armMorph(grp); morphThen(go); } else go();
 }
 function aCalcSubmit() {
@@ -7712,6 +7717,7 @@ function aCalcSubmit() {
   if (hit) return aCalcLive();
   const pnd = G.fork.pending;
   const q = parseExp($('calcIn') && $('calcIn').value);
+  if (pnd.like) return likeMiss('Check that coefficient.', true);
   if (pnd.opt != null) return aOrderMiss(whyNumber(q, 'num', ''));
   return aOrderMiss(whyNumber(q, pnd.kind, (pnd.pairs[0] && pnd.pairs[0].baseName) || ''));
 }
@@ -7722,11 +7728,185 @@ function setPlayMode(m) {
   if (!was || needsType() || !G || !G.fork || !G.fork.pending || G.busy || G.over) return;
   const pnd = G.fork.pending; G.fork.pending = null;
   if (pnd.opt != null) aApply(pnd.opt, true);
+  else if (pnd.like) finishLike(pnd.like);
   else if (pnd.pairs && pnd.pairs[0]) applyPair(pnd.pairs[0], true);
+}
+
+
+/* Simplify only: pair like terms in any order, then Done. Other plates, and bracket steps, stay on the move path. */
+function monoParts(t) {
+  if (!t) return null;
+  if (t.t === 'n') return { c: t.v, sig: '', dec: !!t.dec };
+  if (t.t === 'v') return { c: A.Q(1), sig: t.s + '^1', dec: false };
+  if (t.t === 'neg') { const m = monoParts(t.a); return m ? { c: A.qneg(m.c), sig: m.sig, dec: m.dec } : null; }
+  if (t.t === '^') {
+    if (!t.a || t.a.t !== 'v' || !t.e || t.e.t !== 'n' || !A.qint(t.e.v) || t.e.v.n <= 0) return null;
+    return { c: A.Q(1), sig: t.a.s + '^' + t.e.v.n, dec: false };
+  }
+  if (t.t === '/') {
+    if (!t.bar || !t.b || t.b.t !== 'n' || t.b.v.n <= 0 || !A.qint(t.b.v)) return null;
+    const m = monoParts(t.a); if (!m) return null;
+    return { c: A.qd(m.c, t.b.v), sig: m.sig, dec: false };
+  }
+  if (t.t === '*') {
+    let c = A.Q(1), dec = false; const exps = {};
+    for (const f of t.a || []) {
+      if (f.t === 'n') { c = A.qm(c, f.v); dec = dec || !!f.dec; continue; }
+      if (f.t === 'v') { exps[f.s] = (exps[f.s] || 0) + 1; continue; }
+      if (f.t === '^' && f.a && f.a.t === 'v' && f.e && f.e.t === 'n' && A.qint(f.e.v) && f.e.v.n > 0) { exps[f.a.s] = (exps[f.a.s] || 0) + f.e.v.n; continue; }
+      return null;
+    }
+    const sig = Object.keys(exps).sort().map(k => k + '^' + exps[k]).join('*');
+    return { c, sig, dec };
+  }
+  return null;
+}
+function likeBoard(tree) {
+  if (!tree) return null;
+  const nodes = tree.t === '+' ? tree.a.slice() : [tree];
+  if (!nodes.length) return null;
+  const parts = nodes.map(monoParts);
+  if (parts.some(p => !p)) return null;
+  const cnt = {};
+  parts.forEach(p => { cnt[p.sig] = (cnt[p.sig] || 0) + 1; });
+  return { nodes, parts, likesLeft: Object.values(cnt).some(n => n > 1) };
+}
+function monoTree(c, sig, dec) {
+  if (A.qz(c) || !sig) return A.N(c, !!dec && !A.qz(c));
+  const bits = sig.split('*').map(p => {
+    const i = p.indexOf('^'), s = p.slice(0, i), k = +p.slice(i + 1);
+    return k === 1 ? A.V(s) : A.P(A.V(s), k);
+  });
+  if (bits.length === 1 && dec) {
+    const xp = bits[0];
+    if (A.qcmp(c, A.Q(1)) === 0) return xp;
+    if (A.qcmp(c, A.Q(-1)) === 0) return A.Neg(xp);
+    return A.M([A.N(c, true), xp]);
+  }
+  if (bits.length === 1) { const i = sig.indexOf('^'); return A.term(c, +sig.slice(i + 1), sig.slice(0, i)); }
+  if (A.qcmp(c, A.Q(1)) === 0) return A.M(bits);
+  if (A.qcmp(c, A.Q(-1)) === 0) return A.Neg(A.M(bits));
+  return A.M([A.N(c, !!dec), ...bits]);
+}
+function combinedTree(ia, ib) {
+  const board = likeBoard(G.step.tree);
+  const nodes = board.nodes.slice();
+  const sum = A.qa(board.parts[ia].c, board.parts[ib].c);
+  const lo = Math.min(ia, ib), hi = Math.max(ia, ib);
+  if (A.qz(sum)) { nodes.splice(hi, 1); nodes.splice(lo, 1); }
+  else { nodes[lo] = monoTree(sum, board.parts[ia].sig, board.parts[ia].dec || board.parts[ib].dec); nodes.splice(hi, 1); }
+  if (!nodes.length) return A.N(0);
+  return nodes.length === 1 ? nodes[0] : A.S(nodes);
+}
+function termFace(node, i) {
+  const [sg, u] = A.signOf(node), h = A.html(u);
+  if (i === 0) return (sg < 0 ? A.MINUS : '') + h;
+  return (sg < 0 ? A.MINUS + ' ' : '+ ') + h;
+}
+function likeWhy(a, b) {
+  const pretty = sig => sig.replace(/\^1(?!\d)/g, '').replace(/\^(\d+)/g, '<sup>$1</sup>').replace(/\*/g, '');
+  if (!a.sig || !b.sig) return `A plain number and ${pretty(a.sig || b.sig) || 'that term'} aren't like terms.`;
+  return "Those aren't like terms. The letters or the powers differ.";
+}
+function paintTerm(i, cls) {
+  const b = document.querySelector(`#expr .op.term[data-id="${i}"]`);
+  if (b) b.classList.add(cls);
+}
+function clearTermColors() {
+  document.querySelectorAll('#expr .op.term').forEach(b => b.classList.remove('yel', 'grn', 'red'));
+}
+function renderLike(board) {
+  G.likeSel = null;
+  G.fork = { mode: 'like', board, opts: [], pending: null };
+  const ex = $('expr');
+  ex.className = 'expr math wrap';
+  ex.innerHTML = G.past.slice(-2).map(t => `<span class="past">${lineHtml(t)}</span>`).join('') + `<span class="cur">` + board.nodes.map((n, i) => `<button type="button" class="op term" data-id="${i}">${termFace(n, i)}</button>`).join('') + `</span>`;
+  fit();
+  const sEl = $('signs');
+  sEl.hidden = false; sEl.classList.add('alg', 'xmode');
+  sEl.style.gridTemplateColumns = '1fr';
+  sEl.innerHTML = `<div class="xchips"><button type="button" class="xchip" id="likeDone">Done</button></div>`;
+  const h = $('hint').innerHTML;
+  if (!h || !/✓/.test(h)) $('hint').innerHTML = 'Tap a term. It turns yellow. A like term turns green and combines. An unlike term turns red. Press <b>Done</b> when none are left.';
+  if (racing()) RD.on('fork', { lanes: board.nodes.length });
+  G.stepT = performance.now();
+}
+function likeMiss(why, rerender) {
+  G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
+  G.whys[why] = (G.whys[why] || 0) + 1;
+  try { garageMiss(why); } catch (e) {}
+  try { S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: 'like', r: 'miss' }); if (S.log.length > 300) S.log.shift(); } catch (e) {}
+  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; if (!G.timed) { G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); } }
+  const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+  $('hint').innerHTML = `<span class="why">${why}</span>`;
+  G.likeSel = null;
+  if (G.fork) G.fork.pending = null;
+  G.stepT = performance.now(); save(); hud();
+  setTimeout(() => { if (!G || G.over) return; if (rerender && !G.stalling) aRender(); else clearTermColors(); }, 450);
+}
+function finishLike(pos) {
+  if (!pos || !G || G.over) return;
+  const ms = performance.now() - G.stepT;
+  G.taps++; G.right++; G.cpSteps++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms);
+  SND.right(G.streak);
+  if (racing()) RD.on('decision.correct');
+  G.step.tree = combinedTree(pos.ia, pos.ib);
+  G.likeSel = null;
+  if (G.fork) G.fork.pending = null;
+  $('hint').innerHTML = '<span class="mv">✓ Combined.</span>';
+  G.busy = true; save(); hud();
+  setTimeout(() => { G.busy = false; if (!G || G.over || G.stalling) return; aRender(); }, 220);
+}
+function aLike(i) {
+  if (!G || G.over || G.busy || G.stalling || !G.fork || G.fork.mode !== 'like' || G.fork.pending) return;
+  const board = G.fork.board;
+  if (!board || !(i >= 0) || i >= board.nodes.length) return;
+  if (G.likeSel == null) { G.likeSel = i; paintTerm(i, 'yel'); return; }
+  if (G.likeSel === i) { G.likeSel = null; clearTermColors(); return; }
+  const ia = G.likeSel, ib = i, like = board.parts[ia].sig === board.parts[ib].sig;
+  clearTermColors(); paintTerm(ia, 'yel');
+  if (!like) { paintTerm(ib, 'red'); G.likeSel = null; return likeMiss(likeWhy(board.parts[ia], board.parts[ib])); }
+  paintTerm(ib, 'grn');
+  const sum = A.qa(board.parts[ia].c, board.parts[ib].c);
+  G.busy = true;
+  setTimeout(() => {
+    G.busy = false;
+    if (!G || G.over || G.stalling) return;
+    if (needsType()) openCalc({ like: { ia, ib }, answers: [sum], kind: 'num' });
+    else finishLike({ ia, ib });
+  }, 240);
+}
+function aLikeDone() {
+  if (!G || G.over || G.busy || G.stalling || !G.fork || G.fork.mode !== 'like') return;
+  const board = likeBoard(G.step.tree);
+  if (!board || board.likesLeft) { clearTermColors(); G.likeSel = null; if (G.fork.pending) G.fork.pending = null; return likeMiss('Like terms are still left.'); }
+  const ms = performance.now() - G.stepT;
+  G.taps++; G.right++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); G.times.push(ms);
+  SND.right(G.streak);
+  if (racing()) RD.on('decision.correct');
+  G.fork = null; G.likeSel = null;
+  G.step = { tree: G.step.tree, done: true };
+  aSolved();
+}
+function parseCoef(raw) {
+  const q = parseExp(raw); if (q) return q;
+  const t = String(raw || '').trim().replace(/\u2212/g, '-').replace(/\s+/g, '');
+  const m = t.match(/^([+-])?(\d+)\.(\d+)$/); if (!m) return null;
+  const den = 10 ** m[3].length;
+  const num = (m[1] === '-' ? -1 : 1) * (Number(m[2]) * den + Number(m[3]));
+  if (!isFinite(num) || den > 1e6) return null;
+  return A.Q(num, den);
 }
 
 function aRender() {
   showOrderBar();
+  if (G.alg && G.alg.lic === 3 && G.step && G.step.tree) {
+    const board = likeBoard(G.step.tree);
+    if (board && (G.likeRun || (board.likesLeft && board.nodes.length >= 2))) {
+      G.likeRun = true;
+      return renderLike(board);
+    }
+  }
   const all = G.step.opts || [], rights = all.filter(o => o.ok), wrongs = shuffle(all.filter(o => !o.ok));
   const pic = stepIsPictorial(G.step);
   const n = racing() ? ALG.lanes[Math.min(G.cp, ALG.lanes.length - 1)] : 4;
@@ -7881,6 +8061,7 @@ function aAtom(entry) {
 }
 function aTap(id) {
   if (!G || !G.alg || G.over || G.busy || G.stalling || !G.fork) return;
+  if (G.fork.mode === 'like') return aLike(id);
   if (G.fork.mode === 'order') {
     const entry = (G.fork.bag && G.fork.bag.nodes || []).find(n => n.id === id);
     if (entry && entry.kind === 'exphot') return aExpClick(entry);
@@ -8106,9 +8287,13 @@ function renderHome() {
     lc.innerHTML = `<span class="cls" aria-label="class">${cl || '–'}</span><span class="lc">${t ? `<b>${t.title}</b><span>${t.line}</span>` : (cl === 'L' ? (p => `<b>Learner</b><span>${p.n}/${p.of} stamped. Stamp them all to open the road test.</span>`)(licProgress(lic)) : `<b>Pro</b><span>Every class earned. Keep the stamps fresh.</span>`)}</span>${t ? `<button>${t.go}</button>` : ''}`;
     $('tip').innerHTML = lic === 2
     ? 'Point at an exponent to turn that base green, then tap. Numbers in front stay their own move. Calculate advances as soon as the typed number is right.'
+    : lic === 3
+    ? 'Tap a term (yellow). A like term turns green and combines; an unlike one turns red. Press <b>Done</b> when no like terms are left. Brackets still use the move on the line.'
     : 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
   const ho = $('homeOrder'); if (ho) { ho.hidden = false; const note = $('homeOrderNote'); if (note) note.textContent = lic === 2
     ? 'Order fills the number. Calculate: tap, then type. Saved on this device.'
+    : lic === 3
+    ? 'Order fills the combined coefficient. Calculate: type it. Saved on this device.'
     : 'This switch is how Powers plays. It is saved on this device.'; }
   syncModeBtns();
     const b = S.abest[lvAt(lic, cur).id];
@@ -8165,6 +8350,7 @@ $('goPractice').addEventListener('click', () => start('practice'));
 $('goRally').addEventListener('click', () => start('rally'));
 $('goForks').addEventListener('click', () => start(S.lic !== 1 ? 'race' : 'forks'));
 $('signs').addEventListener('click', e => {
+  if (e.target.closest('#likeDone')) return aLikeDone();
   const ob = e.target.closest('.obtn'); if (ob && G && G.alg) return aOrder(+ob.dataset.i);
   const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i);
 });
