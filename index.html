@@ -146,10 +146,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .modeswitch{display:flex;border-radius:999px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--desk-line);background:var(--desk-2)}
 .modeswitch button{border:0;background:transparent;color:var(--chalk-dim);font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:.03em;min-height:44px;padding:8px 12px;touch-action:manipulation;cursor:pointer}
 .modeswitch button[aria-pressed="true"]{background:var(--good);color:#fff}
-.op.expb,.op.expidle{font-size:.78em;min-width:1.9em;min-height:1.9em;padding:.22em .3em;vertical-align:.9em;margin:0 .05em;border-radius:.35em}
-.op.expb0{background:#3ecf8e;color:#06351f}
-.op.expb1{background:#8eb6ff;color:#10224a}
-.op.expidle{background:#fff;color:var(--card-ink)}
+.op.expidle,.op.exphot{font-size:.78em;min-width:1.9em;min-height:1.9em;padding:.22em .3em;vertical-align:.9em;margin:0 .05em;border-radius:.35em}
+.op.exphot.lit{background:#3ecf8e;color:#06351f}
+.powbit{display:inline-block}
 .powbit.hot{display:inline-block}
 .expr.morph .powbit.hot{animation:morphExp .48s ease forwards}
 @keyframes morphExp{40%{transform:translateY(.4em) scale(1.14)}100%{transform:scale(.15);opacity:0}}
@@ -2055,13 +2054,13 @@ const mix = (...fs) => () => pick(fs)();
 function L2_intro() {
   const b = 'x';
   const cards = [
-    { kind: 'expr', rule: 'Matching exponents light up. Tap them and they morph into one power. In Calculate or Both, type the new exponent first.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
+    { kind: 'expr', rule: 'Point at an exponent and that base turns green. Tap to morph them into one power. In Calculate or Both, type the new exponent. It advances as you type.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
       wrongs: [W(P(V(b), 6), 'That multiplied the exponents. Multiplying powers adds them.'), W(P(V(b), 1), 'Multiplying powers adds the exponents: 3 + 2 = 5.'), W(M([N(2), P(V(b), 5)]), 'Nothing doubles: there is no 2 in front.')] }] },
-    { kind: 'expr', rule: 'The lit exponents add. The numbers in front are a separate move. Either one first. Calculate or Both: type 7, then 12.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
+    { kind: 'expr', rule: 'Point at the exponents to turn that base green, then tap to add. The numbers in front are a separate move, either first. Calculate or Both: type 7, then 12. A right number advances immediately.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
       wrongs: [W(cx(7, 7, b), 'The numbers multiply: 4 × 3, not 4 + 3.'), W(cx(12, 10, b), 'The exponents add when you multiply powers.'), W(cx(4, 7, b), 'Both numbers multiply in.')] }] },
-    { kind: 'expr', rule: 'Same base across a divide: tap the lit exponents. They subtract. Calculate or Both: type 4.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
+    { kind: 'expr', rule: 'Same base across a divide: point to turn the exponents green, tap to subtract. Calculate or Both: type 4.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
       wrongs: [W(P(V(b), 10), 'Dividing powers subtracts the exponents.'), W(P(V(b), -4), 'Top minus bottom: 7 − 3.'), W(P(V(b), 2), 'The exponents subtract; they don\'t divide.')] }] },
-    { kind: 'expr', rule: 'Power of a power: tap both lit exponents. They multiply. Calculate or Both: type 6.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
+    { kind: 'expr', rule: 'Power of a power: point to turn both exponents green, tap to multiply. Calculate or Both: type 6.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
       wrongs: [W(P(V(b), 5), 'That adds them; a power of a power multiplies.'), W(P(V(b), 8), 'Multiply the exponents; don\'t raise one to the other.'), W(M([N(3), P(V(b), 2)]), 'The outer power repeats the bracket; it isn\'t a multiplier.')] }] }
   ];
   const i = (((G.L2IntroIx || 0) % 4) + 4) % 4;
@@ -7366,12 +7365,14 @@ function algTapHtml(t, bag, ctx) {
       if (bag.expPick && t.e && t.e.t === 'n') {
         const mark = bag.expMap && bag.expMap.get(t.e);
         const id = bag.n++;
-        const col = mark ? mark.col : -1;
+        const hot = !!(mark && mark.grp != null);
+        const grp = hot ? mark.grp : -1;
         const baseName = mark ? mark.base : '';
-        bag.nodes.push({ id, kind: 'exphot', hot: col >= 0, base: baseName, col });
-        const cls = col >= 0 ? `op expb expb${col}` : 'op expidle';
-        const bit = `<sup><button type="button" class="${cls}" data-id="${id}" aria-label="exponent ${expPlain(t.e)}">${expPlain(t.e)}</button></sup>`;
-        return col >= 0 ? `<span class="powbit hot">${base}${bit}</span>` : base + bit;
+        bag.nodes.push({ id, kind: 'exphot', hot, base: baseName, grp });
+        const cls = hot ? 'op expidle exphot' : 'op expidle';
+        const attrs = hot ? ` data-grp="${grp}" data-hot="1"` : ' data-hot="0"';
+        const bit = `<sup><button type="button" class="${cls}" data-id="${id}"${attrs} aria-label="exponent ${expPlain(t.e)}">${expPlain(t.e)}</button></sup>`;
+        return hot ? `<span class="powbit" data-grp="${grp}">${base}${bit}</span>` : base + bit;
       }
       if (bag.atomMap && t.e && bag.atomMap.has(t.e)) return base + `<sup>${atomBtn(t.e, 'exp', expPlain(t.e))}</sup>`;
       const ex = algTapHtml(t.e, bag);
@@ -7530,7 +7531,7 @@ function expMarks(pairs) {
     const name = p.baseName || '';
     let i = bases.indexOf(name);
     if (i < 0) { i = bases.length; bases.push(name); }
-    const mark = { col: i % 2, base: name };
+    const mark = { grp: i, base: name };
     if (p.aNode) map.set(p.aNode, mark);
     if (p.bNode) map.set(p.bNode, mark);
   });
@@ -7551,7 +7552,7 @@ function renderOrder(opts, moves) {
     sEl.innerHTML = `<div class="xchips">${shown.map(i => `<button type="button" class="obtn" data-i="${i}">${moves[i].label}</button>`).join('')}</div>`;
   }
   if (!$('hint').innerHTML) $('hint').innerHTML = exp
-    ? (shown.length ? 'Tap the <b>lit exponents</b>. The numbers in front are their own move.' : 'Tap the <b>lit exponents</b>. They morph into one power.')
+    ? (shown.length ? 'Point at an exponent to turn that base green, then tap. The numbers in front are their own move.' : 'Point at an exponent to turn that base green, then tap. They morph into one power.')
     : 'Press the next move, in order.';
   if (racing()) RD.on('fork', { lanes: Math.max(shown.length, exp ? 1 : 0) });
   if (!G.solved || G.alg.id === '2.intro') shown.forEach(i => { if (moves[i].ok) { const b = document.querySelector(`.obtn[data-i="${i}"]`); if (b) b.classList.add('hint'); } });
@@ -7569,28 +7570,49 @@ function morphThen(done) {
     done();
   }, 480);
 }
+function lightExp(grp, on) {
+  if (grp == null || grp < 0) return;
+  const g = String(grp);
+  document.querySelectorAll('#expr .op.exphot').forEach(b => { if (b.dataset.grp === g) b.classList.toggle('lit', !!on); });
+}
+function armMorph(grp) {
+  if (grp == null || grp < 0) return;
+  const g = String(grp);
+  lightExp(grp, true);
+  document.querySelectorAll('#expr .powbit').forEach(bit => { if (bit.dataset.grp === g) bit.classList.add('hot'); });
+}
 function aExpClick(entry) {
   if (!G || !G.fork || G.fork.mode !== 'order' || G.busy || G.over || G.stalling || G.fork.pending) return;
   if (!entry.hot) return aOrderMiss('Those exponents are not the next combine.');
   const exp = (G.fork.moves || []).find(m => m.id === 'exp' && m.ok);
   const pairs = exp ? exp.pairs.filter(p => (p.baseName || '') === entry.base) : [];
   if (!pairs.length) return aOrderMiss('Those exponents are not the next combine.');
+  G.expGrp = entry.grp;
   if (needsType()) return openCalc({ pairs, kind: 'exp', morph: true });
+  armMorph(entry.grp);
   morphThen(() => applyPair(pairs[0], true));
+}
+function focusCalc() {
+  const inp = $('calcIn');
+  if (!inp || !inp.isConnected) return;
+  try { inp.focus({ preventScroll: true }); } catch (e) { try { inp.focus(); } catch (e2) {} }
 }
 function openCalc(pnd) {
   G.fork.pending = pnd;
   const bases = pnd.base ? [pnd.base] : [...new Set((pnd.pairs || []).map(p => p.baseName).filter(Boolean))];
   const base = pnd.kind === 'exp' && bases.length === 1 ? bases[0] : '';
   pnd.base = base;
-  const field = `<input id="calcIn" inputmode="text" autocomplete="off" enterkeyhint="done" aria-label="${pnd.kind === 'exp' ? 'exponent' : 'number'}">`;
+  const field = `<input id="calcIn" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" aria-label="${pnd.kind === 'exp' ? 'exponent' : 'number'}">`;
   const body = base ? `<span class="var"><i>${base}</i><sup>${field}</sup></span>` : field;
   const sEl = $('signs');
   sEl.hidden = false; sEl.classList.add('alg', 'xmode');
   sEl.innerHTML = `<div class="calcrow">${body}</div>`;
-  $('hint').innerHTML = pnd.kind === 'exp' ? 'Type the new exponent.' : 'Type the number.';
+  $('hint').innerHTML = pnd.kind === 'exp' ? 'Type the new exponent. It advances when the number is right.' : 'Type the number. It advances when it is right.';
   G.stepT = performance.now();
-  setTimeout(() => { const inp = $('calcIn'); if (inp) inp.focus(); }, 30);
+  const inp = $('calcIn');
+  if (inp) { inp.addEventListener('input', aCalcLive); inp.oninput = aCalcLive; }
+  focusCalc();
+  requestAnimationFrame(focusCalc);
 }
 function aOrderMiss(why) {
   G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
@@ -7648,9 +7670,10 @@ function aCalcLive() {
   const hit = calcHit();
   if (!hit) return;
   const morph = !!G.fork.pending.morph;
+  const grp = G.expGrp;
   G.fork.pending = null;
   const go = () => { if (hit.opt != null) return aApply(hit.opt, true); applyPair(hit.pair, true); };
-  if (morph) morphThen(go); else go();
+  if (morph) { armMorph(grp); morphThen(go); } else go();
 }
 function aCalcSubmit() {
   if (!G || !G.fork || !G.fork.pending || G.over || G.busy || G.stalling) return;
@@ -8048,7 +8071,7 @@ function renderHome() {
     lc.className = 'lcard' + (t ? t.type === 'renew' ? ' due' : ' on' : '');
     lc.innerHTML = `<span class="cls" aria-label="class">${cl || '–'}</span><span class="lc">${t ? `<b>${t.title}</b><span>${t.line}</span>` : (cl === 'L' ? (p => `<b>Learner</b><span>${p.n}/${p.of} stamped. Stamp them all to open the road test.</span>`)(licProgress(lic)) : `<b>Pro</b><span>Every class earned. Keep the stamps fresh.</span>`)}</span>${t ? `<button>${t.go}</button>` : ''}`;
     $('tip').innerHTML = lic === 2
-    ? 'Tap the <b>lit exponents</b> that share a base. Numbers in front stay their own move. Calculate and Both ask you to type the result.'
+    ? 'Point at an exponent to turn that base green, then tap. Numbers in front stay their own move. Calculate and Both advance as soon as the typed number is right.'
     : 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
   const ho = $('homeOrder'); if (ho) { ho.hidden = false; const note = $('homeOrderNote'); if (note) note.textContent = lic === 2
     ? 'Order fills the number. Calculate and Both: tap the exponents, then type. Saved on this device.'
@@ -8087,6 +8110,19 @@ function renderLog() { const c = k => S.log.filter(e => e.r.startsWith(k)).lengt
 function renderSet() { renderLog(); $('openAll').textContent = S.openAll ? 'Lock comebacks again' : 'Open every level'; $('themeSeg').innerHTML = [[null, 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button data-t="${k || ''}" aria-pressed="${S.theme === k}">${l}</button>`).join(''); }
 
 /* ---------- wiring ---------- */
+$('expr').addEventListener('pointerover', e => {
+  const b = e.target.closest && e.target.closest('.op.exphot');
+  if (!b || b.dataset.hot !== '1' || !G || !G.fork || G.fork.mode !== 'order') return;
+  lightExp(b.dataset.grp, true);
+});
+$('expr').addEventListener('pointerout', e => {
+  const b = e.target.closest && e.target.closest('.op.exphot');
+  if (!b) return;
+  const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.op.exphot');
+  if (to && to.dataset.grp === b.dataset.grp) return;
+  if ($('expr').classList.contains('morph')) return;
+  lightExp(b.dataset.grp, false);
+});
 $('expr').addEventListener('click', e => { const b = e.target.closest('.op'); if (!b) return; if (G && G.alg) aTap(+b.dataset.id); else tap(+b.dataset.id); });
 $('plates').addEventListener('click', e => { const b = e.target.closest('.plate'); if (!b) return; S.lic = +b.dataset.lic; save(); renderHome(); });
 $('alv').addEventListener('click', e => { const b = e.target.closest('.lvl'); if (!b) return; S.alv[S.lic] = +b.dataset.v; save(); renderHome(); });
@@ -8098,7 +8134,8 @@ $('signs').addEventListener('click', e => {
   const ob = e.target.closest('.obtn'); if (ob && G && G.alg) return aOrder(+ob.dataset.i);
   const b = e.target.closest('.sign, .xchip'); if (!b) return; if (G && G.bench) bPick(+b.dataset.i); else if (G && G.alg) aPick(+b.dataset.i); else pick(+b.dataset.i);
 });
-$('signs').addEventListener('input', e => { if (e.target && e.target.id === 'calcIn' && G && G.alg) aCalcLive(); });
+document.addEventListener('input', e => { if (e.target && e.target.id === 'calcIn') aCalcLive(); }, true);
+$('signs').addEventListener('input', e => { if (e.target && e.target.id === 'calcIn') aCalcLive(); });
 $('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
 document.querySelectorAll('.modeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.mode) setPlayMode(b.dataset.mode); }));
 $('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
