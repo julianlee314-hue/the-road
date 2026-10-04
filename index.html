@@ -146,6 +146,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .modeswitch{display:flex;border-radius:999px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--desk-line);background:var(--desk-2)}
 .modeswitch button{border:0;background:transparent;color:var(--chalk-dim);font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:.03em;min-height:44px;padding:8px 12px;touch-action:manipulation;cursor:pointer}
 .modeswitch button[aria-pressed="true"]{background:var(--good);color:#fff}
+.timeswitch{max-width:100%}
+.timeswitch button{flex:1;padding:8px 8px}
 .op.expidle,.op.exphot{font-size:.78em;min-width:1.9em;min-height:1.9em;padding:.22em .3em;vertical-align:.9em;margin:0 .05em;border-radius:.35em}
 .op.exphot.lit{background:#3ecf8e;color:#06351f}
 .powbit{display:inline-block}
@@ -325,6 +327,15 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
         <button type="button" data-mode="calc">Calculate</button>
       </div>
       <span class="note" id="homeOrderNote">Powers: Order fills the number. Calculate asks you to type it.</span>
+    </div>
+    <div class="orderbar home" id="timeBar">
+      <span class="ob">Time</span>
+      <div class="modeswitch timeswitch" role="group" aria-label="How long a run lasts">
+        <button type="button" data-limit="30">30s</button>
+        <button type="button" data-limit="60">1 min</button>
+        <button type="button" data-limit="180">3 min</button>
+        <button type="button" data-limit="end">Endless</button>
+      </div>
     </div>
     <div class="foot"><button class="ghost" id="goGarage">Garage</button><button class="ghost" id="goSettings">Settings</button></div>
   </section>
@@ -6891,8 +6902,9 @@ function migrate() {
   for (const lic in S.alv) { const L = LV.LIC[lic]; if (L && S.alv[lic] > L.levels.length) S.alv[lic] = 1; }
   if (S.playMode === 'both') S.playMode = 'calc';
   if (S.playMode !== 'order' && S.playMode !== 'calc') S.playMode = S.calc ? 'calc' : 'order';
+  if (S.runLimit !== '30' && S.runLimit !== '60' && S.runLimit !== '180' && S.runLimit !== 'end') S.runLimit = 'end';
 }
-function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false, playMode: 'order' }; }
+function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false, playMode: 'order', runLimit: 'end' }; }
 function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); return Object.assign(b, o); } } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const RS = (lv, k) => { const id = lv + ':' + k; return S.rules[id] || (S.rules[id] = { right: 0, wrong: 0, t: [] }); };
@@ -6978,8 +6990,10 @@ function start(mode) {
   G = { mode, level: S.level, tier: sprint ? 1 : 0, clean: 0, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], ruleHits: {}, missRules: {},
     clock: (sprint ? Math.max(28, RALLY.start - 8) : RALLY.start) * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
   const run = mode !== 'practice';
+  const lim = runLimit();
+  G.timed = !!lim; if (lim) G.clock = lim;
   $('signs').classList.remove('alg'); $('signs').innerHTML = ''; $('expr').className = 'expr';
-  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('signs').hidden = true; // Precedence: no MCQ signs
+  $('clockWrap').hidden = !G.timed; $('cps').hidden = !run; $('signs').hidden = true; // Precedence: no MCQ signs
   $('roadWrap').hidden = false; // road + speedometer always on for Permit
   if ($('orderBar')) $('orderBar').hidden = true;
   $('speedo').hidden = false;
@@ -7002,9 +7016,9 @@ function render() {
   $('signs').hidden = true; $('signs').innerHTML = '';
 }
 function hud() {
-  if (racing()) {
+  if (G.timed || racing()) {
     const s = Math.max(0, Math.ceil(G.clock / 1000)); $('clock').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); $('clock').classList.toggle('low', s <= 10);
-    $('sA').innerHTML = `<b>${G.dist.toFixed(2)}</b> km`;
+    $('sA').innerHTML = racing() ? `<b>${G.dist.toFixed(2)}</b> km` : `<b>${G.solved}</b> solved`;
     const per = G.alg ? G.alg.perCp : G.mode === 'forks' ? FORKS.perCp : RALLY.perCp;
     $('cps').innerHTML = Array.from({ length: per }, (_, i) => `<i class="${i < G.cpCount ? 'on' : ''}"></i>`).join('');
   } else { $('sA').innerHTML = `<b>${G.solved}</b> solved`; }
@@ -7030,13 +7044,15 @@ function loop() {
   const step = now => {
     if (!G || G.over) return;
     const dt = now - G.last; G.last = now;
-    if (!G.stalling && racing()) G.clock -= dt; // Practice keeps the engine alive with no clock
+    // A chosen limit counts down in every mode. Endless never does. A pro test keeps its own race clock.
+    const tick = !G.stalling && (G.timed || (racing() && G.test));
+    if (tick) G.clock -= dt;
     G.speed += (targetSpeed() - G.speed) * Math.min(1, dt / (G.stalling ? 450 : 600));
     if (racing()) G.dist += G.speed * dt / 3.6e6;
     RD.setSpeed(G.speed);
-    if (racing()) {
+    if (tick) {
       const low = G.clock <= 10000; if (low !== G.lowSent) { G.lowSent = low; RD.on('time.low', low); }
-      if (G.clock <= 0 && !G.stalling) { G.clock = 0; G.stalling = true; G.stallAt = now; RD.on('run.failed'); SND.stall(); $('hint').innerHTML = '<b>Out of time.</b> The engine coughs…'; }
+      if (G.clock <= 0 && !G.stalling) { G.clock = 0; G.stalling = true; G.stallAt = now; RD.on('run.failed'); SND.stall(); $('hint').innerHTML = '<b>Out of time.</b>'; }
     }
     hud();
     if (G.stalling && now - G.stallAt > 1600) return finish();
@@ -7059,7 +7075,7 @@ function bad(id) {
   if (why) { const r = RS(G.level, why); r.wrong++; hit(why, false); G.missRules[why] = (G.missRules[why] || 0) + 1; }
   // sputter the engine on every wrong order tap (Practice included)
   RD.on('decision.incorrect'); G.speed *= 0.45;
-  if (racing()) { G.clock -= RALLY.penalty * 1000; const p = $('penalty'); p.textContent = '−' + RALLY.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+  if (racing() && !G.timed) { G.clock -= RALLY.penalty * 1000; const p = $('penalty'); p.textContent = '−' + RALLY.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
   const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
   return RULES.find(r => r.k === why);
 }
@@ -7165,8 +7181,8 @@ function solvedExpr() {
   const per = G.mode === 'forks' ? FORKS.perCp : RALLY.perCp;
   // size grows with clean solves in Practice, and with each checkpoint in a run
   if (G.mode === 'practice') { if (!G.exprMiss) { if (++G.clean >= 2) { G.tier = Math.min(4, G.tier + 1); G.clean = 0; } } else { G.clean = 0; if (G.exprMiss >= 2) G.tier = Math.max(0, G.tier - 1); } }
-  else if (++G.cpCount >= per) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, RALLY.cpBonus - 2 * (G.cp - 1)); G.clock += bonus * 1000; G.tier = Math.min(4, G.tier + 1); SND.checkpoint(); RD.on('checkpoint');
-    $('hint').innerHTML = `<b style="color:var(--good)">✓ Checkpoint ${G.cp}!</b> +${bonus} seconds.`; }
+  else if (++G.cpCount >= per) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, RALLY.cpBonus - 2 * (G.cp - 1)); if (!G.timed) G.clock += bonus * 1000; G.tier = Math.min(4, G.tier + 1); SND.checkpoint(); RD.on('checkpoint');
+    $('hint').innerHTML = `<b style="color:var(--good)">✓ Checkpoint ${G.cp}!</b>` + (G.timed ? '.' : ` +${bonus} seconds.`); }
   else if (G.cpCount === per - 1) RD.on('checkpoint.near');
   hud(); G.busy = true; setTimeout(() => { G.busy = false; if (!G.over && !G.stalling) nextExpr(); }, 650);
 }
@@ -7179,11 +7195,12 @@ function finish() {
   if (run && G.dist > (bests[lv - 1] || 0)) { bests[lv - 1] = +G.dist.toFixed(2); record = true; }
   save(); SND.end(); setTimeout(() => RD.stop(), 400);
   $('vDone').classList.toggle('arcade', run);
-  $('rTitle').innerHTML = run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done';
+  const up = !!(G.timed && G.stalling);
+  $('rTitle').innerHTML = up ? (run ? `Time's up: <span>${G.dist.toFixed(2)} km</span>` : "Time's up") : (run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done');
   const lost = Object.keys(G.missRules).sort((a, b) => G.missRules[b] - G.missRules[a])[0], lostR = RULES.find(r => r.k === lost);
   $('rLine').textContent = run
     ? `${G.solved} solved · ${acc}% right · best streak ${G.bestStreak} · ${fmt(mean)} a step` + (lostR ? ` · lost time on ${lostR.name.toLowerCase()}` : '')
-    : `Level ${lv}. Your rules board is updated.`;
+    : (up ? `${G.solved} solved · best streak ${G.bestStreak} · ${acc}% right` : `Level ${lv}. Your rules board is updated.`);
   $('rSolved').textContent = G.solved; $('rAcc').textContent = acc + '%'; $('rMed').textContent = fmt(m);
   // clearly too easy here: suggest moving up (higher levels drive faster cars)
   const easy = lv < 4 && G.taps >= 15 && acc >= 95 && m != null && m <= 1000 && (!run || G.cp >= 2);
@@ -7282,7 +7299,9 @@ function aStart(mode, tune, test) {
   G = { mode, tune, test, alg: { lic, lv, id: lvAt(lic, lv).id, perCp, k: 1 + 0.1 * (lic - 2) + 0.03 * (lv - 1) }, tier: 0, clean: 0, seen: new Set(), cpSteps: 0, level: 1, streak: 0, bestStreak: 0, solved: 0, taps: 0, right: 0, times: [], whys: {},
     clock: RALLY.start * 1000, last: performance.now(), cp: 0, cpCount: 0, misses: 0, over: false, busy: false, dist: 0, speed: 0, stalling: false, lowSent: false };
   const run = mode !== 'practice';
-  $('clockWrap').hidden = !run; $('cps').hidden = !run; $('roadWrap').hidden = false;
+  const lim = test ? null : runLimit();
+  G.timed = !!lim; if (lim) G.clock = lim;
+  $('clockWrap').hidden = !(G.timed || (run && test)); $('cps').hidden = !run; $('roadWrap').hidden = false;
   $('signs').hidden = false; $('signs').classList.add('alg');
   $('speedo').hidden = false; // step workouts share the streak speedometer
   $('vPlay').classList.toggle('racing', true);
@@ -7490,9 +7509,19 @@ function playMode() {
 function needsType() { return playMode() === 'calc'; }
 function syncModeBtns() {
   const m = playMode();
-  document.querySelectorAll('.modeswitch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m ? 'true' : 'false'));
+  document.querySelectorAll('.modeswitch button[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m ? 'true' : 'false'));
 }
 function showOrderBar() { const bar = $('orderBar'); if (bar) bar.hidden = !useOrder(); syncModeBtns(); }
+function runLimit() { return S.runLimit === '30' ? 30000 : S.runLimit === '60' ? 60000 : S.runLimit === '180' ? 180000 : null; }
+function limitPhrase() { return S.runLimit === '30' ? 'Stops after 30 seconds.' : S.runLimit === '60' ? 'Stops after 1 minute.' : S.runLimit === '180' ? 'Stops after 3 minutes.' : 'No clock.'; }
+function syncTimeBtns() {
+  const k = S.runLimit === '30' || S.runLimit === '60' || S.runLimit === '180' ? S.runLimit : 'end';
+  document.querySelectorAll('.timeswitch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.limit === k ? 'true' : 'false'));
+}
+function setRunLimit(k) {
+  if (k !== '30' && k !== '60' && k !== '180' && k !== 'end') return;
+  S.runLimit = k; save(); syncTimeBtns();
+}
 function parseExp(raw) {
   const t = String(raw || '').trim().replace(/\u2212/g, '-').replace(/\s+/g, '');
   if (!t) return null;
@@ -7620,7 +7649,7 @@ function aOrderMiss(why) {
   G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
   G.whys[why] = (G.whys[why] || 0) + 1; garageMiss(why);
   try { S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: 'order', r: 'miss' }); if (S.log.length > 300) S.log.shift(); } catch (e) {}
-  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const pen = $('penalty'); pen.textContent = '−' + ALG.penalty; pen.classList.remove('show'); void pen.offsetWidth; pen.classList.add('show'); }
+  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; if (!G.timed) { G.clock -= ALG.penalty * 1000; const pen = $('penalty'); pen.textContent = '−' + ALG.penalty; pen.classList.remove('show'); void pen.offsetWidth; pen.classList.add('show'); } }
   const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
   document.querySelectorAll('.obtn').forEach(b => { const m = G.fork.moves && G.fork.moves[+b.dataset.i]; if (m && m.ok) { b.classList.remove('hint'); void b.offsetWidth; b.classList.add('hint'); } });
   $('hint').innerHTML = `<span class="why">${why}</span> ${G.fork.pending ? 'Try the number again.' : 'The glowing move is next.'}`;
@@ -7799,7 +7828,7 @@ function aApply(i, fromCalc) {
   } else {
     G.misses++; G.exprMiss++; G.streak = 0; SND.miss(); G.whys[o.why] = (G.whys[o.why] || 0) + 1; garageMiss(o.why);
     S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: A.text(o.tree), r: 'miss' }); if (S.log.length > 300) S.log.shift();
-    if (racing()) { RD.on('decision.incorrect'); RD.on('fork.pick', { lane: i, ok: false }); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+    if (racing()) { RD.on('decision.incorrect'); RD.on('fork.pick', { lane: i, ok: false }); G.speed *= 0.5; if (!G.timed) { G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); } }
     const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
     o.used = true; if (btn) { btn.classList.add('wrong'); btn.disabled = true; }
     G.fork.opts.forEach((x, k) => { if (x.ok) {
@@ -7822,7 +7851,7 @@ function aPairMiss(why) {
   G.misses++; G.exprMiss++; G.streak = 0; G.taps++; SND.miss();
   G.whys[why] = (G.whys[why] || 0) + 1; garageMiss(why);
   S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.alg.id, x: A.text(G.step.tree), pick: 'pair', r: 'miss' }); if (S.log.length > 300) S.log.shift();
-  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); }
+  if (racing()) { RD.on('decision.incorrect'); G.speed *= 0.5; if (!G.timed) { G.clock -= ALG.penalty * 1000; const p = $('penalty'); p.textContent = '−' + ALG.penalty; p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); } }
   const c = $('card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
   glowPair((G.fork.pairs || [])[0]);
   $('hint').innerHTML = `<span class="why">${why}</span> The glowing pieces combine.`;
@@ -7893,8 +7922,8 @@ function aSolved() {
   }
   if (G.mode === 'practice') { if (!G.exprMiss) { if (++G.clean >= 3) { G.tier = Math.min(2, G.tier + 1); G.clean = 0; } } else { G.clean = 0; if (G.exprMiss >= 2) G.tier = Math.max(0, G.tier - 1); } }
   if (racing()) {
-    if (++G.cpCount >= G.alg.perCp) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, Math.round(G.cpSteps * Math.max(ALG.floor, ALG.perStep - ALG.decay * (G.cp - 1)))); G.cpSteps = 0; G.clock += bonus * 1000; SND.checkpoint(); RD.on('checkpoint');
-      $('hint').innerHTML += ` <b>Checkpoint ${G.cp}!</b> +${bonus} seconds.`; }
+    if (++G.cpCount >= G.alg.perCp) { G.cp++; G.cpCount = 0; const bonus = Math.max(RALLY.cpMin, Math.round(G.cpSteps * Math.max(ALG.floor, ALG.perStep - ALG.decay * (G.cp - 1)))); G.cpSteps = 0; if (!G.timed) G.clock += bonus * 1000; SND.checkpoint(); RD.on('checkpoint');
+      $('hint').innerHTML += G.timed ? ` <b>Checkpoint ${G.cp}!</b>` : ` <b>Checkpoint ${G.cp}!</b> +${bonus} seconds.`; }
     else if (G.cpCount === G.alg.perCp - 1) RD.on('checkpoint.near');
   }
   if (G.test) testSolved();
@@ -7922,9 +7951,10 @@ function aFinish() {
   let record = false; if (run && G.dist > b.km) { b.km = +G.dist.toFixed(2); record = true; }
   save(); SND.end(); setTimeout(() => RD.stop(), 400);
   $('vDone').classList.toggle('arcade', run);
-  $('rTitle').innerHTML = run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done';
+  const up = !!(G.timed && G.stalling);
+  $('rTitle').innerHTML = up ? (run ? `Time's up: <span>${G.dist.toFixed(2)} km</span>` : "Time's up") : (run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done');
   if (G.test && G.test.pass === null && !run) G.test.pass = false;
-  $('rLine').textContent = (run ? `${G.solved} solved · ${acc}% right · best streak ${G.bestStreak} · ${fmt(mean)} a step` : `${G.test ? TEST_NAME[G.test.type] : G.tune ? "Tune-up" : "Level " + lvCode(G.alg.lic, G.alg.lv)}: ${G.solved} solved, ${acc}% right.`);
+  $('rLine').textContent = (run ? `${G.solved} solved · ${acc}% right · best streak ${G.bestStreak} · ${fmt(mean)} a step` : `${G.test ? TEST_NAME[G.test.type] : G.tune ? "Tune-up" : "Level " + lvCode(G.alg.lic, G.alg.lv)}: ${G.solved} solved, ${acc}% right` + (up ? `, best streak ${G.bestStreak}` : '') + '.');
   $('rSolved').textContent = G.solved; $('rAcc').textContent = acc + '%'; $('rMed').textContent = fmt(m);
   const lv = G.alg.lv, lic = G.alg.lic, nextLv = G.tune || G.test ? null : nextPlayable(lic, lv), code = lvCode(lic, lv);
   const easy = nextLv && G.taps >= 10 && acc >= 90, st = stampOf(key).n;
@@ -8057,6 +8087,8 @@ function renderHome() {
   $('licCard').hidden = true; $('levels').hidden = !prec; $('board').hidden = !prec; $('alv').hidden = prec || uc; $('ucBox').hidden = !uc; $('modes').hidden = uc; $('goRally').hidden = !prec; $('tip').hidden = uc;
   $('modes').style.gridTemplateColumns = prec ? '' : 'repeat(2,minmax(0,1fr))';
   if ($('homeOrder')) $('homeOrder').hidden = prec || uc || FR;
+  if ($('timeBar')) $('timeBar').hidden = uc || FR;
+  syncTimeBtns();
   $('licHead').innerHTML = prec || uc ? '' : `<b>Levels</b><span>World: ${WORLD_NAME[L.world]}</span>`;
   $('goForks').querySelector('b').textContent = prec ? 'Sprint' : 'Race';
   if (uc) { $('licCard').hidden = true; $('ucBox').innerHTML = `<b>Mathera 2.0</b><span class="tip">${L.tease}. This plate keeps its place on the ladder and opens in Mathera 2.0, once the licenses below it are road-tested.</span>`; return; }
@@ -8080,12 +8112,12 @@ function renderHome() {
     : 'This switch is how Powers plays. It is saved on this device.'; }
   syncModeBtns();
     const b = S.abest[lvAt(lic, cur).id];
-    $('goPractice').querySelector('span').textContent = 'Tap the next move. No clock.';
+    $('goPractice').querySelector('span').textContent = 'Tap the next move. ' + limitPhrase();
     $('forksLine').textContent = b && b.km ? `Best ${b.km.toFixed(2)} km` : 'Same taps, race the clock';
     return;
   }
   $('tip').innerHTML = "Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.";
-  $('goPractice').querySelector('span').textContent = 'Tap the next operation. No clock.';
+  $('goPractice').querySelector('span').textContent = 'Tap the next operation. ' + limitPhrase();
   $('levels').innerHTML = E.LEVELS.map((L, i) => `<button class="lvl" data-l="${L.n}" aria-pressed="${S.level === L.n}"><span class="ops">${OPS_LABEL[i]}</span><span class="nm">Level ${L.n} · ${L.name}</span><span class="bs">${bestLine(i)}</span></button>`).join('');
   let h = '<div></div>' + [1, 2, 3, 4].map(l => `<div class="h">L${l}</div>`).join('');
   RULES.forEach(r => { h += `<div class="rn">${r.name}</div>` + [1, 2, 3, 4].map(l => { const L = ruleLevel(l, r.k), na = l === 1 && r.k !== 'brackets'; return `<div class="c${L ? ' l' + L : ''}" title="${r.name}, level ${l}"${na ? ' style="opacity:.35"' : ''}></div>`; }).join(''); });
@@ -8140,6 +8172,7 @@ document.addEventListener('input', e => { if (e.target && e.target.id === 'calcI
 $('signs').addEventListener('input', e => { if (e.target && e.target.id === 'calcIn') aCalcLive(); });
 $('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
 document.querySelectorAll('.modeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.mode) setPlayMode(b.dataset.mode); }));
+document.querySelectorAll('.timeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.limit) setRunLimit(b.dataset.limit); }));
 $('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
