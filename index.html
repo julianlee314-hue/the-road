@@ -322,10 +322,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
     <div class="orderbar home" id="homeOrder" hidden>
       <div class="modeswitch" role="group" aria-label="How you answer">
         <button type="button" data-mode="order">Order</button>
-        <button type="button" data-mode="both">Both</button>
         <button type="button" data-mode="calc">Calculate</button>
       </div>
-      <span class="note" id="homeOrderNote">Powers: tap matching exponents. Calculate and Both also type the result.</span>
+      <span class="note" id="homeOrderNote">Powers: Order fills the number. Calculate asks you to type it.</span>
     </div>
     <div class="foot"><button class="ghost" id="goGarage">Garage</button><button class="ghost" id="goSettings">Settings</button></div>
   </section>
@@ -337,7 +336,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
       <div class="mid"><span class="pen" id="clockWrap">⏱ <b id="clock">0:40</b><i id="penalty">−10</i></span><span id="sA"></span><span id="sB" hidden></span></div>
     </div>
     <div class="speedo" id="speedo" aria-live="polite" aria-label="Speedometer"><div class="gauge" id="gauge"><i id="gaugeFill"></i></div><div class="read"><b id="spdNum">0</b><span>km/h</span></div><span class="flame cold" id="flame">streak 0</span></div>
-    <div class="orderbar" id="orderBar" hidden><div class="modeswitch" role="group" aria-label="How you answer"><button type="button" data-mode="order">Order</button><button type="button" data-mode="both">Both</button><button type="button" data-mode="calc">Calculate</button></div></div>
+    <div class="orderbar" id="orderBar" hidden><div class="modeswitch" role="group" aria-label="How you answer"><button type="button" data-mode="order">Order</button><button type="button" data-mode="calc">Calculate</button></div></div>
     <div class="roadwrap" id="roadWrap" hidden><canvas id="road" aria-hidden="true"></canvas></div>
     <div class="cps" id="cps"></div>
     <div class="stage"><div class="card" id="card"><div class="meta"><span id="metaL"></span><span id="metaR"></span></div><div class="exprbox" id="box"><div class="expr" id="expr"></div></div></div></div>
@@ -2054,13 +2053,13 @@ const mix = (...fs) => () => pick(fs)();
 function L2_intro() {
   const b = 'x';
   const cards = [
-    { kind: 'expr', rule: 'Point at an exponent and that base turns green. Tap to morph them into one power. In Calculate or Both, type the new exponent. It advances as you type.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
+    { kind: 'expr', rule: 'Point at an exponent and that base turns green. Tap to morph them into one power. In Calculate, type the new exponent. It advances as you type.', lines: [{ tree: M([P(V(b), 3), P(V(b), 2)], '·') }, { tree: P(V(b), 5), move: 'Same base: add the exponents, 3 + 2 = 5',
       wrongs: [W(P(V(b), 6), 'That multiplied the exponents. Multiplying powers adds them.'), W(P(V(b), 1), 'Multiplying powers adds the exponents: 3 + 2 = 5.'), W(M([N(2), P(V(b), 5)]), 'Nothing doubles: there is no 2 in front.')] }] },
-    { kind: 'expr', rule: 'Point at the exponents to turn that base green, then tap to add. The numbers in front are a separate move, either first. Calculate or Both: type 7, then 12. A right number advances immediately.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
+    { kind: 'expr', rule: 'Point at the exponents to turn that base green, then tap to add. The numbers in front are a separate move, either first. Calculate: type 7, then 12. A right number advances immediately.', lines: [{ tree: M([cx(4, 2, b), cx(3, 5, b)], '·') }, { tree: cx(12, 7, b), move: 'Multiply the numbers (4 × 3), add the exponents (2 + 5)',
       wrongs: [W(cx(7, 7, b), 'The numbers multiply: 4 × 3, not 4 + 3.'), W(cx(12, 10, b), 'The exponents add when you multiply powers.'), W(cx(4, 7, b), 'Both numbers multiply in.')] }] },
-    { kind: 'expr', rule: 'Same base across a divide: point to turn the exponents green, tap to subtract. Calculate or Both: type 4.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
+    { kind: 'expr', rule: 'Same base across a divide: point to turn the exponents green, tap to subtract. Calculate: type 4.', lines: [{ tree: Dv(P(V(b), 7), P(V(b), 3)) }, { tree: P(V(b), 4), move: 'Same base: subtract the exponents, 7 − 3 = 4',
       wrongs: [W(P(V(b), 10), 'Dividing powers subtracts the exponents.'), W(P(V(b), -4), 'Top minus bottom: 7 − 3.'), W(P(V(b), 2), 'The exponents subtract; they don\'t divide.')] }] },
-    { kind: 'expr', rule: 'Power of a power: point to turn both exponents green, tap to multiply. Calculate or Both: type 6.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
+    { kind: 'expr', rule: 'Power of a power: point to turn both exponents green, tap to multiply. Calculate: type 6.', lines: [{ tree: P(B(P(V(b), 2)), 3) }, { tree: P(V(b), 6), move: 'Power of a power: multiply, 2 × 3 = 6',
       wrongs: [W(P(V(b), 5), 'That adds them; a power of a power multiplies.'), W(P(V(b), 8), 'Multiply the exponents; don\'t raise one to the other.'), W(M([N(3), P(V(b), 2)]), 'The outer power repeats the bracket; it isn\'t a multiplier.')] }] }
   ];
   const i = (((G.L2IntroIx || 0) % 4) + 4) % 4;
@@ -6889,7 +6888,8 @@ function migrate() {
   for (const k in S.stamps) if (typeof S.stamps[k] === 'number') S.stamps[k] = { n: S.stamps[k], t: Date.now(), ever: S.stamps[k] >= 10 };
   if (S.odo == null || isNaN(S.odo)) S.odo = Object.values(S.stamps).reduce((a, s) => a + (s.ever ? 10 : s.n || 0), 0);
   for (const lic in S.alv) { const L = LV.LIC[lic]; if (L && S.alv[lic] > L.levels.length) S.alv[lic] = 1; }
-  if (S.playMode !== 'order' && S.playMode !== 'both' && S.playMode !== 'calc') S.playMode = S.calc ? 'calc' : 'order';
+  if (S.playMode === 'both') S.playMode = 'calc';
+  if (S.playMode !== 'order' && S.playMode !== 'calc') S.playMode = S.calc ? 'calc' : 'order';
 }
 function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false, playMode: 'order' }; }
 function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); return Object.assign(b, o); } } catch (e) {} return blank(); }
@@ -7482,10 +7482,11 @@ function aLine(interactive, extras) {
 
 function useOrder() { return !!(G && G.alg && window.powersPlate && window.powersPlate(G.alg.lic)); }
 function playMode() {
-  if (S.playMode === 'both' || S.playMode === 'calc' || S.playMode === 'order') return S.playMode;
+  if (S.playMode === 'both' || S.playMode === 'calc') return 'calc';
+  if (S.playMode === 'order') return 'order';
   return S.calc ? 'calc' : 'order';
 }
-function needsType() { const m = playMode(); return m === 'calc' || m === 'both'; }
+function needsType() { return playMode() === 'calc'; }
 function syncModeBtns() {
   const m = playMode();
   document.querySelectorAll('.modeswitch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m ? 'true' : 'false'));
@@ -7685,7 +7686,7 @@ function aCalcSubmit() {
   return aOrderMiss(whyNumber(q, pnd.kind, (pnd.pairs[0] && pnd.pairs[0].baseName) || ''));
 }
 function setPlayMode(m) {
-  if (m !== 'order' && m !== 'both' && m !== 'calc') return;
+  if (m !== 'order' && m !== 'calc') return;
   const was = needsType();
   S.playMode = m; S.calc = m !== 'order'; save(); syncModeBtns();
   if (!was || needsType() || !G || !G.fork || !G.fork.pending || G.busy || G.over) return;
@@ -8071,10 +8072,10 @@ function renderHome() {
     lc.className = 'lcard' + (t ? t.type === 'renew' ? ' due' : ' on' : '');
     lc.innerHTML = `<span class="cls" aria-label="class">${cl || '–'}</span><span class="lc">${t ? `<b>${t.title}</b><span>${t.line}</span>` : (cl === 'L' ? (p => `<b>Learner</b><span>${p.n}/${p.of} stamped. Stamp them all to open the road test.</span>`)(licProgress(lic)) : `<b>Pro</b><span>Every class earned. Keep the stamps fresh.</span>`)}</span>${t ? `<button>${t.go}</button>` : ''}`;
     $('tip').innerHTML = lic === 2
-    ? 'Point at an exponent to turn that base green, then tap. Numbers in front stay their own move. Calculate and Both advance as soon as the typed number is right.'
+    ? 'Point at an exponent to turn that base green, then tap. Numbers in front stay their own move. Calculate advances as soon as the typed number is right.'
     : 'Each step, <b>tap the next move</b> on the line (or its tan chip). Equivalent moves still count. Graphs keep picture cards.';
   const ho = $('homeOrder'); if (ho) { ho.hidden = false; const note = $('homeOrderNote'); if (note) note.textContent = lic === 2
-    ? 'Order fills the number. Calculate and Both: tap the exponents, then type. Saved on this device.'
+    ? 'Order fills the number. Calculate: tap, then type. Saved on this device.'
     : 'This switch is how Powers plays. It is saved on this device.'; }
   syncModeBtns();
     const b = S.abest[lvAt(lic, cur).id];
