@@ -2088,9 +2088,9 @@ const LIC = [
     lv('f.letter', 'The same moves with a letter'), lv('f.cancel', 'Cancel factors, never terms'), lv('f.mix', 'Mixed review', null, { mix: 0 })] },
   null,
   { name: 'Powers', levels: [lv('2.intro', 'What combines', L2_intro, { stamp: 4, tutorial: true }), lv('2.mul', 'Same base, multiply', L2_1, { old: 1 }), lv('2.div', 'Same base, divide', L2_2, { old: 2 }), lv('2.pow', 'Power of a power', mix(L2_3, L2_3, L2_3b, L2_3c), { old: 3 }), lv('2.neg', 'Zero and negative exponents', mix(L2_4, L2_4, L2_4, L2_4b), { old: 4 }),
-    // 2.frac (fractional exponents) is off this ladder until Radicals. L2_5 and L2_5n stay in the file.
+    // Fractional exponents (old 2.frac / L2_5, L2_5n) and 2.rad (gRad2) are not Powers levels. Generators stay for later.
     lv('2.laws', 'All the laws at once'), lv('2.negbase', 'Negatives and fractions as bases'), lv('2.negfrac', 'Negative exponents in fractions'), lv('2.sci', 'Scientific notation'), lv('2.mix', 'Mixed review', null, { mix: 2 }),
-    lv('2.rad', 'Radicals and fractional exponents', undefined, { after: 11 }), lv('2.calc', 'Rewrite for the power rule', undefined, { after: 17 })] },
+    lv('2.calc', 'Rewrite for the power rule', undefined, { after: 17 })] },
   { name: 'Simplify', levels: [lv('3.like', 'Like terms', L3_1, { old: 1 }), lv('3.dist', 'Distribute', L3_2, { old: 2 }), lv('3.minus', 'Minus before a bracket', L3_3, { old: 3 }), lv('3.nest', 'Nested brackets', L3_4, { old: 4 }), lv('3.pow', 'Like terms with powers', L3_5, { old: 5 }),
     lv('3.fraccoef', 'Fractions as coefficients'), lv('3.twolet', 'Two letters'), lv('3.dec', 'Decimals'), lv('3.mix', 'Mixed review', null, { mix: 3 }),
     lv('3.rat', 'Cancel factors in fractions', undefined, { after: 10 }), lv('3.radlog', 'Radicals and log laws', undefined, { after: 11 }), lv('3.calc', 'Tidy a derivative', undefined, { after: 17 })] },
@@ -2130,7 +2130,7 @@ function genOf(L) {
   if (cache[L.id] !== undefined) return cache[L.id];
   let g = null;
   if (L.review) g = () => rand() < 0.5 ? pick(built(9).filter(o => !o.mix && !o.review)).g() : pick(allBuilt()).g();
-  else if (L.mix != null) g = () => pick(built(L.mix).filter(o => o.mix == null && !o.L.after && !o.L.tutorial && o.L.id !== '2.frac')).g();
+  else if (L.mix != null) g = () => pick(built(L.mix).filter(o => o.mix == null && !o.L.after && !o.L.tutorial && o.L.id !== '2.frac' && o.L.id !== '2.rad')).g();
   else if (typeof L.gen === 'function') g = mk(L.gen);
   else if (typeof L.gen === 'string' && EXT[L.gen]) g = mk(EXT[L.gen]);
   return (cache[L.id] = g);
@@ -4840,7 +4840,7 @@ function gFracExp() {
     line(N(ans), `${r}${sup(p)} = ${ans}`, [W(N(r * p), `${r}${sup(p)} is ${r} multiplied by itself, not ${r} × ${p}.`), Math.pow(p, r) !== ans ? W(N(Math.pow(p, r)), `${r}${sup(p)}, not ${p}${sup(r)}.`) : null, W(N(ans * r), `Count the factors: ${p} of them, not ${p + 1}.`), W(N(r + p), `${r}${sup(p)} means ${p} factors of ${r} multiplied, not ${r} + ${p}.`)])] };
 }
 
-/* ---------- 2.rad: radicals as powers ---------- */
+/* ---------- gRad2: radicals as powers. Not a Powers level (fractional exponents dropped from the plate). ---------- */
 function gRad2() {
   const v = ri(0, 2), x = letter(), k = pick([2, 2, 3, 3, 4]), mk = () => pick([1, 2, 3].filter(t => t < k && A.gcd(t, k) === 1));
   if (v === 0) { // √x · x^(3/2) → x^(1/2) · x^(3/2) → x², or x² · ∛x
@@ -5021,9 +5021,9 @@ function gRad6() {
 }
 
 G.Levels.def({ '11.simp': gSimp, '11.muldiv': gMulDiv, '11.add': gAdd, '11.ration': gRation, '11.fracexp': gFracExp,
-  '2.rad': gRad2, '4.conj': gConj, '5.fracexp': gFracFac, '6.rad': gRad6 });
+  '4.conj': gConj, '5.fracexp': gFracFac, '6.rad': gRad6 });
 // the ladder lists these comeback levels with gen null (not built yet); point them at the generators above
-G.Levels.LIC.forEach(l => l && l.levels.forEach(L => { if (L.gen === null && L.after && ['2.rad', '4.conj', '5.fracexp', '6.rad'].includes(L.id)) L.gen = L.id; }));
+G.Levels.LIC.forEach(l => l && l.levels.forEach(L => { if (L.gen === null && L.after && ['4.conj', '5.fracexp', '6.rad'].includes(L.id)) L.gen = L.id; }));
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* License 10 (Rationals), plus the comebacks it opens: 3.rat, 5.divthm, 6.ratq, 7.rat.
