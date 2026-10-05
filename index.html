@@ -449,14 +449,23 @@ body.splashing{overflow:hidden}
 .cr-strip .cr-hint{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
 .cr-strip .cr-next{border:3px solid #121212;background:#e2352c;color:#fff2d2;font-family:var(--display);font-weight:900;font-size:18px;padding:10px 16px;border-radius:8px;box-shadow:3px 3px 0 #121212;cursor:pointer}
 .cr-strip .cr-skip{border:3px solid #121212;background:#fff2d2;color:#121212;font-family:var(--display);font-weight:800;font-size:14px;padding:8px 12px;border-radius:8px;box-shadow:2px 2px 0 #121212;cursor:pointer}
-.cr-bubbles{position:absolute;left:10px;right:10px;bottom:8px;z-index:6;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.cr-bubbles[hidden]{display:none!important}
-.cr-bub{position:relative;max-width:88%;padding:7px 10px;border:3px solid #121212;border-radius:12px;box-shadow:3px 3px 0 #121212;font-size:13px;line-height:1.3;background:#fff2d2;color:#121212}
-.cr-bub.marge{align-self:flex-start;background:#fff2d2}
-.cr-bub.pip{align-self:flex-end;background:#73c6ec}
-.cr-bub b{display:block;font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#e2352c;margin-bottom:2px}
+/* Career coach: sits ABOVE the card (in document flow), never overlays expr/hint */
+.cr-coach{flex:0 0 auto;margin:0 0 6px;z-index:2}
+.cr-coach[hidden]{display:none!important}
+.cr-coach-row{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.cr-bub{flex:1 1 150px;min-width:0;padding:6px 9px;border:3px solid #121212;border-radius:10px;box-shadow:2px 2px 0 #121212;font-size:12px;line-height:1.3;background:#fff2d2;color:#121212}
+.cr-bub.marge{background:#fff2d2}
+.cr-bub.pip{background:#73c6ec}
+.cr-bub b{display:block;font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#e2352c;margin-bottom:1px}
 .cr-bub.pip b{color:#121212}
-.vPlay .stage{position:relative}
+.cr-coach-x{flex:0 0 auto;align-self:center;border:3px solid #121212;background:#fff;color:#121212;font-family:var(--display);font-weight:800;font-size:12px;padding:8px 10px;border-radius:8px;box-shadow:2px 2px 0 #121212;cursor:pointer;touch-action:manipulation}
+.cr-coach-x:focus-visible{outline:3px solid #e2352c;outline-offset:2px}
+@media (max-width:520px){.cr-coach-row{flex-direction:column}.cr-bub{flex:1 1 auto}.cr-coach-x{align-self:stretch;order:3;width:100%}}
+#vPlay.cr-guiding .roadwrap{max-height:92px}
+@media (max-height:720px){#vPlay.cr-guiding .roadwrap{max-height:72px}#vPlay.cr-guiding .speedo{transform:scale(.92);transform-origin:left center}}
+@media (prefers-reduced-motion:reduce){#vPlay.cr-guiding .speedo{transform:none}}
+.cr-clue .math{font-family:var(--display);font-weight:900;font-size:42px;line-height:1.1;text-align:center;letter-spacing:.02em;color:#fff2d2;text-shadow:2px 2px 0 #121212}
+.cr-clue .math sup{font-size:.55em}
 .cr-book{display:flex;flex-direction:column;gap:12px}
 .cr-clue{background:#2c2d33;color:#fff2d2;border:4px solid #121212;box-shadow:5px 5px 0 #121212;border-radius:10px;padding:14px;display:grid;gap:10px}
 .cr-clue .chalk{font-family:var(--display);font-weight:900;font-size:72px;line-height:1;text-align:center;letter-spacing:.08em;text-shadow:3px 3px 0 #121212}
@@ -578,13 +587,16 @@ body.splashing{overflow:hidden}
     <div class="orderbar" id="orderBar" hidden><div class="modeswitch" role="group" aria-label="How you answer"><button type="button" data-mode="order">Order</button><button type="button" data-mode="calc">Calculate</button></div></div>
     <div class="roadwrap" id="roadWrap" hidden><canvas id="road" aria-hidden="true"></canvas></div>
     <div class="cps" id="cps"></div>
+    <div class="cr-coach" id="careerBubbles" hidden>
+      <div class="cr-coach-row">
+        <div class="cr-bub marge"><b>Marge</b><span id="crMargeLine">Brackets first. Corners first. Same idea.</span></div>
+        <div class="cr-bub pip"><b>Pip</b><span id="crPipLine">What if I just… go left to right?</span></div>
+        <button type="button" class="cr-coach-x" id="crCoachHide">Got it</button>
+      </div>
+    </div>
     <div class="stage"><div class="card" id="card"><div class="meta"><span id="metaL"></span><span id="metaR"></span></div><div class="exprbox" id="box"><div class="expr" id="expr"></div></div></div></div>
     <div class="signs" id="signs" hidden></div>
     <div class="hint-line" id="hint"></div>
-    <div class="cr-bubbles" id="careerBubbles" hidden>
-      <div class="cr-bub marge"><b>Marge</b><span id="crMargeLine">Brackets first. Corners first. Same idea.</span></div>
-      <div class="cr-bub pip"><b>Pip</b><span id="crPipLine">What if I just… go left to right?</span></div>
-    </div>
   </section>
 
   <!-- RESULTS -->
@@ -7272,7 +7284,7 @@ function start(mode) {
   $('speedo').hidden = false;
   $('vPlay').classList.toggle('racing', true);
   show('vPlay');
-  if ($('careerBubbles')) $('careerBubbles').hidden = !(G && G.careerGuide);
+  showCareerCoach(!!(G && G.careerGuide));
   RD.reset(); RD.setWorld(G.level <= 2 ? 'lamps' : 'circuit'); RD.setSpeed(0); RD.start();
   nextExpr(); loop();
 }
@@ -7469,7 +7481,7 @@ function finish() {
   if (run && G.dist > (bests[lv - 1] || 0)) { bests[lv - 1] = +G.dist.toFixed(2); record = true; }
   if (G.fromCareer) maybeEarnClue();
   save(); SND.end(); setTimeout(() => RD.stop(), 400);
-  if ($('careerBubbles')) $('careerBubbles').hidden = true;
+  hideCareerCoach();
   $('vDone').classList.toggle('arcade', run);
   const up = !!(G.timed && G.stalling);
   $('rTitle').innerHTML = up ? (run ? `Time's up: <span>${G.dist.toFixed(2)} km</span>` : "Time's up") : (run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done');
@@ -8369,6 +8381,7 @@ function aSolved() {
     if (id === '2.intro') G.introN = (G.introN || 0) + 1;
     const goal = needStamp(id), had = stampOf(id), n = Math.min(goal, had.n + 1);
     S.stamps[id] = { n, t: Date.now(), ever: had.ever || n >= goal };
+    maybeEarnClue();
     if (had.n < goal && n === goal) { SND.checkpoint(); const lic = G.alg.lic, p = licProgress(lic), first = p.n === p.of && !S.earned[lic] && !G.test;
       const how = goal === 1 ? 'One clean problem.' : goal + ' clean problems.';
       $('hint').innerHTML = first ? `<b>Road test open!</b> Every ${LICS[lic].math} level is stamped.` : had.ever ? `<b>Stamp restored.</b> ${lvCode(G.alg.lic, G.alg.lv)} is fresh again.` : `<b>Level ${lvCode(G.alg.lic, G.alg.lv)} stamped.</b> ${how}`; G.stamped = first ? 'roadopen' : 'level'; }
@@ -8402,6 +8415,8 @@ function aFinish() {
   const b = S.abest[key] || (S.abest[key] = { km: 0, solved: 0, right: 0, taps: 0 });
   b.solved += G.solved; b.right += G.right; b.taps += G.taps;
   let record = false; if (run && G.dist > b.km) { b.km = +G.dist.toFixed(2); record = true; }
+  if (G.fromCareer) maybeEarnClue();
+  hideCareerCoach();
   save(); SND.end(); setTimeout(() => RD.stop(), 400);
   $('vDone').classList.toggle('arcade', run);
   const up = !!(G.timed && G.stalling);
@@ -8584,7 +8599,7 @@ function renderHome() {
   $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : 'Tap ops, drive far';
   $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : 'Harder clock, same taps';
 }
-function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage', 'vCareer', 'vCareerCh', 'vScrap'].forEach(x => $(x).hidden = x !== v); if ($('careerBubbles')) $('careerBubbles').hidden = true; if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); if (v === 'vCareer') renderCareerMap(); if (v === 'vScrap') renderScrapbook(); }
+function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage', 'vCareer', 'vCareerCh', 'vScrap'].forEach(x => $(x).hidden = x !== v); hideCareerCoach(); if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); if (v === 'vCareer') renderCareerMap(); if (v === 'vScrap') renderScrapbook(); }
 function renderGarage() {
   const all = Object.values(S.garage), hot = hotParts();
   $('garLine').textContent = all.length ? `${hot.length} to fix · ${all.length - hot.length} fixed` : 'Empty for now';
@@ -8632,10 +8647,10 @@ $('signs').addEventListener('input', e => { if (e.target && e.target.id === 'cal
 $('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
 document.querySelectorAll('.modeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.mode) setPlayMode(b.dataset.mode); }));
 document.querySelectorAll('.timeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.limit) setRunLimit(b.dataset.limit); }));
-$('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { const backCareer = G && G.fromCareer; if (G) G.over = true; RD.stop(); if ($('careerBubbles')) $('careerBubbles').hidden = true; if (backCareer) showCareerCh(1); else show('vHome'); } });
+$('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { const backCareer = G && G.fromCareer; if (G) G.over = true; RD.stop(); hideCareerCoach(); if (backCareer) showCareerCh((G && G.careerCh) || 1); else show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
-$('rHome').addEventListener('click', () => { if (G && G.fromCareer) { maybeEarnClue(); showCareerCh(1); } else show('vHome'); });
+$('rHome').addEventListener('click', () => { if (G && G.fromCareer) { maybeEarnClue(); showCareerCh(G.careerCh || 1); } else show('vHome'); });
 $('goSettings').addEventListener('click', () => show('vSet'));
 $('goGarage').addEventListener('click', () => show('vGarage'));
 $('garBack').addEventListener('click', () => show('vHome'));
@@ -8658,26 +8673,34 @@ window.__prec = { RIDES, rideFor, odoRide, S: () => S, G: () => G, tap, pick, aP
 applyTheme(); renderSnd(); show('vHome');
 
 
-/* ---------- Career Mode (plates 1–9 story wrapper; ch.1 live) ---------- */
-const CAREER_CLUE_NEED = 3; // stamped Precedence levels to unlock the chalk "( )" clue
-const CAREER_PREC_STAMP = 5; // clean problems to stamp one Precedence level (career progress)
+/* ---------- Career Mode (plates 1–9 story wrapper; ch.1–2 live) ---------- */
+const CAREER_CLUE_NEED = 3; // stamped levels to unlock a chapter clue
+const CAREER_PREC_STAMP = 5; // clean problems to stamp one Precedence level
 const CAREER_CH = [
-  { n:1, act:1, actName:'Street Circuit', title:'The Racing Line', plate:'Permit', math:'Precedence', tip:'Brackets first. Corners first. Same idea.', pip:'What if I just… go left to right?' },
-  { n:2, act:1, actName:'Street Circuit', title:'Matching Gears', plate:'Operator', math:'Powers', tip:'', pip:'' },
-  { n:3, act:1, actName:'Street Circuit', title:'The Parts Bin', plate:'Road', math:'Simplify', tip:'', pip:'' },
-  { n:4, act:2, actName:'Country Rally', title:'Every Passenger Gets a Seat', plate:'Sport', math:'Expand', tip:'', pip:'' },
-  { n:5, act:2, actName:'Country Rally', title:"What's Inside the Engine", plate:'Competition', math:'Factor', tip:'', pip:'' },
-  { n:6, act:2, actName:'Country Rally', title:'Clearing Both Lanes', plate:'Algebra', math:'Isolate', tip:'', pip:'' },
-  { n:7, act:3, actName:'Grand Tour', title:'Track Limits', plate:'Advanced', math:'Inequalities', tip:'', pip:'' },
-  { n:8, act:3, actName:'Grand Tour', title:'Two-Car Relay', plate:'Expert', math:'Systems', tip:'', pip:'' },
-  { n:9, act:3, actName:'Grand Tour', title:'Where the Ramp Lands', plate:'Unlimited', math:'Quadratics', tip:'', pip:'' }
+  { n:1, act:1, actName:'Street Circuit', title:'The Racing Line', plate:'Permit', math:'Precedence', lic:1, tip:'Brackets first. Corners first. Same idea.', pip:'What if I just… go left to right?', drills:'Open Permit levels · stamp them here', stripTitle:'The Racing Line' },
+  { n:2, act:1, actName:'Street Circuit', title:'Matching Gears', plate:'Operator', math:'Powers', lic:2, tip:'Same gear, same base. Click them together and they shift up.', pip:'Do the front numbers combine too — or only the exponents?', drills:'Open Operator levels · stamp them here', stripTitle:'Matching Gears' },
+  { n:3, act:1, actName:'Street Circuit', title:'The Parts Bin', plate:'Road', math:'Simplify', lic:3, tip:'', pip:'' },
+  { n:4, act:2, actName:'Country Rally', title:'Every Passenger Gets a Seat', plate:'Sport', math:'Expand', lic:4, tip:'', pip:'' },
+  { n:5, act:2, actName:'Country Rally', title:"What's Inside the Engine", plate:'Competition', math:'Factor', lic:5, tip:'', pip:'' },
+  { n:6, act:2, actName:'Country Rally', title:'Clearing Both Lanes', plate:'Algebra', math:'Isolate', lic:6, tip:'', pip:'' },
+  { n:7, act:3, actName:'Grand Tour', title:'Track Limits', plate:'Advanced', math:'Inequalities', lic:7, tip:'', pip:'' },
+  { n:8, act:3, actName:'Grand Tour', title:'Two-Car Relay', plate:'Expert', math:'Systems', lic:8, tip:'', pip:'' },
+  { n:9, act:3, actName:'Grand Tour', title:'Where the Ramp Lands', plate:'Unlimited', math:'Quadratics', lic:9, tip:'', pip:'' }
 ];
-const CR_PANELS = [
+const CR_STRIPS = {
+  1: [
   "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <!-- sky -->\n        <rect width=\"240\" height=\"250\" fill=\"#73c6ec\"/>\n        <circle cx=\"190\" cy=\"36\" r=\"22\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <!-- hills -->\n        <path d=\"M0 110 C40 90 70 95 100 108 S160 130 200 112 S230 100 240 108 L240 140 H0Z\" fill=\"#3f9fd0\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n        <!-- road perspective -->\n        <path d=\"M40 250 L100 140 H140 L200 250Z\" fill=\"#2c2d33\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <path d=\"M118 140 L112 250\" stroke=\"#fff2d2\" stroke-width=\"3\" stroke-dasharray=\"10 8\"/>\n        <!-- kerb hints -->\n        <path d=\"M40 250 L100 140\" stroke=\"#e2352c\" stroke-width=\"4\"/>\n        <path d=\"M200 250 L140 140\" stroke=\"#fff2d2\" stroke-width=\"4\"/>\n        <!-- lamp post -->\n        <rect x=\"148\" y=\"70\" width=\"6\" height=\"70\" fill=\"#121212\"/>\n        <circle cx=\"151\" cy=\"66\" r=\"10\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <circle cx=\"151\" cy=\"66\" r=\"4\" fill=\"#e2352c\"/>\n        <!-- math signs -->\n        <g transform=\"translate(44,94) rotate(45)\">\n          <rect x=\"-16\" y=\"-16\" width=\"32\" height=\"32\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"0\" y=\"7\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"20\" fill=\"#e2352c\" transform=\"rotate(-45)\">+</text>\n        </g>\n        <g transform=\"translate(175,88)\">\n          <rect width=\"30\" height=\"30\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"15\" y=\"23\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"22\" fill=\"#e2352c\">\u00d7</text>\n        </g>\n        <g transform=\"translate(95,48)\">\n          <rect width=\"36\" height=\"28\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"18\" y=\"21\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"18\" fill=\"#e2352c\">( )</text>\n        </g>\n        <!-- your car (rear/3q, cream-red) approaching -->\n        <g transform=\"translate(78,168)\">\n          <!-- speed lines hint -->\n          <path d=\"M-18 40 H-4 M-16 50 H0 M-14 60 H2\" stroke=\"#fff2d2\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".7\"/>\n          <ellipse cx=\"42\" cy=\"72\" rx=\"38\" ry=\"8\" fill=\"#121212\" opacity=\".25\"/>\n          <!-- body -->\n          <path d=\"M8 58 C4 50 6 36 14 30 L22 18 H50 L62 28 C78 34 86 44 88 54 L86 62 H70 A14 14 0 0 0 42 62 H22 A12 12 0 0 0 8 58Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M14 34 H28 L30 48 H12Z\" fill=\"#e2352c\"/>\n          <path d=\"M8 48 H88\" stroke=\"#e2352c\" stroke-width=\"5\"/>\n          <circle cx=\"36\" cy=\"44\" r=\"7\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <text x=\"36\" y=\"47\" text-anchor=\"middle\" font-family=\"Atkinson Hyperlegible,sans-serif\" font-style=\"italic\" font-weight=\"700\" font-size=\"8\" fill=\"#121212\">x\u00b2</text>\n          <!-- wheels -->\n          <circle cx=\"24\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"24\" cy=\"62\" r=\"5\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <circle cx=\"68\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"68\" cy=\"62\" r=\"5\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <circle cx=\"82\" cy=\"52\" r=\"3\" fill=\"#fff9e6\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n        </g>\n      </svg>",
   "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <rect width=\"240\" height=\"250\" fill=\"#62bae6\"/>\n        <!-- motion blur sky stripes -->\n        <g opacity=\".35\" stroke=\"#fff2d2\" stroke-width=\"4\" stroke-linecap=\"round\">\n          <path d=\"M0 40 H80\"/><path d=\"M20 70 H110\"/><path d=\"M0 100 H90\"/><path d=\"M30 130 H120\"/>\n        </g>\n        <!-- road -->\n        <rect y=\"150\" width=\"240\" height=\"100\" fill=\"#2c2d33\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <rect y=\"150\" width=\"240\" height=\"10\" fill=\"#e2352c\"/>\n        <rect y=\"154\" width=\"240\" height=\"4\" fill=\"#fff2d2\"/>\n        <path d=\"M0 200 H240\" stroke=\"#fff2d2\" stroke-width=\"5\" stroke-dasharray=\"28 22\"/>\n        <!-- your car left, being passed -->\n        <g transform=\"translate(8,168) scale(.72)\">\n          <path d=\"M8 58 C4 50 6 36 14 30 L22 18 H50 L62 28 C78 34 86 44 88 54 L86 62 H70 A14 14 0 0 0 42 62 H22 A12 12 0 0 0 8 58Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"4\" stroke-linejoin=\"round\"/>\n          <path d=\"M8 48 H88\" stroke=\"#e2352c\" stroke-width=\"6\"/>\n          <circle cx=\"24\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"68\" cy=\"62\" r=\"10\" fill=\"#121212\"/>\n        </g>\n        <!-- grey masked car blasting past -->\n        <g transform=\"translate(70,145)\">\n          <!-- heavy speed lines -->\n          <g stroke=\"#fff2d2\" stroke-width=\"4\" stroke-linecap=\"round\">\n            <path d=\"M-50 20 H-8\"/><path d=\"M-60 35 H-4\"/><path d=\"M-45 50 H0\"/><path d=\"M-55 65 H-10\"/>\n            <path d=\"M-40 28 H-2\" stroke=\"#e2352c\" stroke-width=\"3\"/>\n            <path d=\"M-48 58 H2\" stroke=\"#e2352c\" stroke-width=\"3\"/>\n          </g>\n          <ellipse cx=\"70\" cy=\"78\" rx=\"55\" ry=\"8\" fill=\"#121212\" opacity=\".3\"/>\n          <!-- grey body -->\n          <path d=\"M10 60 C4 52 6 38 16 30 L28 16 H70 L90 28 C118 36 138 48 142 60 L138 70 H115 A16 16 0 0 0 82 70 H36 A14 14 0 0 0 10 60Z\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M10 50 H140\" stroke=\"#fff2d2\" stroke-width=\"4\"/>\n          <path d=\"M20 34 H40 L42 48 H18Z\" fill=\"#5a6066\"/>\n          <!-- plain helmet driver -->\n          <circle cx=\"55\" cy=\"40\" r=\"11\" fill=\"#3a3e42\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <path d=\"M48 38 H62\" stroke=\"#fff2d2\" stroke-width=\"2.5\" stroke-linecap=\"round\"/>\n          <circle cx=\"55\" cy=\"42\" r=\"3\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <!-- wheels -->\n          <circle cx=\"38\" cy=\"70\" r=\"13\" fill=\"#121212\"/><circle cx=\"38\" cy=\"70\" r=\"6\" fill=\"#c8ccd0\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <circle cx=\"108\" cy=\"70\" r=\"13\" fill=\"#121212\"/><circle cx=\"108\" cy=\"70\" r=\"6\" fill=\"#c8ccd0\" stroke=\"#121212\" stroke-width=\"2\"/>\n        </g>\n        <!-- WHOOSH burst -->\n        <g transform=\"translate(155,55)\">\n          <polygon points=\"70,30 52,34 64,42 46,42 50,54 34,46 28,58 22,46 6,54 10,42 -8,42 4,34 -10,30 4,26 -8,18 10,18 6,6 22,14 28,2 34,14 50,6 46,18 64,18 52,26\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\" stroke-linejoin=\"round\"/>\n          <text x=\"30\" y=\"36\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"13\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\".6\">WHOOSH!</text>\n        </g>\n      </svg>",
   "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <rect width=\"240\" height=\"250\" fill=\"#2c2d33\"/>\n        <!-- asphalt texture dots -->\n        <g fill=\"#3a3b42\" opacity=\".6\">\n          <circle cx=\"30\" cy=\"40\" r=\"2\"/><circle cx=\"80\" cy=\"70\" r=\"1.5\"/><circle cx=\"160\" cy=\"50\" r=\"2\"/>\n          <circle cx=\"200\" cy=\"90\" r=\"1.5\"/><circle cx=\"50\" cy=\"180\" r=\"2\"/><circle cx=\"190\" cy=\"200\" r=\"2\"/>\n        </g>\n        <!-- tire skid -->\n        <path d=\"M20 60 C80 80 100 120 90 200\" fill=\"none\" stroke=\"#1a1b20\" stroke-width=\"14\" stroke-linecap=\"round\" opacity=\".85\"/>\n        <path d=\"M40 50 C100 70 130 110 120 210\" fill=\"none\" stroke=\"#1a1b20\" stroke-width=\"10\" stroke-linecap=\"round\" opacity=\".7\"/>\n        <!-- chalk ( ) big -->\n        <g transform=\"translate(55,70)\">\n          <!-- chalk dust -->\n          <circle cx=\"20\" cy=\"100\" r=\"3\" fill=\"#fff2d2\" opacity=\".5\"/>\n          <circle cx=\"110\" cy=\"110\" r=\"2.5\" fill=\"#fff2d2\" opacity=\".45\"/>\n          <text x=\"65\" y=\"95\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"110\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"4\" opacity=\".95\">( )</text>\n          <!-- chalk stub -->\n          <g transform=\"translate(100,130) rotate(25)\">\n            <rect width=\"28\" height=\"8\" rx=\"2\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n            <rect x=\"22\" width=\"8\" height=\"8\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          </g>\n        </g>\n        <!-- your shoe / foot stepping into frame (player noticing) -->\n        <g transform=\"translate(160,200)\">\n          <ellipse cx=\"30\" cy=\"28\" rx=\"34\" ry=\"12\" fill=\"#121212\" opacity=\".3\"/>\n          <path d=\"M0 20 C8 8 40 4 58 12 L62 28 C40 36 10 34 0 20Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <path d=\"M8 18 H50\" stroke=\"#fff2d2\" stroke-width=\"2\"/>\n        </g>\n        <!-- small caption in-panel -->\n        <rect x=\"12\" y=\"12\" width=\"100\" height=\"26\" rx=\"3\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <text x=\"62\" y=\"30\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#121212\" letter-spacing=\"1\">HE LEFT THIS</text>\n      </svg>",
   "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <!-- garage wall -->\n        <rect width=\"240\" height=\"250\" fill=\"#c4b498\"/>\n        <g stroke=\"#a89878\" stroke-width=\"2\">\n          <path d=\"M0 40 H240\"/><path d=\"M0 80 H240\"/><path d=\"M0 120 H240\"/><path d=\"M0 160 H240\"/><path d=\"M0 200 H240\"/>\n        </g>\n        <!-- blackboard -->\n        <g transform=\"translate(20,18)\">\n          <rect width=\"120\" height=\"90\" rx=\"4\" fill=\"#1c232b\" stroke=\"#121212\" stroke-width=\"4\"/>\n          <rect x=\"4\" y=\"4\" width=\"112\" height=\"82\" fill=\"#243040\"/>\n          <text x=\"60\" y=\"48\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"#fff2d2\">( )</text>\n          <text x=\"60\" y=\"72\" text-anchor=\"middle\" font-family=\"Atkinson Hyperlegible,sans-serif\" font-weight=\"700\" font-size=\"11\" fill=\"#73c6ec\">FIRST</text>\n          <!-- chalk arrow -->\n          <path d=\"M20 78 L40 78\" stroke=\"#e2352c\" stroke-width=\"2.5\" stroke-linecap=\"round\"/>\n        </g>\n        <!-- shelf / tools -->\n        <rect x=\"160\" y=\"30\" width=\"60\" height=\"8\" fill=\"#121212\"/>\n        <g transform=\"translate(170,18)\">\n          <rect width=\"8\" height=\"20\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <rect x=\"16\" width=\"8\" height=\"20\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <rect x=\"32\" width=\"8\" height=\"20\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n        </g>\n        <!-- Marge -->\n        <g transform=\"translate(40,105)\">\n          <!-- body coveralls -->\n          <ellipse cx=\"48\" cy=\"130\" rx=\"40\" ry=\"10\" fill=\"#121212\" opacity=\".2\"/>\n          <path d=\"M20 70 C18 50 28 40 48 40 S78 50 76 70 L80 120 H16Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M20 85 H76\" stroke=\"#e2352c\" stroke-width=\"6\"/>\n          <!-- head -->\n          <circle cx=\"48\" cy=\"28\" r=\"20\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <!-- bandana -->\n          <path d=\"M28 22 C32 8 64 8 68 22 L60 26 H36Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <path d=\"M68 20 L78 14 L72 28Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- silver hair peek -->\n          <path d=\"M30 24 Q36 16 42 22\" fill=\"none\" stroke=\"#d0d4d8\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n          <!-- glasses -->\n          <circle cx=\"40\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <circle cx=\"56\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <path d=\"M46 30 H50\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- smile -->\n          <path d=\"M42 38 Q48 44 54 38\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n          <!-- wrench -->\n          <g transform=\"translate(78,70) rotate(20)\">\n            <rect x=\"0\" y=\"4\" width=\"36\" height=\"6\" rx=\"2\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"2\"/>\n            <circle cx=\"0\" cy=\"7\" r=\"8\" fill=\"none\" stroke=\"#121212\" stroke-width=\"3\"/>\n            <circle cx=\"0\" cy=\"7\" r=\"3\" fill=\"#fff2d2\"/>\n          </g>\n        </g>\n        <!-- Pip -->\n        <g transform=\"translate(145,130)\">\n          <ellipse cx=\"28\" cy=\"100\" rx=\"26\" ry=\"7\" fill=\"#121212\" opacity=\".2\"/>\n          <!-- overalls -->\n          <path d=\"M12 45 C10 30 18 22 28 22 S46 30 44 45 L48 95 H8Z\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"3\" stroke-linejoin=\"round\"/>\n          <path d=\"M18 45 H38 V58 H18Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- straps -->\n          <path d=\"M16 28 L20 45 M40 28 L36 45\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <!-- head -->\n          <circle cx=\"28\" cy=\"14\" r=\"14\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <!-- hair -->\n          <path d=\"M14 12 C16 0 40 0 42 12 L38 10 H18Z\" fill=\"#3a2a1a\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- eyes big curious -->\n          <circle cx=\"23\" cy=\"14\" r=\"2.2\" fill=\"#121212\"/>\n          <circle cx=\"33\" cy=\"14\" r=\"2.2\" fill=\"#121212\"/>\n          <!-- open mouth question -->\n          <ellipse cx=\"28\" cy=\"22\" rx=\"3\" ry=\"2.5\" fill=\"#121212\"/>\n          <!-- hand up -->\n          <circle cx=\"52\" cy=\"40\" r=\"7\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <!-- clipboard -->\n          <g transform=\"translate(-8,55) rotate(-15)\">\n            <rect width=\"22\" height=\"28\" rx=\"2\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n            <rect x=\"4\" y=\"2\" width=\"14\" height=\"4\" fill=\"#e2352c\"/>\n            <path d=\"M5 12 H17 M5 17 H15 M5 22 H16\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          </g>\n          <!-- red-lace sneaker hint -->\n          <path d=\"M10 95 H30 L34 100 H8Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <path d=\"M14 97 H28\" stroke=\"#e2352c\" stroke-width=\"1.5\"/>\n        </g>\n        <!-- speech scribble from Pip -->\n        <g transform=\"translate(195,115)\">\n          <ellipse cx=\"20\" cy=\"16\" rx=\"22\" ry=\"14\" fill=\"#fff\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <text x=\"20\" y=\"21\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"16\" fill=\"#e2352c\">?</text>\n        </g>\n      </svg>"
-];
+],
+  2: [
+    "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"> <rect width=\"240\" height=\"250\" fill=\"#c4b498\"/> <g stroke=\"#a89878\" stroke-width=\"2\"><path d=\"M0 50 H240\"/><path d=\"M0 100 H240\"/><path d=\"M0 150 H240\"/><path d=\"M0 200 H240\"/></g> <rect x=\"20\" y=\"170\" width=\"200\" height=\"50\" rx=\"4\" fill=\"#8a7355\" stroke=\"#121212\" stroke-width=\"3\"/> <!-- gear x\u00b3 --> <g transform=\"translate(55,95)\"> <circle cx=\"0\" cy=\"0\" r=\"36\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"3\"/> <circle cx=\"0\" cy=\"0\" r=\"14\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/> <g fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"2\"> <rect x=\"-6\" y=\"-48\" width=\"12\" height=\"14\" rx=\"2\"/><rect x=\"-6\" y=\"34\" width=\"12\" height=\"14\" rx=\"2\"/> <rect x=\"-48\" y=\"-6\" width=\"14\" height=\"12\" rx=\"2\"/><rect x=\"34\" y=\"-6\" width=\"14\" height=\"12\" rx=\"2\"/> </g> <text x=\"0\" y=\"6\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"20\" fill=\"#121212\">x<tspan dy=\"-8\" font-size=\"12\">3</tspan></text> </g> <!-- gear x\u00b2 --> <g transform=\"translate(175,110)\"> <circle cx=\"0\" cy=\"0\" r=\"28\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"3\"/> <circle cx=\"0\" cy=\"0\" r=\"11\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/> <g fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"2\"> <rect x=\"-5\" y=\"-38\" width=\"10\" height=\"12\" rx=\"2\"/><rect x=\"-5\" y=\"26\" width=\"10\" height=\"12\" rx=\"2\"/> <rect x=\"-38\" y=\"-5\" width=\"12\" height=\"10\" rx=\"2\"/><rect x=\"26\" y=\"-5\" width=\"12\" height=\"10\" rx=\"2\"/> </g> <text x=\"0\" y=\"5\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"18\" fill=\"#121212\">x<tspan dy=\"-7\" font-size=\"11\">2</tspan></text> </g> <rect x=\"12\" y=\"12\" width=\"130\" height=\"24\" rx=\"3\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/> <text x=\"77\" y=\"29\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#121212\">MATCHING GEARS</text> </svg>",
+    "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"> <rect width=\"240\" height=\"250\" fill=\"#73c6ec\"/> <!-- speed lines --> <g stroke=\"#fff2d2\" stroke-width=\"4\" stroke-linecap=\"round\" opacity=\".7\"> <path d=\"M20 60 H90\"/><path d=\"M30 90 H110\"/><path d=\"M25 120 H100\"/><path d=\"M40 150 H120\"/> </g> <!-- morphing gear x\u2075 --> <g transform=\"translate(120,130)\"> <circle cx=\"0\" cy=\"0\" r=\"52\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"4\"/> <circle cx=\"0\" cy=\"0\" r=\"20\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/> <g fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2.5\"> <rect x=\"-8\" y=\"-68\" width=\"16\" height=\"18\" rx=\"2\"/><rect x=\"-8\" y=\"50\" width=\"16\" height=\"18\" rx=\"2\"/> <rect x=\"-68\" y=\"-8\" width=\"18\" height=\"16\" rx=\"2\"/><rect x=\"50\" y=\"-8\" width=\"18\" height=\"16\" rx=\"2\"/> <rect x=\"-52\" y=\"-52\" width=\"14\" height=\"14\" rx=\"2\" transform=\"rotate(45 -45 -45)\"/> <rect x=\"38\" y=\"38\" width=\"14\" height=\"14\" rx=\"2\" transform=\"rotate(45 45 45)\"/> </g> <text x=\"0\" y=\"8\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"28\" fill=\"#121212\">x<tspan dy=\"-12\" font-size=\"16\">5</tspan></text> </g> <!-- CLICK burst --> <g transform=\"translate(165,40)\"> <polygon points=\"60,28 45,32 55,40 40,40 44,52 30,44 24,56 18,44 4,52 8,40 -6,40 4,32 -8,28 4,24 -6,16 8,16 4,4 18,12 24,0 30,12 44,4 40,16 55,16 45,24\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\" stroke-linejoin=\"round\"/> <text x=\"26\" y=\"34\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"14\" fill=\"#e2352c\">CLICK!</text> </g> </svg>",
+    "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"> <rect width=\"240\" height=\"250\" fill=\"#62bae6\"/> <!-- car hood / windshield --> <path d=\"M20 200 L40 90 H200 L220 200Z\" fill=\"#2c2d33\" stroke=\"#121212\" stroke-width=\"3\"/> <path d=\"M50 100 H190 L200 180 H40Z\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"3\" opacity=\".85\"/> <!-- cream car bit --> <path d=\"M30 180 H210 L220 220 H20Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/> <path d=\"M30 195 H210\" stroke=\"#e2352c\" stroke-width=\"6\"/> <!-- napkin under wiper --> <g transform=\"translate(70,95) rotate(-8)\"> <rect width=\"110\" height=\"70\" rx=\"3\" fill=\"#fffef5\" stroke=\"#121212\" stroke-width=\"3\"/> <path d=\"M8 8 Q20 18 8 28\" fill=\"none\" stroke=\"#c4b498\" stroke-width=\"2\"/> <text x=\"55\" y=\"32\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"20\" fill=\"#121212\">x<tspan dy=\"-8\" font-size=\"12\">3</tspan>(x<tspan dy=\"-8\" font-size=\"12\">2</tspan>)</text> <text x=\"55\" y=\"56\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"18\" fill=\"#e2352c\">\u2192 x<tspan dy=\"-7\" font-size=\"11\">5</tspan></text> </g> <!-- wiper --> <path d=\"M40 100 L160 150\" stroke=\"#121212\" stroke-width=\"4\" stroke-linecap=\"round\"/> <rect x=\"12\" y=\"12\" width=\"100\" height=\"24\" rx=\"3\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/> <text x=\"62\" y=\"29\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"800\" font-size=\"11\" fill=\"#121212\">UNDER THE WIPER</text> </svg>",
+    "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\"> <rect width=\"240\" height=\"250\" fill=\"#c4b498\"/> <g stroke=\"#a89878\" stroke-width=\"2\"><path d=\"M0 40 H240\"/><path d=\"M0 80 H240\"/><path d=\"M0 120 H240\"/></g> <!-- open alley door --> <rect x=\"150\" y=\"40\" width=\"70\" height=\"110\" fill=\"#3a4a3a\" stroke=\"#121212\" stroke-width=\"3\"/> <path d=\"M155 50 H215 M155 70 H215 M155 90 H215\" stroke=\"#2a3a2a\" stroke-width=\"2\"/> <!-- empty - grey car gone: dust puff --> <g transform=\"translate(165,100)\" opacity=\".8\"> <circle cx=\"10\" cy=\"20\" r=\"12\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/> <circle cx=\"28\" cy=\"14\" r=\"10\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/> <circle cx=\"40\" cy=\"24\" r=\"8\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/> </g> <!-- Marge nod --> <g transform=\"translate(30,100)\"> <ellipse cx=\"48\" cy=\"130\" rx=\"40\" ry=\"10\" fill=\"#121212\" opacity=\".2\"/> <path d=\"M20 70 C18 50 28 40 48 40 S78 50 76 70 L80 120 H16Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/> <path d=\"M20 85 H76\" stroke=\"#e2352c\" stroke-width=\"6\"/> <circle cx=\"48\" cy=\"28\" r=\"20\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"3\"/> <path d=\"M28 22 C32 8 64 8 68 22 L60 26 H36Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2.5\"/> <circle cx=\"40\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/> <circle cx=\"56\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/> <path d=\"M46 30 H50\" stroke=\"#121212\" stroke-width=\"2\"/> <path d=\"M42 38 Q48 44 54 38\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2\" stroke-linecap=\"round\"/> <!-- napkin in hand --> <g transform=\"translate(78,60) rotate(15)\"> <rect width=\"36\" height=\"28\" rx=\"2\" fill=\"#fffef5\" stroke=\"#121212\" stroke-width=\"2\"/> <text x=\"18\" y=\"18\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"10\" fill=\"#121212\">x\u2075</text> </g> </g> <rect x=\"12\" y=\"12\" width=\"120\" height=\"24\" rx=\"3\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/> <text x=\"72\" y=\"29\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"800\" font-size=\"11\" fill=\"#121212\">ALREADY GONE</text> </svg>"
+  ]
+};
 let crStrip = { ch:1, i:0 };
 
 function ensureCareer() {
@@ -8685,6 +8708,12 @@ function ensureCareer() {
   S.career.strip = S.career.strip || {};
   S.career.clue = S.career.clue || {};
   S.career.lesson = S.career.lesson || {};
+}
+function careerOpen(n) {
+  ensureCareer();
+  if (n === 1) return true;
+  if (n === 2) return !!S.career.clue['1'];
+  return false;
 }
 function stampPrecLevel(lv) {
   if (!lv || FR) return;
@@ -8698,12 +8727,29 @@ function precStampedCount() {
   for (let i = 1; i <= 6; i++) { const st = stampOf('p.' + i); if (st.n >= CAREER_PREC_STAMP || st.ever) n++; }
   return n;
 }
+function powersStampedCount() {
+  if (!LV.LIC[2]) return 0;
+  let n = 0;
+  coreIdx(2).forEach(i => { const id = lvAt(2, i).id, st = stampOf(id); if (st.n >= needStamp(id) || st.ever) n++; });
+  return n;
+}
+function powersStampOf() { return coreIdx(2).length; }
+function chStamped(n) { return n === 1 ? precStampedCount() : n === 2 ? powersStampedCount() : 0; }
+function chStampOf(n) { return n === 1 ? 6 : n === 2 ? powersStampOf() : 0; }
 function maybeEarnClue() {
   ensureCareer();
-  if (S.career.clue['1']) return false;
-  if (precStampedCount() >= CAREER_CLUE_NEED) { S.career.clue['1'] = 1; save(); return true; }
-  return false;
+  let got = false;
+  if (!S.career.clue['1'] && precStampedCount() >= CAREER_CLUE_NEED) { S.career.clue['1'] = 1; got = true; }
+  if (!S.career.clue['2'] && powersStampedCount() >= CAREER_CLUE_NEED) { S.career.clue['2'] = 1; got = true; }
+  if (got) save();
+  return got;
 }
+function showCareerCoach(on) {
+  const b = $('careerBubbles'); if (!b) return;
+  b.hidden = !on;
+  $('vPlay').classList.toggle('cr-guiding', !!on);
+}
+function hideCareerCoach() { showCareerCoach(false); }
 
 function renderCareerMap() {
   ensureCareer();
@@ -8718,9 +8764,9 @@ function renderCareerMap() {
   marks += '<rect x="150" y="385" width="130" height="22" rx="4" fill="#121212"/><text class="cr-act" x="156" y="400">ACT II · RALLY</text>';
   marks += '<rect x="10" y="8" width="120" height="22" rx="4" fill="#121212"/><text class="cr-act" x="16" y="23">ACT III · TOUR</text>';
   marks += '<text x="175" y="55" font-family="Atkinson Hyperlegible,sans-serif" font-size="11" fill="#121212" opacity=".75">Coming soon</text>';
-  marks += '<text x="220" y="245" font-family="Atkinson Hyperlegible,sans-serif" font-size="11" fill="#121212" opacity=".75">Coming soon</text>';
+  if (!careerOpen(2)) marks += '<text x="130" y="270" font-family="Atkinson Hyperlegible,sans-serif" font-size="11" fill="#121212" opacity=".75">Coming soon</text>';
   stops.forEach(s => {
-    const ch = CAREER_CH[s.n - 1], open = s.n === 1;
+    const ch = CAREER_CH[s.n - 1], open = careerOpen(s.n);
     const cls = open ? 'cr-stop open' : 'cr-stop lock';
     const title = open ? `Ch. ${s.n} · ${ch.title}` : `Ch. ${s.n} · Coming soon`;
     marks += `<g class="${cls}" data-ch="${s.n}" role="button" tabindex="${open ? 0 : -1}" aria-label="${title.replace(/"/g, '')}" ${open ? '' : 'aria-disabled="true"'}>` +
@@ -8737,40 +8783,40 @@ function renderCareerMap() {
     `<path d="${path}" fill="none" stroke="#fff2d2" stroke-width="6" stroke-dasharray="16 14" stroke-linecap="round"/>` +
     `<path d="${path}" fill="none" stroke="#121212" stroke-width="3" stroke-linecap="round" opacity=".35"/>` +
     marks + `</svg>`;
-  const tip = S.career.clue['1'] ? 'Clue 1 is in your scrapbook.' : `Stop 1 open · stamp ${CAREER_CLUE_NEED} levels for the clue (${precStampedCount()}/${CAREER_CLUE_NEED}). Stops 2–9 coming soon.`;
+  let tip;
+  if (careerOpen(2)) tip = S.career.clue['2'] ? 'Stops 1–2 open. Clue 2 is in your scrapbook.' : `Stops 1–2 open · stamp ${CAREER_CLUE_NEED} Powers levels for clue 2 (${powersStampedCount()}/${CAREER_CLUE_NEED}).`;
+  else tip = S.career.clue['1'] ? 'Clue 1 earned — stop 2 should be open.' : `Stop 1 open · stamp ${CAREER_CLUE_NEED} Precedence levels for the clue (${precStampedCount()}/${CAREER_CLUE_NEED}).`;
   $('crMapTip').textContent = tip;
 }
 
 function showCareerCh(n) {
   ensureCareer();
-  const ch = CAREER_CH[n - 1]; if (!ch || n !== 1) return show('vCareer');
+  const ch = CAREER_CH[n - 1];
+  if (!ch || !careerOpen(n) || !CR_STRIPS[n]) return show('vCareer');
   show('vCareerCh');
-  const stamped = precStampedCount(), of = 6, pct = Math.round(100 * stamped / of);
-  const stripSeen = !!S.career.strip['1'];
-  const lessonDone = !!S.career.lesson['1'];
-  const clue = !!S.career.clue['1'];
+  const stamped = chStamped(n), of = chStampOf(n), pct = of ? Math.round(100 * stamped / of) : 0;
+  const stripSeen = !!S.career.strip[String(n)];
+  const lessonDone = !!S.career.lesson[String(n)];
+  const clue = !!S.career.clue[String(n)];
   $('crHub').innerHTML = `
     <span class="cr-tag">ACT ${ch.act} · ${ch.actName.toUpperCase()}</span>
     <h2 class="cr-title" style="font-size:clamp(24px,6.5vw,34px)">Ch. ${ch.n} · ${ch.title}</h2>
     <p class="cr-sub">${ch.plate} · ${ch.math}</p>
     <div class="cr-card">
       <h3>Progress</h3>
-      <p>${stamped} of ${of} Precedence levels stamped · clue at ${CAREER_CLUE_NEED}${clue ? ' · clue earned ✓' : ''}</p>
+      <p>${stamped} of ${of} ${ch.math} levels stamped · clue at ${CAREER_CLUE_NEED}${clue ? ' · clue earned ✓' : ''}</p>
       <div class="cr-bar" aria-label="Chapter progress"><i style="width:${pct}%"></i></div>
     </div>
     <div class="cr-actions">
-      <button type="button" class="big career" id="crWatch"><b>${stripSeen ? 'Watch strip again' : 'Comic strip'}</b><span>${stripSeen ? 'The Racing Line · 4 panels' : 'Tap through 4 panels'}</span></button>
+      <button type="button" class="big career" id="crWatch"><b>${stripSeen ? 'Watch strip again' : 'Comic strip'}</b><span>${stripSeen ? ch.stripTitle + ' · 4 panels' : 'Tap through 4 panels'}</span></button>
       <button type="button" class="big practice" id="crLesson"><b>Garage lesson</b><span>${lessonDone ? 'Replay guided drive with Marge' : "Marge's tip · guided practice"}</span></button>
-      <button type="button" class="big rally" id="crDrills"><b>Drills</b><span>Open Permit levels · stamp them here</span></button>
+      <button type="button" class="big rally" id="crDrills"><b>Drills</b><span>${ch.drills}</span></button>
     </div>
     <p class="tip">Education first: stamp levels in Drills. The Masked Driver's clue drops into the scrapbook after ${CAREER_CLUE_NEED} stamps.</p>`;
-  $('crWatch').onclick = () => openStrip(1);
-  $('crLesson').onclick = () => startCareerLesson(1);
-  $('crDrills').onclick = () => {
-    S.lic = 1; save(); show('vHome');
-  };
-  // First visit: autoplay strip if not seen
-  if (!stripSeen) setTimeout(() => openStrip(1), 180);
+  $('crWatch').onclick = () => openStrip(n);
+  $('crLesson').onclick = () => startCareerLesson(n);
+  $('crDrills').onclick = () => { S.lic = ch.lic; if (ch.lic !== 1) S.alv[ch.lic] = S.alv[ch.lic] || 1; save(); show('vHome'); };
+  if (!stripSeen) setTimeout(() => openStrip(n), 180);
 }
 
 function openStrip(ch) {
@@ -8783,14 +8829,16 @@ function openStrip(ch) {
   $('crStrip').hidden = false;
 }
 function paintStrip() {
-  const i = crStrip.i, last = i >= CR_PANELS.length - 1;
+  const panels = CR_STRIPS[crStrip.ch] || [];
+  const i = crStrip.i, last = i >= panels.length - 1;
   $('crStripPn').textContent = String(i + 1);
-  $('crStripArt').innerHTML = CR_PANELS[i] || '';
+  $('crStripArt').innerHTML = panels[i] || '';
   $('crStripHint').textContent = last ? 'Tap to enter the garage' : 'Tap to continue';
   $('crStripNext').textContent = last ? 'Continue' : 'Next';
 }
 function advanceStrip() {
-  if (crStrip.i < CR_PANELS.length - 1) { crStrip.i++; paintStrip(); return; }
+  const panels = CR_STRIPS[crStrip.ch] || [];
+  if (crStrip.i < panels.length - 1) { crStrip.i++; paintStrip(); return; }
   closeStrip(true);
 }
 function closeStrip(finished) {
@@ -8802,25 +8850,30 @@ function closeStrip(finished) {
 
 function startCareerLesson(ch) {
   ensureCareer();
-  S.lic = 1; S.level = 1; save();
-  const tip = CAREER_CH[ch - 1].tip, pip = CAREER_CH[ch - 1].pip;
-  if ($('crMargeLine')) $('crMargeLine').textContent = tip;
-  if ($('crPipLine')) $('crPipLine').textContent = pip;
-  start('practice');
-  if (G) { G.careerGuide = true; G.fromCareer = true; }
-  if ($('careerBubbles')) $('careerBubbles').hidden = false;
+  const meta = CAREER_CH[ch - 1];
+  if ($('crMargeLine')) $('crMargeLine').textContent = meta.tip;
+  if ($('crPipLine')) $('crPipLine').textContent = meta.pip;
+  if (ch === 1) { S.lic = 1; S.level = 1; save(); start('practice'); }
+  else if (ch === 2) { S.lic = 2; S.alv[2] = 1; save(); start('practice'); }
+  else return;
+  if (G) { G.careerGuide = true; G.fromCareer = true; G.careerCh = ch; }
+  showCareerCoach(true);
   S.career.lesson[String(ch)] = 1; save();
-  if ($('hint')) $('hint').innerHTML = 'Tap the <b>operation</b> that comes next. Marge is coaching from the pit.';
+  if (ch === 1 && $('hint')) $('hint').innerHTML = 'Tap the <b>operation</b> that comes next. Marge is coaching from the pit.';
+  else if (ch === 2 && $('hint') && !$('hint').innerHTML) $('hint').innerHTML = 'Hover a matching exponent, then tap. Marge is in the garage.';
 }
 
 function renderScrapbook() {
   ensureCareer();
-  const clue1 = !!S.career.clue['1'];
   let h = '';
-  if (clue1) {
+  if (S.career.clue['1']) {
     h += `<div class="cr-clue"><div class="lab">Clue 1 · Street Circuit</div><div class="chalk">( )</div><p>Chalk on the asphalt after he passed you. Brackets first — the racing line has an order.</p></div>`;
-  } else {
-    h += `<div class="cr-empty">No clues yet. Stamp ${CAREER_CLUE_NEED} Precedence levels in Career → Drills (you have ${precStampedCount()}).</div>`;
+  }
+  if (S.career.clue['2']) {
+    h += `<div class="cr-clue"><div class="lab">Clue 2 · Matching Gears</div><div class="math">x<sup>3</sup>(x<sup>2</sup>)</div><p>Napkin under your wiper. Same base — the exponents combine. No multiplication dots; the gears just touch.</p></div>`;
+  }
+  if (!h) {
+    h = `<div class="cr-empty">No clues yet. Stamp ${CAREER_CLUE_NEED} Precedence levels in Career → Drills (you have ${precStampedCount()}).</div>`;
   }
   $('crBook').innerHTML = h;
 }
@@ -8831,15 +8884,17 @@ if ($('crBack')) $('crBack').addEventListener('click', () => show('vHome'));
 if ($('crChBack')) $('crChBack').addEventListener('click', () => show('vCareer'));
 if ($('crScrapBtn')) $('crScrapBtn').addEventListener('click', () => show('vScrap'));
 if ($('crScrapBack')) $('crScrapBack').addEventListener('click', () => show('vCareer'));
+if ($('crCoachHide')) $('crCoachHide').addEventListener('click', hideCareerCoach);
 if ($('crMap')) $('crMap').addEventListener('click', e => {
   const g = e.target.closest('.cr-stop'); if (!g) return;
-  const n = +g.dataset.ch; if (n === 1) showCareerCh(1);
-  else if ($('crMapTip')) { $('crMapTip').textContent = `Ch. ${n} · Coming soon`; }
+  const n = +g.dataset.ch;
+  if (careerOpen(n)) showCareerCh(n);
+  else if ($('crMapTip')) $('crMapTip').textContent = `Ch. ${n} · Coming soon`;
 });
 if ($('crMap')) $('crMap').addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ') return;
   const g = e.target.closest('.cr-stop'); if (!g) return;
-  e.preventDefault(); const n = +g.dataset.ch; if (n === 1) showCareerCh(1);
+  e.preventDefault(); const n = +g.dataset.ch; if (careerOpen(n)) showCareerCh(n);
 });
 function stripTap(e) {
   if (e.target.closest('#crStripSkip')) return;
