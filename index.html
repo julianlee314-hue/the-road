@@ -404,6 +404,66 @@ body.splashing{overflow:hidden}
 .sp.rm .sp-tin{transition:opacity .4s}.sp.rm.s-title .sp-tin{opacity:1}
 .sp.rm .sp-banner{transition:opacity .4s;transform:translateX(-50%) rotate(-3deg)}.sp.rm.s-loop .sp-banner{opacity:1}
 .sp.rm .sp-intro{transition:opacity .4s}
+
+/* ---------- Career Mode: Rulestown map, strip, scrapbook (splash palette) ---------- */
+.big.career{background:#73c6ec;color:#121212;border:3px solid #121212;box-shadow:4px 4px 0 #121212;margin-top:10px}
+.big.career b{color:#121212;text-shadow:1px 1px 0 #fff2d2}
+.big.career span{opacity:.9;color:#1c232b}
+.carrow{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+@media (min-width:520px){.carrow{grid-template-columns:1fr 1fr 1fr}}
+.cr-tag{display:inline-block;background:#121212;color:#fff2d2;font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.18em;padding:3px 9px 2px;border-radius:3px;transform:skewX(-8deg)}
+.cr-title{font-family:var(--display);font-weight:900;font-size:clamp(26px,7vw,36px);line-height:.9;text-transform:uppercase;transform:skewX(-6deg);margin:8px 0 4px;color:#e2352c;text-shadow:2px 2px 0 #121212}
+.cr-sub{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--chalk-dim);margin:0 0 10px}
+.cr-map{position:relative;background:#73c6ec;border:4px solid #121212;box-shadow:5px 5px 0 #121212;border-radius:10px;overflow:hidden;min-height:420px}
+.cr-map svg{display:block;width:100%;height:auto}
+.cr-stop{cursor:pointer;touch-action:manipulation}
+.cr-stop[disabled],.cr-stop.lock{cursor:not-allowed}
+.cr-stop circle.dot{stroke:#121212;stroke-width:3;fill:#fff2d2;transition:fill .15s}
+.cr-stop.open circle.dot{fill:#e2352c}
+.cr-stop.open:focus-visible circle.dot,.cr-stop.open:hover circle.dot{fill:#ff5a4f}
+.cr-stop.lock circle.dot{fill:#8a9096}
+.cr-stop text{font-family:var(--display),Impact,sans-serif;font-weight:900;fill:#121212;pointer-events:none}
+.cr-act{font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;fill:#fff2d2}
+.cr-lock{font-size:14px}
+.cr-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center;justify-content:space-between}
+.cr-scrap{border:3px solid #121212;background:#fff2d2;color:#121212;font-family:var(--display);font-weight:800;padding:8px 12px;border-radius:8px;box-shadow:3px 3px 0 #121212;cursor:pointer}
+.cr-scrap:focus-visible{outline:3px solid #e2352c;outline-offset:2px}
+.cr-hub{display:flex;flex-direction:column;gap:10px}
+.cr-card{background:#fffefb;color:#1c232b;border:3px solid #121212;box-shadow:4px 4px 0 #121212;border-radius:10px;padding:12px 14px}
+.cr-card h3{font-family:var(--display);font-weight:900;font-size:20px;margin:0 0 4px;text-transform:uppercase}
+.cr-card p{margin:0 0 10px;font-size:14px;line-height:1.4;color:#5d6873}
+.cr-bar{height:12px;border-radius:999px;background:#e5e1d6;border:2px solid #121212;overflow:hidden}
+.cr-bar i{display:block;height:100%;background:#e2352c;width:0;transition:width .35s ease}
+@media (prefers-reduced-motion:reduce){.cr-bar i{transition:none}}
+.cr-actions{display:grid;gap:8px}
+.cr-actions .big{border:3px solid #121212;box-shadow:3px 3px 0 #121212}
+.cr-actions .big:disabled{opacity:.45;box-shadow:none}
+.cr-strip{position:fixed;inset:0;z-index:800;background:#73c6ec;color:#121212;display:flex;flex-direction:column;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));-webkit-user-select:none;user-select:none}
+.cr-strip[hidden]{display:none!important}
+.cr-strip .cr-sh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.cr-strip .cr-panel{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.cr-strip .cr-frame{position:relative;width:min(100%,420px);aspect-ratio:1/1.05;background:#fff;border:4px solid #121212;box-shadow:6px 6px 0 #121212;overflow:hidden}
+.cr-strip .cr-frame svg{display:block;width:100%;height:100%}
+.cr-strip .cr-pn{position:absolute;top:8px;left:8px;z-index:2;width:28px;height:28px;border-radius:50%;background:#e2352c;border:3px solid #121212;color:#fff2d2;font-family:var(--display);font-weight:900;font-size:16px;display:grid;place-items:center;box-shadow:2px 2px 0 #121212}
+.cr-strip .cr-bot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.cr-strip .cr-hint{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.cr-strip .cr-next{border:3px solid #121212;background:#e2352c;color:#fff2d2;font-family:var(--display);font-weight:900;font-size:18px;padding:10px 16px;border-radius:8px;box-shadow:3px 3px 0 #121212;cursor:pointer}
+.cr-strip .cr-skip{border:3px solid #121212;background:#fff2d2;color:#121212;font-family:var(--display);font-weight:800;font-size:14px;padding:8px 12px;border-radius:8px;box-shadow:2px 2px 0 #121212;cursor:pointer}
+.cr-bubbles{position:absolute;left:10px;right:10px;bottom:8px;z-index:6;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.cr-bubbles[hidden]{display:none!important}
+.cr-bub{position:relative;max-width:88%;padding:7px 10px;border:3px solid #121212;border-radius:12px;box-shadow:3px 3px 0 #121212;font-size:13px;line-height:1.3;background:#fff2d2;color:#121212}
+.cr-bub.marge{align-self:flex-start;background:#fff2d2}
+.cr-bub.pip{align-self:flex-end;background:#73c6ec}
+.cr-bub b{display:block;font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#e2352c;margin-bottom:2px}
+.cr-bub.pip b{color:#121212}
+.vPlay .stage{position:relative}
+.cr-book{display:flex;flex-direction:column;gap:12px}
+.cr-clue{background:#2c2d33;color:#fff2d2;border:4px solid #121212;box-shadow:5px 5px 0 #121212;border-radius:10px;padding:14px;display:grid;gap:10px}
+.cr-clue .chalk{font-family:var(--display);font-weight:900;font-size:72px;line-height:1;text-align:center;letter-spacing:.08em;text-shadow:3px 3px 0 #121212}
+.cr-clue .lab{font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:#73c6ec}
+.cr-clue p{margin:0;font-size:14px;line-height:1.4;color:#c8ccd0}
+.cr-empty{padding:18px;border:3px dashed #121212;border-radius:10px;background:#fff2d2;color:#5d6873;font-size:14px}
+
 </style>
 </head>
 <body>
@@ -483,6 +543,7 @@ body.splashing{overflow:hidden}
       <div class="scale"><span>new</span><i></i><span>instant</span></div>
     </div>
     <p class="tip" id="tip">Don't work anything out. <b>Tap the operation that comes next</b>, and it turns into its answer.</p>
+    <button type="button" class="big career" id="goCareer" hidden><b>Career</b><span>Rulestown story · Order of the road</span></button>
     <div class="modes" id="modes">
       <button class="big practice" id="goPractice"><b>Practice</b><span>Tap the next operation. No clock.</span></button>
       <button class="big rally" id="goRally"><b>Rally</b><span id="rallyLine">Tap ops, drive far</span></button>
@@ -520,6 +581,10 @@ body.splashing{overflow:hidden}
     <div class="stage"><div class="card" id="card"><div class="meta"><span id="metaL"></span><span id="metaR"></span></div><div class="exprbox" id="box"><div class="expr" id="expr"></div></div></div></div>
     <div class="signs" id="signs" hidden></div>
     <div class="hint-line" id="hint"></div>
+    <div class="cr-bubbles" id="careerBubbles" hidden>
+      <div class="cr-bub marge"><b>Marge</b><span id="crMargeLine">Brackets first. Corners first. Same idea.</span></div>
+      <div class="cr-bub pip"><b>Pip</b><span id="crPipLine">What if I just… go left to right?</span></div>
+    </div>
   </section>
 
   <!-- RESULTS -->
@@ -552,6 +617,47 @@ body.splashing{overflow:hidden}
     <div class="sheet"><h3>Testing</h3><p>Open every level, comebacks included, jump a week ahead to see stamps fade, or replay the new-ride notes.</p><div class="seg"><button id="openAll"></button><button id="skipWeek">Skip a week</button><button id="nextRide">Replay rides</button></div><div class="msg" id="testMsg"></div></div>
     <div class="sheet"><h3>Start over</h3><p>Progress lives on this device. Starting over clears your rules board and best scores.</p><div class="seg"><button id="reset">Start over</button></div><div class="msg" id="setMsg"></div></div>
   </section>
+
+  <!-- CAREER MAP -->
+  <section class="view" id="vCareer" hidden>
+    <div class="hud"><button class="ghost" id="crBack" type="button">← Home</button><span></span></div>
+    <span class="cr-tag">RULESTOWN</span>
+    <h2 class="cr-title">Career</h2>
+    <p class="cr-sub">Nine licenses. Three acts. One masked driver.</p>
+    <div class="cr-map" id="crMap" aria-label="Rulestown career map"></div>
+    <div class="cr-foot">
+      <button type="button" class="cr-scrap" id="crScrapBtn">📔 Scrapbook</button>
+      <span class="tip" id="crMapTip">Stop 1 is open. The rest unlock later.</span>
+    </div>
+  </section>
+
+  <!-- CAREER CHAPTER HUB -->
+  <section class="view" id="vCareerCh" hidden>
+    <div class="hud"><button class="ghost" id="crChBack" type="button">← Map</button><span></span></div>
+    <div class="cr-hub" id="crHub"></div>
+  </section>
+
+  <!-- SCRAPBOOK -->
+  <section class="view" id="vScrap" hidden>
+    <div class="hud"><button class="ghost" id="crScrapBack" type="button">← Map</button><span></span></div>
+    <span class="cr-tag">SCRAPBOOK</span>
+    <h2 class="cr-title" style="font-size:clamp(24px,6vw,32px)">Clues</h2>
+    <p class="cr-sub">Notes the Masked Driver leaves behind</p>
+    <div class="cr-book" id="crBook"></div>
+  </section>
+
+  <!-- CAREER STRIP OVERLAY -->
+  <div class="cr-strip" id="crStrip" hidden role="dialog" aria-modal="true" aria-label="Chapter comic strip">
+    <div class="cr-sh">
+      <span class="cr-tag" id="crStripTag">ACT I</span>
+      <button type="button" class="cr-skip" id="crStripSkip" hidden>Skip</button>
+    </div>
+    <div class="cr-panel"><div class="cr-frame" id="crStripFrame"><span class="cr-pn" id="crStripPn">1</span><div id="crStripArt"></div></div></div>
+    <div class="cr-bot">
+      <span class="cr-hint" id="crStripHint">Tap to continue</span>
+      <button type="button" class="cr-next" id="crStripNext">Next</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -7071,8 +7177,8 @@ function migrate() {
   if (S.playMode !== 'order' && S.playMode !== 'calc') S.playMode = S.calc ? 'calc' : 'order';
   if (S.runLimit !== '30' && S.runLimit !== '60' && S.runLimit !== '180' && S.runLimit !== 'end') S.runLimit = 'end';
 }
-function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false, playMode: 'order', runLimit: 'end' }; }
-function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); return Object.assign(b, o); } } catch (e) {} return blank(); }
+function blank() { return { odo: 0, ride: 0, v: 1, level: 1, best: [0, 0, 0, 0, 0, 0], rules: {}, theme: null, sound: true, runs: 0, log: [], bestKm: { rally: [0, 0, 0, 0, 0, 0], forks: [0, 0, 0, 0, 0, 0] }, lic: FR ? 0 : 1, alv: {}, abest: {}, stamps: {}, earned: {}, pro: {}, garage: {}, openAll: false, calc: false, playMode: 'order', runLimit: 'end', career: { strip: {}, clue: {}, lesson: {} } }; }
+function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && o.v === 1) { const b = blank(); o.bestKm = Object.assign(b.bestKm, o.bestKm || {}); const s = Object.assign(b, o); s.career = Object.assign(b.career, o.career || {}); s.career.strip = Object.assign({}, b.career.strip, (o.career && o.career.strip) || {}); s.career.clue = Object.assign({}, b.career.clue, (o.career && o.career.clue) || {}); s.career.lesson = Object.assign({}, b.career.lesson, (o.career && o.career.lesson) || {}); return s; } } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 const RS = (lv, k) => { const id = lv + ':' + k; return S.rules[id] || (S.rules[id] = { right: 0, wrong: 0, t: [] }); };
 const med = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
@@ -7166,6 +7272,7 @@ function start(mode) {
   $('speedo').hidden = false;
   $('vPlay').classList.toggle('racing', true);
   show('vPlay');
+  if ($('careerBubbles')) $('careerBubbles').hidden = !(G && G.careerGuide);
   RD.reset(); RD.setWorld(G.level <= 2 ? 'lamps' : 'circuit'); RD.setSpeed(0); RD.start();
   nextExpr(); loop();
 }
@@ -7341,7 +7448,7 @@ function pick(i) {
 function logTap(id, kind) { const ops = E.opsInOrder(G.tree); S.log.push({ d: new Date().toISOString(), m: G.mode, lv: G.level, x: E.toText(G.tree), k: ops.findIndex(o => o.id === id), r: kind }); if (S.log.length > 300) S.log.shift(); }
 function hit(k, ok) { const h = G.ruleHits[k] || (G.ruleHits[k] = { right: 0, wrong: 0 }); ok ? h.right++ : h.wrong++; }
 function solvedExpr() {
-  G.solved++; SND.solved(); if (!G.exprMiss) addOdo();
+  G.solved++; SND.solved(); if (!G.exprMiss) { addOdo(); stampPrecLevel(G.level); }
   $('expr').innerHTML = `<span class="n fresh solved-mark">${G.tree.v}</span>`; fit(); $('card').classList.add('done');
   $('signs').innerHTML = '';
   $('hint').innerHTML = G.exprMiss ? '<b style="color:var(--good)">✓ Solved.</b>' : '<b style="color:var(--good)">✓ Clean.</b>';
@@ -7360,7 +7467,9 @@ function finish() {
   const run = racing(), lv = G.level, acc = G.taps ? Math.round(100 * G.right / G.taps) : 0, m = med(G.times), mean = G.times.length ? G.times.reduce((a, b) => a + b, 0) / G.times.length : null;
   let record = false; const bests = S.bestKm[G.mode];
   if (run && G.dist > (bests[lv - 1] || 0)) { bests[lv - 1] = +G.dist.toFixed(2); record = true; }
+  if (G.fromCareer) maybeEarnClue();
   save(); SND.end(); setTimeout(() => RD.stop(), 400);
+  if ($('careerBubbles')) $('careerBubbles').hidden = true;
   $('vDone').classList.toggle('arcade', run);
   const up = !!(G.timed && G.stalling);
   $('rTitle').innerHTML = up ? (run ? `Time's up: <span>${G.dist.toFixed(2)} km</span>` : "Time's up") : (run ? `${record ? 'New best' : 'You made it'}: <span>${G.dist.toFixed(2)} km</span>` : 'Practice done');
@@ -8428,6 +8537,7 @@ function renderHome() {
   const lic = S.lic, L = LICS[lic], prec = lic === 1, uc = !!L.uc;
   $('brand').innerHTML = FR ? `Fractions<small>THE ROAD · BAKERY LANE</small>` : `${L.math}<small>THE ROAD · ${lic} OF ${LICS.length - 1}</small>`;
   $('plates').hidden = FR; $('bench').hidden = !FR; if (FR) renderBench();
+  if ($('goCareer')) $('goCareer').hidden = !!FR;
   $('licCard').hidden = true; $('levels').hidden = !prec; $('board').hidden = !prec; $('alv').hidden = prec || uc; $('ucBox').hidden = !uc; $('modes').hidden = uc; $('goRally').hidden = !prec; $('tip').hidden = uc;
   $('modes').style.gridTemplateColumns = prec ? '' : 'repeat(2,minmax(0,1fr))';
   if ($('homeOrder')) $('homeOrder').hidden = prec || uc || FR;
@@ -8474,7 +8584,7 @@ function renderHome() {
   $('rallyLine').textContent = bk('rally') ? `Best ${bk('rally').toFixed(2)} km` : 'Tap ops, drive far';
   $('forksLine').textContent = bk('forks') ? `Best ${bk('forks').toFixed(2)} km` : 'Harder clock, same taps';
 }
-function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage'].forEach(x => $(x).hidden = x !== v); if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); }
+function show(v) { ['vHome', 'vPlay', 'vDone', 'vSet', 'vGarage', 'vCareer', 'vCareerCh', 'vScrap'].forEach(x => $(x).hidden = x !== v); if ($('careerBubbles')) $('careerBubbles').hidden = true; if (v === 'vHome') renderHome(); if (v === 'vSet') renderSet(); if (v === 'vGarage') renderGarage(); if (v === 'vCareer') renderCareerMap(); if (v === 'vScrap') renderScrapbook(); }
 function renderGarage() {
   const all = Object.values(S.garage), hot = hotParts();
   $('garLine').textContent = all.length ? `${hot.length} to fix · ${all.length - hot.length} fixed` : 'Empty for now';
@@ -8522,10 +8632,10 @@ $('signs').addEventListener('input', e => { if (e.target && e.target.id === 'cal
 $('signs').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target && e.target.id === 'calcIn') { e.preventDefault(); aCalcSubmit(); } });
 document.querySelectorAll('.modeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.mode) setPlayMode(b.dataset.mode); }));
 document.querySelectorAll('.timeswitch').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.limit) setRunLimit(b.dataset.limit); }));
-$('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { if (G) G.over = true; RD.stop(); show('vHome'); } });
+$('quit').addEventListener('click', () => { if (G && (G.taps || racing())) finish(); else { const backCareer = G && G.fromCareer; if (G) G.over = true; RD.stop(); if ($('careerBubbles')) $('careerBubbles').hidden = true; if (backCareer) showCareerCh(1); else show('vHome'); } });
 $('rAgain').addEventListener('click', () => G && G.bench ? bStart() : G && G.test ? (!G.test.pass && licTest(G.test.lic) ? startTest(G.test.lic) : show('vHome')) : G && G.tune ? tuneUp() : start(G ? G.mode : 'rally'));
 $('licCard').addEventListener('click', e => { if (e.target.closest('button')) startTest(S.lic); });
-$('rHome').addEventListener('click', () => show('vHome'));
+$('rHome').addEventListener('click', () => { if (G && G.fromCareer) { maybeEarnClue(); showCareerCh(1); } else show('vHome'); });
 $('goSettings').addEventListener('click', () => show('vSet'));
 $('goGarage').addEventListener('click', () => show('vGarage'));
 $('garBack').addEventListener('click', () => show('vHome'));
@@ -8546,6 +8656,200 @@ $('sndBtn').addEventListener('click', () => { S.sound = !S.sound; save(); render
 $('thmBtn').addEventListener('click', () => { S.theme = isDark() ? 'light' : 'dark'; save(); applyTheme(); if (!$('vSet').hidden) renderSet(); });
 window.__prec = { RIDES, rideFor, odoRide, S: () => S, G: () => G, tap, pick, aPick, aTap, bPick, bStart, bLevel, BENCH, E, RD, A, LV, stampOf, tuneUp, hotParts, stepIsPictorial, PIC_IDS };
 applyTheme(); renderSnd(); show('vHome');
+
+
+/* ---------- Career Mode (plates 1–9 story wrapper; ch.1 live) ---------- */
+const CAREER_CLUE_NEED = 3; // stamped Precedence levels to unlock the chalk "( )" clue
+const CAREER_PREC_STAMP = 5; // clean problems to stamp one Precedence level (career progress)
+const CAREER_CH = [
+  { n:1, act:1, actName:'Street Circuit', title:'The Racing Line', plate:'Permit', math:'Precedence', tip:'Brackets first. Corners first. Same idea.', pip:'What if I just… go left to right?' },
+  { n:2, act:1, actName:'Street Circuit', title:'Matching Gears', plate:'Operator', math:'Powers', tip:'', pip:'' },
+  { n:3, act:1, actName:'Street Circuit', title:'The Parts Bin', plate:'Road', math:'Simplify', tip:'', pip:'' },
+  { n:4, act:2, actName:'Country Rally', title:'Every Passenger Gets a Seat', plate:'Sport', math:'Expand', tip:'', pip:'' },
+  { n:5, act:2, actName:'Country Rally', title:"What's Inside the Engine", plate:'Competition', math:'Factor', tip:'', pip:'' },
+  { n:6, act:2, actName:'Country Rally', title:'Clearing Both Lanes', plate:'Algebra', math:'Isolate', tip:'', pip:'' },
+  { n:7, act:3, actName:'Grand Tour', title:'Track Limits', plate:'Advanced', math:'Inequalities', tip:'', pip:'' },
+  { n:8, act:3, actName:'Grand Tour', title:'Two-Car Relay', plate:'Expert', math:'Systems', tip:'', pip:'' },
+  { n:9, act:3, actName:'Grand Tour', title:'Where the Ramp Lands', plate:'Unlimited', math:'Quadratics', tip:'', pip:'' }
+];
+const CR_PANELS = [
+  "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <!-- sky -->\n        <rect width=\"240\" height=\"250\" fill=\"#73c6ec\"/>\n        <circle cx=\"190\" cy=\"36\" r=\"22\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <!-- hills -->\n        <path d=\"M0 110 C40 90 70 95 100 108 S160 130 200 112 S230 100 240 108 L240 140 H0Z\" fill=\"#3f9fd0\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n        <!-- road perspective -->\n        <path d=\"M40 250 L100 140 H140 L200 250Z\" fill=\"#2c2d33\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <path d=\"M118 140 L112 250\" stroke=\"#fff2d2\" stroke-width=\"3\" stroke-dasharray=\"10 8\"/>\n        <!-- kerb hints -->\n        <path d=\"M40 250 L100 140\" stroke=\"#e2352c\" stroke-width=\"4\"/>\n        <path d=\"M200 250 L140 140\" stroke=\"#fff2d2\" stroke-width=\"4\"/>\n        <!-- lamp post -->\n        <rect x=\"148\" y=\"70\" width=\"6\" height=\"70\" fill=\"#121212\"/>\n        <circle cx=\"151\" cy=\"66\" r=\"10\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <circle cx=\"151\" cy=\"66\" r=\"4\" fill=\"#e2352c\"/>\n        <!-- math signs -->\n        <g transform=\"translate(44,94) rotate(45)\">\n          <rect x=\"-16\" y=\"-16\" width=\"32\" height=\"32\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"0\" y=\"7\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"20\" fill=\"#e2352c\" transform=\"rotate(-45)\">+</text>\n        </g>\n        <g transform=\"translate(175,88)\">\n          <rect width=\"30\" height=\"30\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"15\" y=\"23\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"22\" fill=\"#e2352c\">\u00d7</text>\n        </g>\n        <g transform=\"translate(95,48)\">\n          <rect width=\"36\" height=\"28\" rx=\"4\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <text x=\"18\" y=\"21\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"18\" fill=\"#e2352c\">( )</text>\n        </g>\n        <!-- your car (rear/3q, cream-red) approaching -->\n        <g transform=\"translate(78,168)\">\n          <!-- speed lines hint -->\n          <path d=\"M-18 40 H-4 M-16 50 H0 M-14 60 H2\" stroke=\"#fff2d2\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".7\"/>\n          <ellipse cx=\"42\" cy=\"72\" rx=\"38\" ry=\"8\" fill=\"#121212\" opacity=\".25\"/>\n          <!-- body -->\n          <path d=\"M8 58 C4 50 6 36 14 30 L22 18 H50 L62 28 C78 34 86 44 88 54 L86 62 H70 A14 14 0 0 0 42 62 H22 A12 12 0 0 0 8 58Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M14 34 H28 L30 48 H12Z\" fill=\"#e2352c\"/>\n          <path d=\"M8 48 H88\" stroke=\"#e2352c\" stroke-width=\"5\"/>\n          <circle cx=\"36\" cy=\"44\" r=\"7\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <text x=\"36\" y=\"47\" text-anchor=\"middle\" font-family=\"Atkinson Hyperlegible,sans-serif\" font-style=\"italic\" font-weight=\"700\" font-size=\"8\" fill=\"#121212\">x\u00b2</text>\n          <!-- wheels -->\n          <circle cx=\"24\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"24\" cy=\"62\" r=\"5\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <circle cx=\"68\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"68\" cy=\"62\" r=\"5\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <circle cx=\"82\" cy=\"52\" r=\"3\" fill=\"#fff9e6\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n        </g>\n      </svg>",
+  "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <rect width=\"240\" height=\"250\" fill=\"#62bae6\"/>\n        <!-- motion blur sky stripes -->\n        <g opacity=\".35\" stroke=\"#fff2d2\" stroke-width=\"4\" stroke-linecap=\"round\">\n          <path d=\"M0 40 H80\"/><path d=\"M20 70 H110\"/><path d=\"M0 100 H90\"/><path d=\"M30 130 H120\"/>\n        </g>\n        <!-- road -->\n        <rect y=\"150\" width=\"240\" height=\"100\" fill=\"#2c2d33\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <rect y=\"150\" width=\"240\" height=\"10\" fill=\"#e2352c\"/>\n        <rect y=\"154\" width=\"240\" height=\"4\" fill=\"#fff2d2\"/>\n        <path d=\"M0 200 H240\" stroke=\"#fff2d2\" stroke-width=\"5\" stroke-dasharray=\"28 22\"/>\n        <!-- your car left, being passed -->\n        <g transform=\"translate(8,168) scale(.72)\">\n          <path d=\"M8 58 C4 50 6 36 14 30 L22 18 H50 L62 28 C78 34 86 44 88 54 L86 62 H70 A14 14 0 0 0 42 62 H22 A12 12 0 0 0 8 58Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"4\" stroke-linejoin=\"round\"/>\n          <path d=\"M8 48 H88\" stroke=\"#e2352c\" stroke-width=\"6\"/>\n          <circle cx=\"24\" cy=\"62\" r=\"10\" fill=\"#121212\"/><circle cx=\"68\" cy=\"62\" r=\"10\" fill=\"#121212\"/>\n        </g>\n        <!-- grey masked car blasting past -->\n        <g transform=\"translate(70,145)\">\n          <!-- heavy speed lines -->\n          <g stroke=\"#fff2d2\" stroke-width=\"4\" stroke-linecap=\"round\">\n            <path d=\"M-50 20 H-8\"/><path d=\"M-60 35 H-4\"/><path d=\"M-45 50 H0\"/><path d=\"M-55 65 H-10\"/>\n            <path d=\"M-40 28 H-2\" stroke=\"#e2352c\" stroke-width=\"3\"/>\n            <path d=\"M-48 58 H2\" stroke=\"#e2352c\" stroke-width=\"3\"/>\n          </g>\n          <ellipse cx=\"70\" cy=\"78\" rx=\"55\" ry=\"8\" fill=\"#121212\" opacity=\".3\"/>\n          <!-- grey body -->\n          <path d=\"M10 60 C4 52 6 38 16 30 L28 16 H70 L90 28 C118 36 138 48 142 60 L138 70 H115 A16 16 0 0 0 82 70 H36 A14 14 0 0 0 10 60Z\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M10 50 H140\" stroke=\"#fff2d2\" stroke-width=\"4\"/>\n          <path d=\"M20 34 H40 L42 48 H18Z\" fill=\"#5a6066\"/>\n          <!-- plain helmet driver -->\n          <circle cx=\"55\" cy=\"40\" r=\"11\" fill=\"#3a3e42\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <path d=\"M48 38 H62\" stroke=\"#fff2d2\" stroke-width=\"2.5\" stroke-linecap=\"round\"/>\n          <circle cx=\"55\" cy=\"42\" r=\"3\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          <!-- wheels -->\n          <circle cx=\"38\" cy=\"70\" r=\"13\" fill=\"#121212\"/><circle cx=\"38\" cy=\"70\" r=\"6\" fill=\"#c8ccd0\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <circle cx=\"108\" cy=\"70\" r=\"13\" fill=\"#121212\"/><circle cx=\"108\" cy=\"70\" r=\"6\" fill=\"#c8ccd0\" stroke=\"#121212\" stroke-width=\"2\"/>\n        </g>\n        <!-- WHOOSH burst -->\n        <g transform=\"translate(155,55)\">\n          <polygon points=\"70,30 52,34 64,42 46,42 50,54 34,46 28,58 22,46 6,54 10,42 -8,42 4,34 -10,30 4,26 -8,18 10,18 6,6 22,14 28,2 34,14 50,6 46,18 64,18 52,26\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\" stroke-linejoin=\"round\"/>\n          <text x=\"30\" y=\"36\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"13\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\".6\">WHOOSH!</text>\n        </g>\n      </svg>",
+  "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <rect width=\"240\" height=\"250\" fill=\"#2c2d33\"/>\n        <!-- asphalt texture dots -->\n        <g fill=\"#3a3b42\" opacity=\".6\">\n          <circle cx=\"30\" cy=\"40\" r=\"2\"/><circle cx=\"80\" cy=\"70\" r=\"1.5\"/><circle cx=\"160\" cy=\"50\" r=\"2\"/>\n          <circle cx=\"200\" cy=\"90\" r=\"1.5\"/><circle cx=\"50\" cy=\"180\" r=\"2\"/><circle cx=\"190\" cy=\"200\" r=\"2\"/>\n        </g>\n        <!-- tire skid -->\n        <path d=\"M20 60 C80 80 100 120 90 200\" fill=\"none\" stroke=\"#1a1b20\" stroke-width=\"14\" stroke-linecap=\"round\" opacity=\".85\"/>\n        <path d=\"M40 50 C100 70 130 110 120 210\" fill=\"none\" stroke=\"#1a1b20\" stroke-width=\"10\" stroke-linecap=\"round\" opacity=\".7\"/>\n        <!-- chalk ( ) big -->\n        <g transform=\"translate(55,70)\">\n          <!-- chalk dust -->\n          <circle cx=\"20\" cy=\"100\" r=\"3\" fill=\"#fff2d2\" opacity=\".5\"/>\n          <circle cx=\"110\" cy=\"110\" r=\"2.5\" fill=\"#fff2d2\" opacity=\".45\"/>\n          <text x=\"65\" y=\"95\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"110\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"4\" opacity=\".95\">( )</text>\n          <!-- chalk stub -->\n          <g transform=\"translate(100,130) rotate(25)\">\n            <rect width=\"28\" height=\"8\" rx=\"2\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n            <rect x=\"22\" width=\"8\" height=\"8\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          </g>\n        </g>\n        <!-- your shoe / foot stepping into frame (player noticing) -->\n        <g transform=\"translate(160,200)\">\n          <ellipse cx=\"30\" cy=\"28\" rx=\"34\" ry=\"12\" fill=\"#121212\" opacity=\".3\"/>\n          <path d=\"M0 20 C8 8 40 4 58 12 L62 28 C40 36 10 34 0 20Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <path d=\"M8 18 H50\" stroke=\"#fff2d2\" stroke-width=\"2\"/>\n        </g>\n        <!-- small caption in-panel -->\n        <rect x=\"12\" y=\"12\" width=\"100\" height=\"26\" rx=\"3\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3\"/>\n        <text x=\"62\" y=\"30\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"800\" font-size=\"12\" fill=\"#121212\" letter-spacing=\"1\">HE LEFT THIS</text>\n      </svg>",
+  "<svg viewBox=\"0 0 240 250\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">\n        <!-- garage wall -->\n        <rect width=\"240\" height=\"250\" fill=\"#c4b498\"/>\n        <g stroke=\"#a89878\" stroke-width=\"2\">\n          <path d=\"M0 40 H240\"/><path d=\"M0 80 H240\"/><path d=\"M0 120 H240\"/><path d=\"M0 160 H240\"/><path d=\"M0 200 H240\"/>\n        </g>\n        <!-- blackboard -->\n        <g transform=\"translate(20,18)\">\n          <rect width=\"120\" height=\"90\" rx=\"4\" fill=\"#1c232b\" stroke=\"#121212\" stroke-width=\"4\"/>\n          <rect x=\"4\" y=\"4\" width=\"112\" height=\"82\" fill=\"#243040\"/>\n          <text x=\"60\" y=\"48\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"42\" fill=\"#fff2d2\">( )</text>\n          <text x=\"60\" y=\"72\" text-anchor=\"middle\" font-family=\"Atkinson Hyperlegible,sans-serif\" font-weight=\"700\" font-size=\"11\" fill=\"#73c6ec\">FIRST</text>\n          <!-- chalk arrow -->\n          <path d=\"M20 78 L40 78\" stroke=\"#e2352c\" stroke-width=\"2.5\" stroke-linecap=\"round\"/>\n        </g>\n        <!-- shelf / tools -->\n        <rect x=\"160\" y=\"30\" width=\"60\" height=\"8\" fill=\"#121212\"/>\n        <g transform=\"translate(170,18)\">\n          <rect width=\"8\" height=\"20\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <rect x=\"16\" width=\"8\" height=\"20\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <rect x=\"32\" width=\"8\" height=\"20\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n        </g>\n        <!-- Marge -->\n        <g transform=\"translate(40,105)\">\n          <!-- body coveralls -->\n          <ellipse cx=\"48\" cy=\"130\" rx=\"40\" ry=\"10\" fill=\"#121212\" opacity=\".2\"/>\n          <path d=\"M20 70 C18 50 28 40 48 40 S78 50 76 70 L80 120 H16Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"3.5\" stroke-linejoin=\"round\"/>\n          <path d=\"M20 85 H76\" stroke=\"#e2352c\" stroke-width=\"6\"/>\n          <!-- head -->\n          <circle cx=\"48\" cy=\"28\" r=\"20\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <!-- bandana -->\n          <path d=\"M28 22 C32 8 64 8 68 22 L60 26 H36Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <path d=\"M68 20 L78 14 L72 28Z\" fill=\"#e2352c\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- silver hair peek -->\n          <path d=\"M30 24 Q36 16 42 22\" fill=\"none\" stroke=\"#d0d4d8\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n          <!-- glasses -->\n          <circle cx=\"40\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <circle cx=\"56\" cy=\"30\" r=\"6\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <path d=\"M46 30 H50\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- smile -->\n          <path d=\"M42 38 Q48 44 54 38\" fill=\"none\" stroke=\"#121212\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n          <!-- wrench -->\n          <g transform=\"translate(78,70) rotate(20)\">\n            <rect x=\"0\" y=\"4\" width=\"36\" height=\"6\" rx=\"2\" fill=\"#8a9096\" stroke=\"#121212\" stroke-width=\"2\"/>\n            <circle cx=\"0\" cy=\"7\" r=\"8\" fill=\"none\" stroke=\"#121212\" stroke-width=\"3\"/>\n            <circle cx=\"0\" cy=\"7\" r=\"3\" fill=\"#fff2d2\"/>\n          </g>\n        </g>\n        <!-- Pip -->\n        <g transform=\"translate(145,130)\">\n          <ellipse cx=\"28\" cy=\"100\" rx=\"26\" ry=\"7\" fill=\"#121212\" opacity=\".2\"/>\n          <!-- overalls -->\n          <path d=\"M12 45 C10 30 18 22 28 22 S46 30 44 45 L48 95 H8Z\" fill=\"#73c6ec\" stroke=\"#121212\" stroke-width=\"3\" stroke-linejoin=\"round\"/>\n          <path d=\"M18 45 H38 V58 H18Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- straps -->\n          <path d=\"M16 28 L20 45 M40 28 L36 45\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <!-- head -->\n          <circle cx=\"28\" cy=\"14\" r=\"14\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"3\"/>\n          <!-- hair -->\n          <path d=\"M14 12 C16 0 40 0 42 12 L38 10 H18Z\" fill=\"#3a2a1a\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <!-- eyes big curious -->\n          <circle cx=\"23\" cy=\"14\" r=\"2.2\" fill=\"#121212\"/>\n          <circle cx=\"33\" cy=\"14\" r=\"2.2\" fill=\"#121212\"/>\n          <!-- open mouth question -->\n          <ellipse cx=\"28\" cy=\"22\" rx=\"3\" ry=\"2.5\" fill=\"#121212\"/>\n          <!-- hand up -->\n          <circle cx=\"52\" cy=\"40\" r=\"7\" fill=\"#e8c4a0\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <!-- clipboard -->\n          <g transform=\"translate(-8,55) rotate(-15)\">\n            <rect width=\"22\" height=\"28\" rx=\"2\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n            <rect x=\"4\" y=\"2\" width=\"14\" height=\"4\" fill=\"#e2352c\"/>\n            <path d=\"M5 12 H17 M5 17 H15 M5 22 H16\" stroke=\"#121212\" stroke-width=\"1.5\"/>\n          </g>\n          <!-- red-lace sneaker hint -->\n          <path d=\"M10 95 H30 L34 100 H8Z\" fill=\"#fff2d2\" stroke=\"#121212\" stroke-width=\"2\"/>\n          <path d=\"M14 97 H28\" stroke=\"#e2352c\" stroke-width=\"1.5\"/>\n        </g>\n        <!-- speech scribble from Pip -->\n        <g transform=\"translate(195,115)\">\n          <ellipse cx=\"20\" cy=\"16\" rx=\"22\" ry=\"14\" fill=\"#fff\" stroke=\"#121212\" stroke-width=\"2.5\"/>\n          <text x=\"20\" y=\"21\" text-anchor=\"middle\" font-family=\"Big Shoulders Display,Impact,sans-serif\" font-weight=\"900\" font-size=\"16\" fill=\"#e2352c\">?</text>\n        </g>\n      </svg>"
+];
+let crStrip = { ch:1, i:0 };
+
+function ensureCareer() {
+  if (!S.career) S.career = { strip: {}, clue: {}, lesson: {} };
+  S.career.strip = S.career.strip || {};
+  S.career.clue = S.career.clue || {};
+  S.career.lesson = S.career.lesson || {};
+}
+function stampPrecLevel(lv) {
+  if (!lv || FR) return;
+  const id = 'p.' + lv, goal = CAREER_PREC_STAMP, had = stampOf(id);
+  const n = Math.min(goal, had.n + 1);
+  S.stamps[id] = { n, t: Date.now(), ever: had.ever || n >= goal };
+  maybeEarnClue();
+}
+function precStampedCount() {
+  let n = 0;
+  for (let i = 1; i <= 6; i++) { const st = stampOf('p.' + i); if (st.n >= CAREER_PREC_STAMP || st.ever) n++; }
+  return n;
+}
+function maybeEarnClue() {
+  ensureCareer();
+  if (S.career.clue['1']) return false;
+  if (precStampedCount() >= CAREER_CLUE_NEED) { S.career.clue['1'] = 1; save(); return true; }
+  return false;
+}
+
+function renderCareerMap() {
+  ensureCareer();
+  const stops = [
+    { n:1, x:48, y:340 }, { n:2, x:110, y:290 }, { n:3, x:70, y:230 },
+    { n:4, x:140, y:180 }, { n:5, x:210, y:210 }, { n:6, x:250, y:140 },
+    { n:7, x:180, y:90 }, { n:8, x:100, y:70 }, { n:9, x:160, y:30 }
+  ];
+  const path = 'M40 360 C60 320 90 310 110 290 S90 250 70 230 S110 200 140 180 S200 200 210 210 S240 170 250 140 S210 100 180 90 S120 80 100 70 S130 40 160 30';
+  let marks = '';
+  marks += '<rect x="10" y="355" width="118" height="22" rx="4" fill="#121212"/><text class="cr-act" x="16" y="370">ACT I · STREET</text>';
+  marks += '<rect x="150" y="385" width="130" height="22" rx="4" fill="#121212"/><text class="cr-act" x="156" y="400">ACT II · RALLY</text>';
+  marks += '<rect x="10" y="8" width="120" height="22" rx="4" fill="#121212"/><text class="cr-act" x="16" y="23">ACT III · TOUR</text>';
+  marks += '<text x="175" y="55" font-family="Atkinson Hyperlegible,sans-serif" font-size="11" fill="#121212" opacity=".75">Coming soon</text>';
+  marks += '<text x="220" y="245" font-family="Atkinson Hyperlegible,sans-serif" font-size="11" fill="#121212" opacity=".75">Coming soon</text>';
+  stops.forEach(s => {
+    const ch = CAREER_CH[s.n - 1], open = s.n === 1;
+    const cls = open ? 'cr-stop open' : 'cr-stop lock';
+    const title = open ? `Ch. ${s.n} · ${ch.title}` : `Ch. ${s.n} · Coming soon`;
+    marks += `<g class="${cls}" data-ch="${s.n}" role="button" tabindex="${open ? 0 : -1}" aria-label="${title.replace(/"/g, '')}" ${open ? '' : 'aria-disabled="true"'}>` +
+      `<circle class="dot" cx="${s.x}" cy="${s.y}" r="18"/>` +
+      (open ? `<text text-anchor="middle" x="${s.x}" y="${s.y + 6}" font-size="16">${s.n}</text>` :
+        `<text class="cr-lock" text-anchor="middle" x="${s.x}" y="${s.y + 5}">🔒</text>`) +
+      `</g>`;
+  });
+  $('crMap').innerHTML = `<svg viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">` +
+    `<rect width="300" height="420" fill="#73c6ec"/>` +
+    `<path d="M0 380 Q80 350 150 370 T300 360 L300 420 H0Z" fill="#fff2d2"/>` +
+    `<path d="M0 0 H300 V50 Q200 80 150 40 T0 60Z" fill="#3f9fd0" opacity=".55"/>` +
+    `<path d="${path}" fill="none" stroke="#2c2d33" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="${path}" fill="none" stroke="#fff2d2" stroke-width="6" stroke-dasharray="16 14" stroke-linecap="round"/>` +
+    `<path d="${path}" fill="none" stroke="#121212" stroke-width="3" stroke-linecap="round" opacity=".35"/>` +
+    marks + `</svg>`;
+  const tip = S.career.clue['1'] ? 'Clue 1 is in your scrapbook.' : `Stop 1 open · stamp ${CAREER_CLUE_NEED} levels for the clue (${precStampedCount()}/${CAREER_CLUE_NEED}). Stops 2–9 coming soon.`;
+  $('crMapTip').textContent = tip;
+}
+
+function showCareerCh(n) {
+  ensureCareer();
+  const ch = CAREER_CH[n - 1]; if (!ch || n !== 1) return show('vCareer');
+  show('vCareerCh');
+  const stamped = precStampedCount(), of = 6, pct = Math.round(100 * stamped / of);
+  const stripSeen = !!S.career.strip['1'];
+  const lessonDone = !!S.career.lesson['1'];
+  const clue = !!S.career.clue['1'];
+  $('crHub').innerHTML = `
+    <span class="cr-tag">ACT ${ch.act} · ${ch.actName.toUpperCase()}</span>
+    <h2 class="cr-title" style="font-size:clamp(24px,6.5vw,34px)">Ch. ${ch.n} · ${ch.title}</h2>
+    <p class="cr-sub">${ch.plate} · ${ch.math}</p>
+    <div class="cr-card">
+      <h3>Progress</h3>
+      <p>${stamped} of ${of} Precedence levels stamped · clue at ${CAREER_CLUE_NEED}${clue ? ' · clue earned ✓' : ''}</p>
+      <div class="cr-bar" aria-label="Chapter progress"><i style="width:${pct}%"></i></div>
+    </div>
+    <div class="cr-actions">
+      <button type="button" class="big career" id="crWatch"><b>${stripSeen ? 'Watch strip again' : 'Comic strip'}</b><span>${stripSeen ? 'The Racing Line · 4 panels' : 'Tap through 4 panels'}</span></button>
+      <button type="button" class="big practice" id="crLesson"><b>Garage lesson</b><span>${lessonDone ? 'Replay guided drive with Marge' : "Marge's tip · guided practice"}</span></button>
+      <button type="button" class="big rally" id="crDrills"><b>Drills</b><span>Open Permit levels · stamp them here</span></button>
+    </div>
+    <p class="tip">Education first: stamp levels in Drills. The Masked Driver's clue drops into the scrapbook after ${CAREER_CLUE_NEED} stamps.</p>`;
+  $('crWatch').onclick = () => openStrip(1);
+  $('crLesson').onclick = () => startCareerLesson(1);
+  $('crDrills').onclick = () => {
+    S.lic = 1; save(); show('vHome');
+  };
+  // First visit: autoplay strip if not seen
+  if (!stripSeen) setTimeout(() => openStrip(1), 180);
+}
+
+function openStrip(ch) {
+  ensureCareer();
+  crStrip = { ch, i: 0 };
+  const seen = !!S.career.strip[String(ch)];
+  $('crStripSkip').hidden = !seen;
+  $('crStripTag').textContent = 'ACT ' + CAREER_CH[ch - 1].act + ' · ' + CAREER_CH[ch - 1].actName.toUpperCase();
+  paintStrip();
+  $('crStrip').hidden = false;
+}
+function paintStrip() {
+  const i = crStrip.i, last = i >= CR_PANELS.length - 1;
+  $('crStripPn').textContent = String(i + 1);
+  $('crStripArt').innerHTML = CR_PANELS[i] || '';
+  $('crStripHint').textContent = last ? 'Tap to enter the garage' : 'Tap to continue';
+  $('crStripNext').textContent = last ? 'Continue' : 'Next';
+}
+function advanceStrip() {
+  if (crStrip.i < CR_PANELS.length - 1) { crStrip.i++; paintStrip(); return; }
+  closeStrip(true);
+}
+function closeStrip(finished) {
+  $('crStrip').hidden = true;
+  ensureCareer();
+  if (finished || crStrip.i > 0) { S.career.strip[String(crStrip.ch)] = 1; save(); }
+  showCareerCh(crStrip.ch);
+}
+
+function startCareerLesson(ch) {
+  ensureCareer();
+  S.lic = 1; S.level = 1; save();
+  const tip = CAREER_CH[ch - 1].tip, pip = CAREER_CH[ch - 1].pip;
+  if ($('crMargeLine')) $('crMargeLine').textContent = tip;
+  if ($('crPipLine')) $('crPipLine').textContent = pip;
+  start('practice');
+  if (G) { G.careerGuide = true; G.fromCareer = true; }
+  if ($('careerBubbles')) $('careerBubbles').hidden = false;
+  S.career.lesson[String(ch)] = 1; save();
+  if ($('hint')) $('hint').innerHTML = 'Tap the <b>operation</b> that comes next. Marge is coaching from the pit.';
+}
+
+function renderScrapbook() {
+  ensureCareer();
+  const clue1 = !!S.career.clue['1'];
+  let h = '';
+  if (clue1) {
+    h += `<div class="cr-clue"><div class="lab">Clue 1 · Street Circuit</div><div class="chalk">( )</div><p>Chalk on the asphalt after he passed you. Brackets first — the racing line has an order.</p></div>`;
+  } else {
+    h += `<div class="cr-empty">No clues yet. Stamp ${CAREER_CLUE_NEED} Precedence levels in Career → Drills (you have ${precStampedCount()}).</div>`;
+  }
+  $('crBook').innerHTML = h;
+}
+
+// Career wiring
+if ($('goCareer')) $('goCareer').addEventListener('click', () => show('vCareer'));
+if ($('crBack')) $('crBack').addEventListener('click', () => show('vHome'));
+if ($('crChBack')) $('crChBack').addEventListener('click', () => show('vCareer'));
+if ($('crScrapBtn')) $('crScrapBtn').addEventListener('click', () => show('vScrap'));
+if ($('crScrapBack')) $('crScrapBack').addEventListener('click', () => show('vCareer'));
+if ($('crMap')) $('crMap').addEventListener('click', e => {
+  const g = e.target.closest('.cr-stop'); if (!g) return;
+  const n = +g.dataset.ch; if (n === 1) showCareerCh(1);
+  else if ($('crMapTip')) { $('crMapTip').textContent = `Ch. ${n} · Coming soon`; }
+});
+if ($('crMap')) $('crMap').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const g = e.target.closest('.cr-stop'); if (!g) return;
+  e.preventDefault(); const n = +g.dataset.ch; if (n === 1) showCareerCh(1);
+});
+function stripTap(e) {
+  if (e.target.closest('#crStripSkip')) return;
+  if (e.target.closest('#crStripNext') || e.target.closest('.cr-frame') || e.target.closest('.cr-panel') || e.currentTarget === $('crStrip')) advanceStrip();
+}
+if ($('crStrip')) {
+  $('crStrip').addEventListener('click', stripTap);
+  $('crStripNext').addEventListener('click', e => { e.stopPropagation(); advanceStrip(); });
+  $('crStripSkip').addEventListener('click', e => { e.stopPropagation(); closeStrip(true); });
+}
 
 /* ---------- splash and PRESS START ---------- */
 // First visit: starting lights, the car blasts in and skids, the title slams down, then the PRESS START loop.
