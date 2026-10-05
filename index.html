@@ -293,9 +293,172 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .signs.alg .sign .gr.plot{width:100%;max-width:132px}.signs.alg .sign .gr.nl{width:100%}
 .hint-line .mv{color:var(--good);font-weight:700}
 @media (prefers-reduced-motion:reduce){.coin,.sign.hint,.sign.wrong{animation:none}.op.hint,.op.wrong,.card.shake,.expr .n.fresh,.pen i.show{animation:none}.expr .grp{transition:none}}
+/* ---------- splash and PRESS START: an original 60s cartoon-racing intro (flat red, cream, sky blue, black; thick outlines) ---------- */
+body.splashing{overflow:hidden}
+.sp{--red:#e2352c;--cream:#fff2d2;--sky:#73c6ec;--sky2:#62bae6;--ink:#121212;position:fixed;inset:0;z-index:1000;overflow:hidden;background:var(--sky);color:var(--ink);font-family:var(--display);-webkit-user-select:none;user-select:none;cursor:pointer;touch-action:manipulation;transform-origin:left center;backface-visibility:hidden}
+.sp-scene{position:absolute;inset:0;overflow:hidden}
+.sp-sky{position:absolute;inset:0;overflow:hidden;background:var(--sky)}
+.sp-sky::before{content:"";position:absolute;left:50%;top:26%;width:260vmax;height:260vmax;margin:-130vmax 0 0 -130vmax;background:repeating-conic-gradient(var(--sky) 0 7.5deg,var(--sky2) 7.5deg 15deg);animation:spSpin 120s linear infinite}
+.sp-sky::after{content:"";position:absolute;inset:0;background:radial-gradient(rgba(18,18,18,.09) 1px,transparent 1.7px) 0 0/7px 7px}
+.sp-hills{position:absolute;left:0;bottom:46%;width:100%;height:11%;display:block}
+.sp-signs{position:absolute;left:0;right:0;bottom:46%;height:0;z-index:1}
+.sgn{position:absolute;bottom:0;left:100%;display:flex;flex-direction:column;align-items:center;animation:spWhip var(--d,2.5s) linear var(--dl,0s) infinite paused}
+.sgn b{display:grid;place-items:center;width:clamp(36px,10vw,50px);height:clamp(36px,10vw,50px);background:var(--cream);border:3px solid var(--ink);border-radius:8px;color:var(--red);font-weight:900;font-size:clamp(22px,6.4vw,32px);line-height:1;box-shadow:3px 3px 0 var(--ink)}
+.sgn b .xv{font-family:var(--body);font-style:italic;font-weight:700;font-size:.82em;white-space:nowrap}.sgn b sup{font-size:.6em;margin-left:1px;font-style:normal}
+.sgn.dia b{transform:rotate(45deg);border-radius:6px}.sgn.dia b span{transform:rotate(-45deg)}
+.sgn i{display:block;width:5px;height:clamp(22px,6vh,40px);background:var(--ink)}
+.sp-title{position:absolute;left:0;right:0;top:8%;text-align:center;z-index:2;pointer-events:none}
+.sp-tin{display:inline-block;opacity:0}
+.sp-tag{display:inline-block;background:var(--ink);color:var(--cream);font-weight:800;font-size:clamp(12px,3.4vw,16px);letter-spacing:.22em;padding:4px 12px 3px;border-radius:3px;transform:skewX(-9deg);margin-bottom:6px}
+.sp-ttl{display:block;font-weight:900;text-transform:uppercase;line-height:.84;transform:skewX(-9deg);
+  --o:3px;--o2:4px;text-shadow:calc(-1*var(--o)) calc(-1*var(--o)) 0 var(--ink),var(--o) calc(-1*var(--o)) 0 var(--ink),calc(-1*var(--o)) var(--o) 0 var(--ink),var(--o) var(--o) 0 var(--ink),0 calc(-1*var(--o2)) 0 var(--ink),0 var(--o2) 0 var(--ink),calc(-1*var(--o2)) 0 0 var(--ink),var(--o2) 0 0 var(--ink),6px 6px 0 var(--ink),8px 8px 0 var(--ink),9px 9px 0 var(--ink)}
+.sp-ttl .t1{display:block;color:var(--red);font-size:clamp(40px,min(14vw,9.5vh),92px);letter-spacing:.12em}
+.sp-ttl .t2{display:block;color:var(--cream);font-size:clamp(92px,min(36vw,23vh),220px);letter-spacing:.02em;--o:4px;--o2:5px;text-shadow:-4px -4px 0 var(--ink),4px -4px 0 var(--ink),-4px 4px 0 var(--ink),4px 4px 0 var(--ink),0 -5px 0 var(--ink),0 5px 0 var(--ink),-5px 0 0 var(--ink),5px 0 0 var(--ink),9px 8px 0 var(--red),12px 11px 0 var(--red),14px 13px 0 var(--ink),15px 14px 0 var(--ink)}
+.sp-road{position:absolute;left:0;right:0;bottom:22%;height:24%;background:#2c2d33;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);z-index:3}
+.sp-road::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:repeating-linear-gradient(90deg,var(--red) 0 28px,var(--cream) 28px 56px);border-bottom:3px solid var(--ink);animation:spKerb .3s linear infinite paused}
+.sp-road::after{content:"";position:absolute;left:0;right:0;top:56%;height:8px;background:repeating-linear-gradient(90deg,var(--cream) 0 46px,transparent 46px 100px);animation:spDash .26s linear infinite paused}
+.sp-ground{position:absolute;left:0;right:0;bottom:0;height:22%;background:var(--cream);z-index:3}
+.sp-ground::after{content:"";position:absolute;inset:0;background:radial-gradient(rgba(226,53,44,.16) 1.2px,transparent 1.9px) 0 0/8px 8px}
+.sp-car{position:absolute;left:50%;bottom:25%;width:min(80vw,440px);transform:translateX(-50%);z-index:4;pointer-events:none}
+.car-x{position:relative;transform:translateX(-170vw)}
+.car-sh{position:relative}
+.sp-car svg.car{display:block;width:100%;height:auto;overflow:visible}
+.sp-car .wh{transform-box:fill-box;transform-origin:center;animation:spWheel .28s linear infinite paused}
+.sp-lines{position:absolute;right:94%;top:16%;width:70%;height:66%;opacity:0}
+.sp-lines span{position:absolute;right:0;height:5px;border-radius:3px;background:var(--cream);box-shadow:0 0 0 2px var(--ink)}
+.sp-lines span:nth-child(1){top:0;width:70%}.sp-lines span:nth-child(2){top:22%;width:100%;background:var(--red);height:4px}.sp-lines span:nth-child(3){top:44%;width:85%}.sp-lines span:nth-child(4){top:66%;width:55%;background:var(--red);height:4px}.sp-lines span:nth-child(5){top:88%;width:95%}
+.sp-puff{position:absolute;left:-10%;bottom:-2%;width:34%;height:60%;pointer-events:none}
+.sp-puff span{position:absolute;border-radius:50%;background:var(--cream);border:3px solid var(--ink);transform:scale(0);opacity:0}
+.sp-puff span:nth-child(1){left:40%;bottom:0;width:38%;aspect-ratio:1}.sp-puff span:nth-child(2){left:12%;bottom:12%;width:46%;aspect-ratio:1}.sp-puff span:nth-child(3){left:-8%;bottom:30%;width:34%;aspect-ratio:1}.sp-puff span:nth-child(4){left:26%;bottom:44%;width:30%;aspect-ratio:1}
+.sp-pow{position:absolute;width:42%;left:-14%;top:-46%;opacity:0;transform:scale(0) rotate(-10deg);pointer-events:none}
+.sp-pow.vroom{left:auto;right:-2%;top:-52%}
+.sp-pow svg{display:block;width:100%;height:auto;overflow:visible}
+.sp-banner{position:absolute;left:50%;bottom:7%;z-index:5;transform:translateX(-50%) rotate(-3deg) scale(0);border:0;padding:0;background:none;color:var(--cream);font-family:var(--display);opacity:0}
+.sp-banner .bx{display:block;background:var(--red);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:0;min-width:min(78vw,380px)}
+.sp-banner .ck{display:block;height:14px;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/14px 14px}
+.sp-banner .ps{display:block;font-weight:900;font-size:clamp(30px,9vw,50px);letter-spacing:.08em;line-height:1;padding:9px 18px 7px;text-shadow:3px 3px 0 var(--ink);animation:spBlink 1.1s steps(1) infinite}
+.sp-banner:focus-visible{outline:4px solid var(--ink);outline-offset:6px}
+.sp-hint{position:absolute;left:0;right:0;bottom:calc(1.6% + env(safe-area-inset-bottom));z-index:5;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);opacity:0;transition:opacity .4s}
+.sp-mute{position:absolute;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));z-index:30;width:40px;height:40px;border-radius:999px;border:3px solid var(--ink);background:var(--cream);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:2px 2px 0 var(--ink)}
+.sp-mute svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.sp-mute:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.sp-intro{position:absolute;inset:0;z-index:20;background:#000;display:grid;place-items:center;transition:opacity .3s}
+.sp-tree{display:flex;flex-direction:column;gap:clamp(10px,2.4vh,18px);padding:clamp(12px,2.6vh,18px);background:#1c1c1c;border:4px solid #3a3a3a;border-radius:18px}
+.sp-tree i{display:block;width:clamp(48px,14vw,72px);aspect-ratio:1;border-radius:50%;background:#2c1414;border:4px solid #000;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35);transition:background .08s,box-shadow .08s}
+.sp.s-l1 .sp-tree i:nth-child(1),.sp.s-l2 .sp-tree i:nth-child(2),.sp.s-l3 .sp-tree i:nth-child(3){background:#ff3b2f;box-shadow:0 0 28px 6px rgba(255,59,47,.55),inset 0 -6px 0 rgba(0,0,0,.2)}
+.sp.s-gr .sp-tree i{background:#3ee06a!important;box-shadow:0 0 34px 8px rgba(62,224,106,.6),inset 0 -6px 0 rgba(0,0,0,.2)!important}
+.sp.s-scene .sp-intro{opacity:0;pointer-events:none}
+.sp.s-scene .sgn{animation-play-state:running}
+.sp.s-scene .sp-car .wh{animation-play-state:running}
+.sp.s-car .car-x{animation:spCarIn .9s cubic-bezier(.15,.75,.35,1) forwards}
+.sp.s-car .sp-lines{animation:spLines .9s ease-out forwards}
+.sp.s-skid .sp-puff span{animation:spPuff 1s ease-out forwards}
+.sp.s-skid .sp-puff span:nth-child(2){animation-delay:.06s}.sp.s-skid .sp-puff span:nth-child(3){animation-delay:.12s}.sp.s-skid .sp-puff span:nth-child(4){animation-delay:.18s}
+.sp.s-skid .sp-pow.screech{animation:spPow 1.1s ease-out forwards}
+.sp.s-title .sp-tin{animation:spSlam .7s cubic-bezier(.3,.7,.4,1) forwards}
+.sp.s-title .sp-scene{animation:spThud .32s .36s ease-out}
+.sp.s-loop .sp-road::before,.sp.s-loop .sp-road::after{animation-play-state:running}
+.sp.s-loop .car-sh{animation:spIdle .16s steps(2) infinite}
+.sp.s-loop .sp-banner{animation:spBanner .45s cubic-bezier(.3,1.6,.5,1) forwards}
+.sp.s-loop .sp-hint{opacity:.7}
+.sp.s-skip .sp-intro{display:none}
+.sp.s-skip .car-x{animation:none;transform:none}
+.sp.s-skip .sp-lines,.sp.s-skip .sp-puff span,.sp.s-skip .sp-pow.screech{animation:none;opacity:0}
+.sp.s-skip .sp-tin{animation:none;opacity:1}
+.sp.s-skip .sp-scene{animation:spFade .35s ease-out}
+.sp.s-rev .car-sh{animation:spRev .06s linear infinite}
+.sp.s-out .car-x{animation:spCarOut .55s cubic-bezier(.55,0,.9,.55) forwards}
+.sp.s-out .sp-lines{animation:spLinesOut .55s ease-in forwards}
+.sp.s-out .sp-pow.vroom{animation:spPow .9s ease-out forwards}
+.sp.s-out .sp-banner{animation:spBannerOut .3s ease-in forwards}
+.sp::after{content:"";position:absolute;inset:0;z-index:40;border:7px solid var(--ink);background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.5));opacity:0;pointer-events:none}
+.sp.s-turn{animation:spTurn .6s cubic-bezier(.55,0,.75,.4) forwards;pointer-events:none}
+.sp.s-turn::after{animation:spShade .6s ease-in forwards}
+.sp.s-fade{transition:opacity .3s;opacity:0;pointer-events:none}
+@keyframes spSpin{to{transform:rotate(360deg)}}
+@keyframes spWhip{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 140px))}}
+@keyframes spKerb{to{background-position:-56px 0}}
+@keyframes spDash{to{background-position:-100px 0}}
+@keyframes spWheel{to{transform:rotate(360deg)}}
+@keyframes spCarIn{0%{transform:translateX(-170vw) skewX(-16deg)}52%{transform:translateX(7vw) skewX(-12deg)}66%{transform:translateX(3vw) rotate(-3deg) skewX(5deg)}82%{transform:translateX(-1vw) rotate(1.2deg)}100%{transform:none}}
+@keyframes spLines{0%,50%{opacity:1}100%{opacity:0}}
+@keyframes spLinesOut{0%{opacity:0}30%,100%{opacity:1}}
+@keyframes spPuff{0%{transform:scale(0) translate(0,0);opacity:1}35%{transform:scale(1.1) translate(-6%,-4%);opacity:1}100%{transform:scale(1.5) translate(-30%,-24%);opacity:0}}
+@keyframes spPow{0%{opacity:0;transform:scale(0) rotate(-14deg)}18%{opacity:1;transform:scale(1.15) rotate(-6deg)}30%,70%{opacity:1;transform:scale(1) rotate(-8deg)}100%{opacity:0;transform:scale(1.1) rotate(-8deg)}}
+@keyframes spSlam{0%{opacity:0;transform:translateY(-75vh) scale(1.6)}50%{opacity:1;transform:translateY(0) scale(1.12,.82)}68%{transform:translateY(-5%) scale(.96,1.06)}84%{transform:translateY(0) scale(1.02,.98)}100%{opacity:1;transform:none}}
+@keyframes spThud{0%{transform:translateY(0)}30%{transform:translateY(7px)}60%{transform:translateY(-3px)}100%{transform:none}}
+@keyframes spIdle{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(-1.5px) rotate(-.35deg)}}
+@keyframes spRev{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(-2px,-2px) rotate(-1.2deg)}100%{transform:translate(1px,0) rotate(.5deg)}}
+@keyframes spCarOut{0%{transform:none}20%{transform:translateX(-3vw) rotate(-4deg)}100%{transform:translateX(170vw) skewX(-16deg)}}
+@keyframes spBanner{0%{opacity:0;transform:translateX(-50%) rotate(-3deg) scale(0)}100%{opacity:1;transform:translateX(-50%) rotate(-3deg) scale(1)}}
+@keyframes spBannerOut{0%{opacity:1;transform:translateX(-50%) rotate(-3deg) scale(1)}100%{opacity:0;transform:translateX(-50%) rotate(-3deg) scale(.6)}}
+@keyframes spBlink{0%{opacity:1}55%{opacity:.08}}
+@keyframes spFade{from{opacity:0}to{opacity:1}}
+@keyframes spTurn{0%{transform:perspective(1400px) rotateY(0)}100%{transform:perspective(1400px) rotateY(-100deg)}}
+@keyframes spShade{0%{opacity:0}25%{opacity:1}100%{opacity:1}}
+/* reduced motion: a short, still version. Lights, a fade to the parked car, a steady banner, a plain fade out */
+.sp.rm *,.sp.rm::before,.sp.rm::after,.sp.rm .sp-sky::before{animation:none!important}
+.sp.rm .car-x{transform:none}
+.sp.rm .sp-lines,.sp.rm .sp-puff,.sp.rm .sp-pow{display:none}
+.sp.rm .sgn{left:var(--x)}
+.sp.rm .sp-tin{transition:opacity .4s}.sp.rm.s-title .sp-tin{opacity:1}
+.sp.rm .sp-banner{transition:opacity .4s;transform:translateX(-50%) rotate(-3deg)}.sp.rm.s-loop .sp-banner{opacity:1}
+.sp.rm .sp-intro{transition:opacity .4s}
 </style>
 </head>
 <body>
+
+<!-- SPLASH: PRESS START. Removed from the page once you're through it -->
+<div class="sp" id="splash" role="dialog" aria-modal="true" aria-label="The Road. Press start">
+  <div class="sp-scene">
+    <div class="sp-sky"></div>
+    <svg class="sp-hills" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40V26C30 14 52 12 80 22S130 34 160 18 210 4 240 16 300 34 330 20 380 10 400 18V40Z" fill="#3f9fd0" stroke="#121212" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+    <div class="sp-signs" aria-hidden="true">
+      <div class="sgn dia" style="--dl:0s;--x:8%"><b><span>+</span></b><i></i></div>
+      <div class="sgn" style="--dl:.5s;--x:28%"><b>−</b><i></i></div>
+      <div class="sgn dia" style="--dl:1s;--x:48%"><b><span>×</span></b><i></i></div>
+      <div class="sgn" style="--dl:1.5s;--x:68%"><b>÷</b><i></i></div>
+      <div class="sgn" style="--dl:2s;--x:86%"><b><span class="xv">x<sup>2</sup></span></b><i></i></div>
+    </div>
+    <div class="sp-title" aria-hidden="true"><div class="sp-tin"><span class="sp-tag">MATHERA</span><span class="sp-ttl"><span class="t1">THE</span><span class="t2">ROAD</span></span></div></div>
+    <div class="sp-road"></div>
+    <div class="sp-ground"></div>
+    <div class="sp-car" aria-hidden="true"><div class="car-x">
+      <div class="sp-lines"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="car-sh">
+        <svg class="car" viewBox="0 0 260 110">
+          <defs><clipPath id="spBody"><path d="M18 84C10 78 10 60 16 52L22 34 38 32 46 46H92C96 40 100 38 104 38L140 40C150 42 156 46 160 48 196 52 226 58 244 70 252 75 250 84 242 86H222A22 22 0 0 0 178 86H84A22 22 0 0 0 40 86Z"/></clipPath></defs>
+          <path d="M14 66H3M14 74H5" stroke="#121212" stroke-width="6" stroke-linecap="round"/><path d="M14 66H5M14 74H7" stroke="#9aa3ab" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="116" cy="32" r="13" fill="#e2352c" stroke="#121212" stroke-width="3.5"/>
+          <path d="M116 22a10 10 0 0 1 9 5" fill="none" stroke="#fff2d2" stroke-width="3" stroke-linecap="round"/>
+          <path d="M119 28h9a4.5 4.5 0 0 1 0 9h-9z" fill="#73c6ec" stroke="#121212" stroke-width="2.5"/>
+          <path d="M18 84C10 78 10 60 16 52L22 34 38 32 46 46H92C96 40 100 38 104 38L140 40C150 42 156 46 160 48 196 52 226 58 244 70 252 75 250 84 242 86H222A22 22 0 0 0 178 86H84A22 22 0 0 0 40 86Z" fill="#fff2d2"/>
+          <g clip-path="url(#spBody)">
+            <path d="M0 30H48L52 48H0Z" fill="#e2352c"/>
+            <path d="M0 59L260 63V71L0 67Z" fill="#e2352c"/>
+            <path d="M226 40H262V100H214C222 80 224 60 226 40Z" fill="#e2352c"/>
+            <path d="M60 51H150C170 52 200 56 222 63" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+          </g>
+          <path d="M18 84C10 78 10 60 16 52L22 34 38 32 46 46H92C96 40 100 38 104 38L140 40C150 42 156 46 160 48 196 52 226 58 244 70 252 75 250 84 242 86H222A22 22 0 0 0 178 86H84A22 22 0 0 0 40 86Z" fill="none" stroke="#121212" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M136 41C137 33 142 29 150 30" fill="none" stroke="#121212" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="131" cy="65" r="13" fill="#fff2d2" stroke="#121212" stroke-width="3"/>
+          <text x="130" y="70" text-anchor="middle" font-family="Atkinson Hyperlegible,system-ui,sans-serif" font-style="italic" font-weight="700" font-size="15" fill="#121212">x<tspan dy="-6" font-size="9" font-style="normal">2</tspan></text>
+          <circle cx="238" cy="72" r="5" fill="#fff9e6" stroke="#121212" stroke-width="2.5"/>
+          <g class="wh"><circle cx="62" cy="86" r="17" fill="#121212"/><circle cx="62" cy="86" r="9" fill="#fff2d2" stroke="#121212" stroke-width="2"/><path d="M62 78V94M54 86H70" stroke="#e2352c" stroke-width="3"/><circle cx="62" cy="86" r="2.5" fill="#121212"/></g>
+          <g class="wh"><circle cx="200" cy="86" r="17" fill="#121212"/><circle cx="200" cy="86" r="9" fill="#fff2d2" stroke="#121212" stroke-width="2"/><path d="M200 78V94M192 86H208" stroke="#e2352c" stroke-width="3"/><circle cx="200" cy="86" r="2.5" fill="#121212"/></g>
+        </svg>
+        <div class="sp-puff"><span></span><span></span><span></span><span></span></div>
+        <div class="sp-pow screech"><svg viewBox="0 0 200 100"><polygon points="196,50 157,58 183,74 142,71 148,92 115,79 100,98 85,79 52,92 58,71 17,74 43,58 4,50 43,42 17,26 58,29 52,8 85,21 100,2 115,21 148,8 142,29 183,26 157,42" fill="#fff2d2" stroke="#121212" stroke-width="4" stroke-linejoin="round"/><text x="100" y="60" text-anchor="middle" font-family="Big Shoulders Display,Impact,sans-serif" font-weight="900" font-size="30" fill="#e2352c" stroke="#121212" stroke-width="1.2">SKREE!</text></svg></div>
+        <div class="sp-pow vroom"><svg viewBox="0 0 200 100"><polygon points="196,50 157,58 183,74 142,71 148,92 115,79 100,98 85,79 52,92 58,71 17,74 43,58 4,50 43,42 17,26 58,29 52,8 85,21 100,2 115,21 148,8 142,29 183,26 157,42" fill="#fff2d2" stroke="#121212" stroke-width="4" stroke-linejoin="round"/><text x="100" y="61" text-anchor="middle" font-family="Big Shoulders Display,Impact,sans-serif" font-weight="900" font-size="32" fill="#e2352c" stroke="#121212" stroke-width="1.2">VROOM!</text></svg></div>
+      </div>
+    </div></div>
+    <button type="button" class="sp-banner" id="spStart" aria-label="Press start"><span class="bx"><span class="ck"></span><span class="ps">PRESS START</span><span class="ck"></span></span></button>
+    <div class="sp-hint" aria-hidden="true">Tap anywhere · Enter · Space</div>
+  </div>
+  <div class="sp-intro" aria-hidden="true"><div class="sp-tree"><i></i><i></i><i></i></div></div>
+  <button type="button" class="sp-mute" id="spMute" aria-label="Sound"></button>
+</div>
+
 
 <div class="app">
   <div class="top">
@@ -8376,13 +8539,77 @@ $('setBack').addEventListener('click', () => show('vHome'));
 $('themeSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.theme = b.dataset.t || null; save(); applyTheme(); renderSet(); });
 let resetArm = false;
 $('reset').addEventListener('click', () => { if (!resetArm) { resetArm = true; $('reset').textContent = 'Tap again to erase everything'; setTimeout(() => { resetArm = false; $('reset').textContent = 'Start over'; }, 3000); return; }
-  S = Object.assign(blank(), { theme: S.theme, sound: S.sound }); save(); resetArm = false; $('reset').textContent = 'Start over'; $('setMsg').textContent = 'Erased. A fresh board is ready.'; });
+  S = Object.assign(blank(), { theme: S.theme, sound: S.sound, splashSeen: S.splashSeen }); save(); resetArm = false; $('reset').textContent = 'Start over'; $('setMsg').textContent = 'Erased. A fresh board is ready.'; });
 $('copyLog').addEventListener('click', () => { const t = JSON.stringify(S.log, null, 1); const done = () => $('logMsg').textContent = 'Copied.';
   if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, () => $('logMsg').textContent = 'Copy blocked here.'); else $('logMsg').textContent = 'Copy blocked here.'; });
 $('sndBtn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSnd(); if (S.sound) SND.solved(); });
 $('thmBtn').addEventListener('click', () => { S.theme = isDark() ? 'light' : 'dark'; save(); applyTheme(); if (!$('vSet').hidden) renderSet(); });
 window.__prec = { RIDES, rideFor, odoRide, S: () => S, G: () => G, tap, pick, aPick, aTap, bPick, bStart, bLevel, BENCH, E, RD, A, LV, stampOf, tuneUp, hotParts, stepIsPictorial, PIC_IDS };
 applyTheme(); renderSnd(); show('vHome');
+
+/* ---------- splash and PRESS START ---------- */
+// First visit: starting lights, the car blasts in and skids, the title slams down, then the PRESS START loop.
+// After that (S.splashSeen) it opens straight on the loop. A tap during the intro skips to the loop; a tap on the loop revs,
+// the car peels off and the page turns to the menu. Sound only after a tap, and only if sound is on.
+(function splash() {
+  const sp = $('splash'); if (!sp) return;
+  if (FR) { sp.remove(); return; }
+  const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const app = document.querySelector('.app'), mute = $('spMute');
+  let state = 'intro', timers = [];
+  const at = (ms, f) => timers.push(setTimeout(f, ms));
+  const add = (...c) => sp.classList.add(...c);
+  app.setAttribute('inert', ''); app.setAttribute('aria-hidden', 'true'); document.body.classList.add('splashing');
+  if (RM) add('rm');
+  const renderMute = () => { mute.innerHTML = S.sound
+    ? '<svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>';
+    mute.setAttribute('aria-pressed', String(!S.sound)); mute.setAttribute('aria-label', S.sound ? 'Mute' : 'Unmute'); };
+  function engine(dur, f0, f1, vol) { // a little Web Audio engine: two detuned saws through a lowpass
+    if (!S.sound) return; const c = ac(); if (!c) return; const t = c.currentTime, g = c.createGain(), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(700, t); lp.frequency.linearRampToValueAtTime(2600, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.04); g.gain.setValueAtTime(vol, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    [1, 0.503].forEach(m => { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f0 * m, t);
+      o.frequency.exponentialRampToValueAtTime(f0 * 2.4 * m, t + dur * 0.28); o.frequency.exponentialRampToValueAtTime(f0 * 1.7 * m, t + dur * 0.4);
+      o.frequency.exponentialRampToValueAtTime(f1 * m, t + dur); o.connect(lp); o.start(t); o.stop(t + dur + 0.02); });
+    lp.connect(g).connect(c.destination);
+  }
+  const revSnd = () => { engine(1.15, 60, 340, 0.075); if (S.sound) tone(1900, 0.28, 'triangle', 0.018, 0.4, 1300); };
+  const blip = () => { if (S.sound) { tone(660, 0.05, 'square', 0.035); tone(990, 0.08, 'square', 0.035, 0.05); } };
+  function toLoop(skip) {
+    timers.forEach(clearTimeout); timers = [];
+    if (skip) add('s-skip');
+    add('s-l1', 's-l2', 's-l3', 's-gr', 's-scene', 's-car', 's-title', 's-loop'); state = 'loop';
+    if (!S.splashSeen) { S.splashSeen = 1; save(); }
+  }
+  function done() {
+    timers.forEach(clearTimeout); timers = []; state = 'gone';
+    document.removeEventListener('keydown', onKey, true); sp.remove();
+    app.removeAttribute('inert'); app.removeAttribute('aria-hidden'); document.body.classList.remove('splashing');
+  }
+  function go() {
+    if (state === 'intro') { blip(); toLoop(true); return; } // a tap during the intro skips ahead to PRESS START
+    if (state !== 'loop') return; state = 'out';
+    if (!S.splashSeen) { S.splashSeen = 1; save(); }
+    revSnd();
+    if (RM) { add('s-fade'); at(330, done); return; }
+    add('s-rev'); at(380, () => add('s-out')); at(800, () => add('s-turn')); at(1420, done);
+  }
+  function onKey(e) {
+    if (state === 'gone' || e.target === mute) return;
+    if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') { e.preventDefault(); e.stopPropagation(); go(); }
+  }
+  sp.addEventListener('click', e => { if (e.target.closest('#spMute')) return; go(); });
+  mute.addEventListener('click', e => { e.stopPropagation(); S.sound = !S.sound; save(); renderMute(); renderSnd(); if (S.sound) blip(); });
+  document.addEventListener('keydown', onKey, true);
+  renderMute();
+  if (S.splashSeen) { toLoop(true); return; } // returning players open on the PRESS START loop
+  const T = RM ? { l1: 150, l2: 300, l3: 450, gr: 650, scene: 850, car: 850, skid: 850, title: 950, loop: 1350 }
+               : { l1: 500, l2: 1000, l3: 1500, gr: 2050, scene: 2350, car: 2420, skid: 2900, title: 3200, loop: 3950 };
+  at(T.l1, () => add('s-l1')); at(T.l2, () => add('s-l2')); at(T.l3, () => add('s-l3')); at(T.gr, () => add('s-gr'));
+  at(T.scene, () => add('s-scene')); at(T.car, () => add('s-car')); at(T.skid, () => add('s-skid')); at(T.title, () => add('s-title'));
+  at(T.loop, () => toLoop(false));
+})();
 })();
 </script>
 
